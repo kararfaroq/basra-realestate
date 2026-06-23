@@ -1,15 +1,15 @@
-// دالة رئيسية لتشغيل الكود بمجرد تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
     loadRealData();
 });
 
-// الدالة المسؤولة عن جلب البيانات من سيرفر Render وعرضها
 async function loadRealData() {
     const listingsContainer = document.getElementById('listings-container');
     const officesContainer = document.getElementById('offices-container');
+    const totalListingsEl = document.getElementById('total-listings');
+    const totalOfficesEl = document.getElementById('total-offices');
 
     try {
-        // طلب البيانات من مسار الـ API التابع لـ Render
+        // طلب البيانات من مسار الـ API التابع لسيرفر Render
         const response = await fetch('/api/get-data');
         
         if (!response.ok) {
@@ -18,13 +18,22 @@ async function loadRealData() {
 
         const data = await response.json();
 
-        // 1. عرض العقارات (Listings)
+        // تحديث العدادات الرقمية في أعلى الصفحة بناءً على البيانات الحية
+        if (totalListingsEl && data.listings) {
+            totalListingsEl.textContent = data.listings.length;
+        }
+        if (totalOfficesEl && data.offices) {
+            totalOfficesEl.textContent = data.offices.length;
+        }
+
+        // 1. عرض وتنسيق العقارات (Listings)
         if (listingsContainer) {
-            listingsContainer.innerHTML = ''; // تفريغ العناصر التجريبية القديمة
+            listingsContainer.innerHTML = ''; 
 
             if (data.listings && data.listings.length > 0) {
                 data.listings.forEach(item => {
                     const card = document.createElement('div');
+                    // إذا كان العقار مميزاً VIP يحصل على كلاس إضافي للتصميم
                     card.className = `card ${item.vip ? 'vip-card' : ''}`;
                     
                     card.innerHTML = `
@@ -55,9 +64,9 @@ async function loadRealData() {
             }
         }
 
-        // 2. عرض مكاتب الدلالية (Offices)
+        // 2. عرض وتنسيق مكاتب الدلالية (Offices)
         if (officesContainer) {
-            officesContainer.innerHTML = ''; // تفريغ المكاتب القديمة
+            officesContainer.innerHTML = ''; 
 
             if (data.offices && data.offices.length > 0) {
                 data.offices.forEach(office => {
