@@ -8,13 +8,8 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// تشغيل وقراءة الملفات الثابتة (CSS, JS, الصور) من المجلد الرئيسي
+// مشاركة المجلد الرئيسي بالكامل بما يحتويه من css و js وصور
 app.use(express.static(path.join(__dirname, '..')));
-
-// توجيه الرابط الرئيسي للموقع ليفتح ملف الواجهة index.html مباشرة
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'index.html'));
-});
 
 // مسار جلب البيانات الحية من قاعدة بيانات Neon
 app.get('/api/get-data', async (req, res) => {
@@ -38,6 +33,11 @@ app.get('/api/get-data', async (req, res) => {
   }
 });
 
+// توجيه أي مسار آخر ليفتح ملف index.html مباشرة
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'index.html'));
+});
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
-});
+ });
