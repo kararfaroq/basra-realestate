@@ -56,6 +56,7 @@
     .status-suspended { background:rgba(255,152,0,0.15); color:var(--warning); border:1px solid rgba(255,152,0,0.3); }
 
     .btn-renew { background:var(--success); color:white; border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-family:'Cairo'; font-size:11px; font-weight:600; }
+    .btn-renew:disabled { background: rgba(255,255,255,0.1); color: var(--text-muted); cursor: not-allowed; }
     .btn-suspend { background:var(--warning); color:var(--navy); border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-family:'Cairo'; font-size:11px; font-weight:700; }
     .btn-danger { background:var(--danger); color:white; border:none; padding:5px 12px; border-radius:6px; cursor:pointer; font-family:'Cairo'; font-size:12px; }
     .btn-outline-back { background:transparent; color:var(--text-muted); border:1px solid rgba(255,255,255,0.2); padding:6px 14px; border-radius:6px; text-decoration:none; font-size:13px; }
@@ -142,9 +143,9 @@
 </div>
 
 <script>
-  // قاعدة بيانات حية تحاكي شروط العمل الدقيقة
+  // قاعدة بيانات حية ومحدثة طبقاً لشروط العمل الجديدة
   let mockOffices = [
-    {id: "1", name:'مكتب الأمانة العقاري', area:'العشار', publishedProps: 2, pkg:'free', status:'active', allowPublish: true, expiry:'2026-07-10'},
+    {id: "1", name:'مكتب الأمانة العقاري', area:'العشار', publishedProps: 1, pkg:'free', status:'active', allowPublish: true, expiry:'مفتوح الصلاحية دائم'},
     {id: "2", name:'عقارات الخليج بالبصرة', area:'الجمهورية', publishedProps: 4, pkg:'eco', status:'active', allowPublish: false, expiry:'2026-07-24'},
     {id: "3", name:'مكتب الرافدين للاستثمار', area:'المعقل', publishedProps: 12, pkg:'gold', status:'expired', allowPublish: true, expiry:'2026-06-01'}
   ];
@@ -189,7 +190,8 @@
     if (!tbody) return;
 
     tbody.innerHTML = mockOffices.map(o => {
-      const isExpired = o.status === 'expired';
+      const isFree = o.pkg === 'free';
+      const isExpired = o.status === 'expired' && !isFree;
       let limitText = o.pkg === 'gold' ? '∞ مفتوح' : o.pkg === 'eco' ? 'اقصى 5' : 'اقصى 2';
       
       return `
@@ -202,8 +204,8 @@
             </span>
           </td>
           <td>
-            <span class="badge-status ${isExpired ? 'status-expired' : 'status-active'}">
-              ${isExpired ? '🔴 منتهي' : '🟢 نشط'}
+            <span class="badge-status ${isFree ? 'status-active' : (isExpired ? 'status-expired' : 'status-active')}">
+              ${isFree ? '🟢 نشط دائم' : (isExpired ? '🔴 منتهي' : '🟢 نشط')}
             </span>
           </td>
           <td>
@@ -211,7 +213,7 @@
               ${o.allowPublish ? '🟢 مسموح بالنشر' : '🔴 حظر إداري'}
             </span>
           </td>
-          <td style="font-family:monospace;">${o.expiry}</td>
+          <td style="font-family:monospace; font-size:12px;">${o.expiry}</td>
           <td>
             <select style="background:var(--navy); color:#fff; border:1px solid rgba(201,168,76,0.3); padding:4px; border-radius:6px; font-family:'Cairo'; font-size:11px;" onchange="changePackage('${o.id}', this.value)">
               <option value="free" ${o.pkg == 'free' ? 'selected' : ''}>مجاني</option>
@@ -220,7 +222,9 @@
             </select>
           </td>
           <td>
-            <button onclick="renewSubscriptionMonthly('${o.id}')" class="btn-renew">🔄 تجديد 30 يوم</button>
+            <button onclick="renewSubscriptionMonthly('${o.id}')" class="btn-renew" ${isFree ? 'disabled title="الباقة المجانية لا تحتاج لتجديد"' : ''}>
+              ${isFree ? '🚫 لا يتطلب' : '🔄 تجديد 30 يوم'}
+            </button>
           </td>
           <td>
             <button onclick="togglePublishStatus('${o.id}')" class="btn-suspend" style="background:${o.allowPublish?'var(--warning)':'var(--success)'}">
@@ -232,23 +236,25 @@
     }).join('');
   }
 
-  // دالة التجديد الشهري (إضافة 30 يوماً حركياً من تاريخ اللحظة الحالية)
+  // تجديد شهري يضيف 30 يوماً من اليوم للمكاتب ذات الباقات المدفوعة
   function renewSubscriptionMonthly(id) {
     const idx = mockOffices.findIndex(o => o.id === id);
     if (idx !== -1) {
+      if(mockOffices[idx].pkg === 'free') return;
+      
       const today = new Date();
-      today.setDate(today.getDate() + 30); // حساب تاريخ الانتهاء بعد 30 يوم تماماً
+      today.setDate(today.getDate() + 30);
       const expiryString = today.toISOString().split('T')[0];
       
       mockOffices[idx].status = 'active';
       mockOffices[idx].expiry = expiryString;
       
-      alert(`✅ تم تجديد الاشتراك الشهري لـ (${mockOffices[idx].name}) بنجاح!\nالصلاحية الجديدة تنتهي بتاريخ: ${expiryString} (بعد 30 يوماً).`);
+      alert(`✅ تم تجديد الاشتراك الشهري لـ (${mockOffices[idx].name}) بنجاح!\nتنتهي الصلاحية الجديدة في: ${expiryString}.`);
       renderOfficesTable();
     }
   }
 
-  // 🛑 دالة الإيقاف الإداري والمنع من النشر (صلاحية كاملة للمدير والمشرف)
+  // 🛑 إيقاف/تفعيل النشر الفوري بقرار من الإدارة
   function togglePublishStatus(id) {
     const idx = mockOffices.findIndex(o => o.id === id);
     if (idx !== -1) {
@@ -259,67 +265,82 @@
     }
   }
 
+  // عند تغيير الباقة، يتم تحديث الصلاحية والتواريخ تلقائياً
   function changePackage(id, newPkg) {
     const idx = mockOffices.findIndex(o => o.id === id);
     if (idx !== -1) {
       mockOffices[idx].pkg = newPkg;
-      alert(`🔹 تم تحويل باقة المكتب وسقف صلاحيات النشر إلى فئة [${newPkg}].`);
+      if (newPkg === 'free') {
+        mockOffices[idx].expiry = 'مفتوح الصلاحية دائم';
+        mockOffices[idx].status = 'active';
+      } else {
+        const today = new Date();
+        today.setDate(today.getDate() + 30);
+        mockOffices[idx].expiry = today.toISOString().split('T')[0];
+        mockOffices[idx].status = 'active';
+      }
+      alert(`🔹 تم تغيير الباقة إلى [${newPkg === 'free'?'مجانية':newPkg === 'eco'?'اقتصادية':'ذهبية'}] وتعديل سقف الصلاحيات والتواريخ.`);
       renderOfficesTable();
     }
   }
 
-  // محاكاة واجهة صاحب المكتب وحساب سقفه الإعلاني بناءً على باقته
+  // واجهة محاكاة صاحب المكتب
   function setupOfficeViewUI() {
     const banner = document.getElementById('officeStatusBanner');
-    // نربطه برمجياً ببيانات "مكتب الأمانة العقاري" للاختبار
     const myOffice = mockOffices[0]; 
     
     document.getElementById('currentOfficePropsCount').textContent = myOffice.publishedProps;
     
     let maxLimit = myOffice.pkg === 'gold' ? Infinity : myOffice.pkg === 'eco' ? 5 : 2;
     document.getElementById('packageLimitInfo').textContent = myOffice.pkg === 'gold' ? 
-      "🥇 باقتك ذهبية: عدد العقارات المسموح بنشرها غير محدود." : 
-      `ℹ️ سقف الباقة الحالية: مسموح لك بنشر ${maxLimit} عقارات كحد أقصى (مستهلك منها ${myOffice.publishedProps}).`;
+      "🥇 باقتك ذهبية: عدد العقارات المسموح بنشرها غير محدود بالدليل." : 
+      `ℹ️ سقف الباقة الحالية: مسموح لك بنشر ${maxLimit} عقارات نشطة معاً (مستهلك حالياً ${myOffice.publishedProps}).`;
 
+    // 1. فحص الإيقاف الإداري أولاً (أعلى سلطة)
     if (!myOffice.allowPublish) {
       banner.className = "status-suspended";
-      banner.innerHTML = `🛑 <strong>تنبيه إداري قطعي: تم إيقاف مكتبك عن النشر من قبل الإدارة!</strong><br>
-      على الرغم من أن حالة اشتراكك قد تكون سارية، إلا أن الإدارة قامت بـ (إيقاف النشر) لحسابك. يرجى التواصل مع الدليل لتسوية الحالة.`;
-    } else if (myOffice.status === 'expired') {
+      banner.innerHTML = `🛑 <strong>تنبيه قطعي: تم إيقاف مكتبك عن النشر من قبل إدارة الدليل!</strong><br>
+      حسابك موقف حالياً بقرار من المدير أو المشرف العقاري. يرجى مراجعة الإدارة لتسوية الحالة وإعادة تفعيل النشر.`;
+    } 
+    // 2. فحص انتهاء الصلاحية للباقات المدفوعة فقط
+    else if (myOffice.pkg !== 'free' && myOffice.status === 'expired') {
       banner.className = "status-expired";
-      banner.innerHTML = `⚠️ <strong>اشتراكك الشهري منتهٍ!</strong><br>انتهت الصلاحية بتاريخ ${myOffice.expiry}. يرجى السداد وتفعيل الاشتراك الشهري لمتابعة العمل.`;
-    } else {
+      banner.innerHTML = `⚠️ <strong>اشتراكك الشهري منتهٍ!</strong><br>انتهت صلاحية باقتك المدفوعة بتاريخ ${myOffice.expiry}. يرجى تجديد الاشتراك لمتابعة العمل وتفادي حجب الإعلانات.`;
+    } 
+    // 3. الحساب نشط وطبيعي
+    else {
       banner.className = "status-active";
-      banner.innerHTML = `🟢 <strong>حسابك نشط ومصرح له بالنشر</strong><br>باقة الحساب الحالية: [${myOffice.pkg}] - اشتراكك الشهري ينتهي بتاريخ: ${myOffice.expiry}.`;
+      banner.innerHTML = myOffice.pkg === 'free' ? 
+        `🟢 <strong>حسابك نشط بالباقة المجانية المفتوحة دائماً!</strong><br>لك صلاحية نشر حتى عقارين (2) في نفس الوقت بدون الحاجة للتجديد الشهري.` :
+        `🟢 <strong>حسابك نشط والاشتراك الشهري ساري!</strong><br>نوع الباقة: [${myOffice.pkg}] - ينتهي اشتراكك الحالي بتاريخ: ${myOffice.expiry}.`;
     }
   }
 
-  // محاكاة ذكية لفحص الصلاحيات عند محاولة إضافة عقار جديد من قبل صاحب المكتب
+  // محرك فحص الصلاحيات الذكي عند النشر
   function tryAddPropertyFromOffice() {
     const myOffice = mockOffices[0]; 
     
-    // 1. الفحص الرقابي الأول: هل هو موقوف من قبل المدير/المشرف؟
+    // الفحص 1: هل الحساب موقف إدارياً؟
     if (!myOffice.allowPublish) {
-      alert("❌ حظر إداري: لا يمكنك إضافة أي عقار! حسابك موقف عن النشر بقرار من إدارة الدليل حتى وإن كان الاشتراك مدفوعاً.");
+      alert("❌ حظر إداري: لا يمكنك إضافة عقارات! حسابك موقف عن النشر بقرار من إدارة الدليل.");
       return;
     }
     
-    // 2. الفحص الرقابي الثاني: انتهاء الصلاحية الشهرية
-    if (myOffice.status === 'expired') {
-      alert("❌ عذراً: اشتراكك الشهري منتهي الصلاحية! يجب طلب تجديد الاشتراك أولاً لتتمكن من النشر.");
+    // الفحص 2: هل الاشتراك منتهي؟ (يُستثنى منها الحساب المجاني)
+    if (myOffice.pkg !== 'free' && myOffice.status === 'expired') {
+      alert("❌ عذراً: اشتراكك الشهري منتهي الصلاحية! يجب سداد الاشتراك وتجديده لمتابعة النشر.");
       return;
     }
     
-    // 3. الفحص الرقابي الثالث: حدود الباقة السحابية
+    // الفحص 3: هل تجاوز سقف العقارات المسموح بها معاً؟
     let maxLimit = myOffice.pkg === 'gold' ? Infinity : myOffice.pkg === 'eco' ? 5 : 2;
     if (myOffice.publishedProps >= maxLimit) {
-      alert(`❌ تجاوز الحد المسموح: لقد استهلكت كامل رصيد باقتك الحالية (${maxLimit}/${maxLimit} عقارات).\n\nقم بترقية الباقة إلى فئة أعلى من خلال الإدارة لمتابعة النشر!`);
+      alert(`❌ تجاوز السقف المسموح: باقتك الحالية تسمح بـ (${maxLimit}) عقارات نشطة فقط كحد أقصى.\n\nيمكنك حذف عقار قديم لتفريغ مساحة، أو طلب ترقية باقتك من الإدارة!`);
       return;
     }
 
-    // إذا تخطى الفحوصات ينجح النشر
     myOffice.publishedProps++;
-    alert("🎉 تم التحقق من الصلاحيات بنجاح! اشتراكك نشط، وبقاك تسمح، وحسابك غير موقف. تم نشر العقار بنجاح!");
+    alert("🎉 تم التحقق من الصلاحيات بنجاح! حسابك مستوفٍ للشروط، وتم نشر العقار الجديد في الدليل.");
     setupOfficeViewUI();
   }
 
@@ -334,7 +355,7 @@
     } else if (u === 'office' && p === 'office123') {
       session = { role: 'office', username: 'مكتب الأمانة العقاري' };
     } else {
-      alert('بيانات غير صحيحة!'); return;
+      alert('بيانات الدخول غير صحيحة!'); return;
     }
 
     localStorage.setItem('basra_admin_session', JSON.stringify(session));
