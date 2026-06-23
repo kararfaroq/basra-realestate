@@ -6,7 +6,7 @@
   <title>بوابة التحكم والإدارة المتقدمة - دليل البصرة العقاري</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght=400;600;700;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
     *{margin:0;padding:0;box-sizing:border-box}
     :root{
       --gold:#C9A84C; --gold-light:#E8C96A;
@@ -415,9 +415,18 @@
   function handleLogin() {
     const u = document.getElementById('usernameInput').value.trim();
     const p = document.getElementById('passwordInput').value.trim();
-    if (u === 'admin' && p === 'admin123') session = { role: 'admin', username: 'المدير العام' };
-    else if (u === 'office' && p === 'office123') session = { role: 'office', username: 'مكتب الأمانة العقاري' };
-    else { alert('البيانات خاطئة!'); return; }
+    
+    if (u === 'admin' && p === 'admin123') {
+      session = { role: 'admin', username: 'المدير العام للنظام' };
+    } else if (u === 'super' && p === 'super123') {
+      session = { role: 'supervisor', username: 'المشرف المعتمد (Super)' };
+    } else if (u === 'office' && p === 'office123') {
+      session = { role: 'office', username: 'مكتب الأمانة العقاري' };
+    } else { 
+      alert('⚠️ اسم المستخدم أو كلمة المرور غير صحيحة!'); 
+      return; 
+    }
+    
     localStorage.setItem('basra_admin_session', JSON.stringify(session));
     evaluateSessionUI();
   }
