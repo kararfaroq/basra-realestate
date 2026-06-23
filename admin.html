@@ -29,10 +29,12 @@
       font-size:14px; outline:none; margin-bottom:15px;
     }
     .input-field:focus{ border-color:var(--gold); background:rgba(255,255,255,0.08); }
+    
     .btn-action{
       width:100%; background:var(--gold); color:var(--navy); border:none; border-radius:8px;
-      padding:14px; font-size:16px; font-weight:700; font-family:'Cairo'; cursor:pointer;
+      padding:14px; font-size:16px; font-weight:700; font-family:'Cairo'; cursor:pointer; transition: 0.2s;
     }
+    .btn-action:hover { background: var(--gold-light); }
     
     /* DASHBOARD */
     .dashboard-section { display:none; }
@@ -60,6 +62,28 @@
     .btn-suspend { background:var(--warning); color:var(--navy); border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-family:'Cairo'; font-size:11px; font-weight:700; }
     .btn-danger { background:var(--danger); color:white; border:none; padding:5px 12px; border-radius:6px; cursor:pointer; font-family:'Cairo'; font-size:12px; }
     .btn-outline-back { background:transparent; color:var(--text-muted); border:1px solid rgba(255,255,255,0.2); padding:6px 14px; border-radius:6px; text-decoration:none; font-size:13px; }
+
+    /* MODAL STYLES WITH CLOSE BUTTON */
+    .modal-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(10, 22, 40, 0.85); backdrop-filter: blur(5px);
+      z-index: 1000; justify-content: center; align-items: center; padding: 1rem;
+    }
+    .modal-content {
+      background: var(--navy-mid); border: 1px solid var(--gold);
+      border-radius: 16px; padding: 2rem; width: 100%; max-width: 550px;
+      position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      animation: fadeIn 0.3s ease-out;
+    }
+    .modal-close-btn {
+      position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted);
+      width: 32px; height: 32px; border-radius: 50%; display: flex;
+      align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;
+    }
+    .modal-close-btn:hover { background: var(--danger); color: white; border-color: var(--danger); }
+    
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body>
@@ -69,15 +93,25 @@
   <div id="loginFormSection" class="login-card">
     <div style="text-align:center; margin-bottom:1.5rem">
       <div style="width:56px; height:56px; background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3); border-radius:14px; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; font-size:24px">🔐</div>
-      <h2 style="font-size:1.3rem; font-weight:900; margin-bottom:.3rem">بوابة الإدارة ونظام الصلاحيات والاشتراكات</h2>
+      <h2 style="font-size:1.3rem; font-weight:900; margin-bottom:.3rem">بوابة التحكم والاشتراكات والنشر المباشر</h2>
     </div>
     
     <div>
-      <input type="text" id="usernameInput" class="input-field" placeholder="اسم المستخدم" autocomplete="off">
+      <input type="text" id="usernameInput" class="input-field" placeholder="اسم المستخدم (للمكاتب أو الإدارة)" autocomplete="off">
       <input type="password" id="passwordInput" class="input-field" placeholder="كلمة المرور">
       <button onclick="handleLogin()" class="btn-action">تسجيل الدخول الآمن 🚀</button>
+      
+      <div style="margin: 15px 0; text-align: center; color: var(--text-muted); font-size: 12px; position: relative;">
+        <span style="background: var(--navy-mid); padding: 0 10px; z-index: 2; position: relative;">أو انشر كزائر سريع</span>
+        <hr style="position: absolute; top: 50%; left: 0; width: 100%; border: 0; border-top: 1px solid rgba(255,255,255,0.08); z-index: 1;">
+      </div>
+
+      <button onclick="loginAsGuest()" class="btn-action" style="background: transparent; color: var(--gold); border: 1px solid var(--gold);">
+        ➕ دخول سريع ونشر عقار واحد كزائر
+      </button>
     </div>
-    <div style="text-align:center; margin-top:15px;">
+    
+    <div style="text-align:center; margin-top:20px;">
        <a href="index.html" class="btn-outline-back">← العودة للرئيسية</a>
     </div>
   </div>
@@ -125,11 +159,11 @@
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
         <span style="font-weight:700; font-size:14px;">إحصائيات الإعلانات الحالية للمكتب:</span>
-        <button class="btn-action" style="width:auto; padding:6px 15px; font-size:12px;" onclick="tryAddPropertyFromOffice()">➕ محاكاة إضافة عقار جديد</button>
+        <button class="btn-action" style="width:auto; padding:6px 15px; font-size:12px;" onclick="openAddPropertyModal()">➕ إضافة عقار جديد</button>
       </div>
       
       <div style="background:rgba(255,255,255,0.02); padding:1rem; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
-         <p>📊 العقارات المنشورة حالياً: <strong id="currentOfficePropsCount" style="color:var(--gold);">2</strong> عقارات</p>
+         <p>📊 العقارات المنشورة حالياً: <strong id="currentOfficePropsCount" style="color:var(--gold);">1</strong> عقارات</p>
          <p id="packageLimitInfo" style="font-size:12px; color:var(--text-muted); margin-top:5px;"></p>
       </div>
     </div>
@@ -142,13 +176,56 @@
 
 </div>
 
+<div id="addPropertyModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event)">
+  <div class="modal-content">
+    <button class="modal-close-btn" onclick="closeAddPropertyModal()" title="إغلاق النافذة">✕</button>
+    
+    <div style="margin-bottom: 1.5rem;">
+      <h3 style="color: var(--gold); font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+        <i class="ti ti-circle-plus"></i> إضافة عقار جديد للدليل
+      </h3>
+      <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">تأكد من إدخال المواصفات الدقيقة للعقار البصري قبل النشر الرسمي</p>
+    </div>
+
+    <div>
+      <label style="font-size: 12px; color: var(--gold); display: block; margin-bottom: 5px;">نوع العقار</label>
+      <select id="propType" class="input-field" style="background: var(--navy); color:#fff;">
+        <option value="بيت">بيت سكني</option>
+        <option value="شقة">شقة فاخرة</option>
+        <option value="أرض">أرض استثمارية / سكنية</option>
+        <option value="محل">محل تجاري</option>
+      </select>
+
+      <label style="font-size: 12px; color: var(--gold); display: block; margin-bottom: 5px;">المنطقة في البصرة</label>
+      <input type="text" id="propArea" class="input-field" placeholder="مثال: العشار، الطويسة، الجنينة...">
+
+      <label style="font-size: 12px; color: var(--gold); display: block; margin-bottom: 5px;">السعر المطلوب</label>
+      <input type="text" id="propPrice" class="input-field" placeholder="مثال: 140 مليون دينار">
+
+      <div id="guestPremiumSection" style="background: rgba(201,168,76,0.06); padding: 12px; border-radius: 8px; border: 1px dashed var(--gold); margin-bottom: 15px; display: none;">
+         <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--gold-light); cursor: pointer;">
+            <input type="checkbox" id="makePremiumCheckbox" onchange="togglePremiumNotice(this.checked)" style="accent-color: var(--gold);">
+            ✨ ترقية الإعلان إلى الباقة الذهبية المميزة (VIP)
+         </label>
+         <p id="premiumNotice" style="font-size: 11px; color: var(--text-muted); margin-top: 5px; line-height: 1.4; display: none;">
+            ⚠️ يتطلب هذا الخيار دفع رسوم معينة قدرها <strong>5,000 دينار عراقي فقط</strong> لتثبيت عقارك في صدارة نتائج البحث بشكل ملفت وضمان مشاهدات مضاعفة!
+         </p>
+      </div>
+
+      <button onclick="submitNewProperty()" class="btn-action" style="margin-top: 10px;">🚀 نشر الإعلان فوراً</button>
+    </div>
+  </div>
+</div>
+
 <script>
-  // قاعدة بيانات حية ومحدثة طبقاً لشروط العمل الجديدة
   let mockOffices = [
     {id: "1", name:'مكتب الأمانة العقاري', area:'العشار', publishedProps: 1, pkg:'free', status:'active', allowPublish: true, expiry:'مفتوح الصلاحية دائم'},
     {id: "2", name:'عقارات الخليج بالبصرة', area:'الجمهورية', publishedProps: 4, pkg:'eco', status:'active', allowPublish: false, expiry:'2026-07-24'},
     {id: "3", name:'مكتب الرافدين للاستثمار', area:'المعقل', publishedProps: 12, pkg:'gold', status:'expired', allowPublish: true, expiry:'2026-06-01'}
   ];
+
+  // زائر وهمي افتراضي لمحاكاة دورة حياة الزوار
+  let guestUser = { publishedProps: 0, maxLimit: 1, allowPublish: true };
 
   let session = JSON.parse(localStorage.getItem('basra_admin_session')) || null;
 
@@ -181,6 +258,10 @@
         badge.textContent = '🏢 مكتب عقاري شريك';
         officeZone.style.display = 'block';
         setupOfficeViewUI();
+      } else if (session.role === 'guest') {
+        badge.textContent = '👤 زائر عادي للدليل';
+        officeZone.style.display = 'block';
+        setupOfficeViewUI();
       }
     }
   }
@@ -198,21 +279,9 @@
         <tr>
           <td><strong>${o.name}</strong></td>
           <td>${o.area}</td>
-          <td>
-            <span style="color:${o.pkg=='gold'?'var(--gold)':'#4A9FD4'}">
-              ${o.pkg=='gold'?'🥇 ذهبي VIP': o.pkg=='eco'?'💎 اقتصادي':'⭐ مجاني'} (${limitText})
-            </span>
-          </td>
-          <td>
-            <span class="badge-status ${isFree ? 'status-active' : (isExpired ? 'status-expired' : 'status-active')}">
-              ${isFree ? '🟢 نشط دائم' : (isExpired ? '🔴 منتهي' : '🟢 نشط')}
-            </span>
-          </td>
-          <td>
-            <span class="badge-status ${o.allowPublish ? 'status-active' : 'status-suspended'}">
-              ${o.allowPublish ? '🟢 مسموح بالنشر' : '🔴 حظر إداري'}
-            </span>
-          </td>
+          <td><span style="color:${o.pkg=='gold'?'var(--gold)':'#4A9FD4'}">${o.pkg=='gold'?'🥇 ذهبي VIP': o.pkg=='eco'?'💎 اقتصادي':'⭐ مجاني'} (${limitText})</span></td>
+          <td><span class="badge-status ${isFree ? 'status-active' : (isExpired ? 'status-expired' : 'status-active')}">${isFree ? '🟢 نشط دائم' : (isExpired ? '🔴 منتهي' : '🟢 نشط')}</span></td>
+          <td><span class="badge-status ${o.allowPublish ? 'status-active' : 'status-suspended'}">${o.allowPublish ? '🟢 مسموح بالنشر' : '🔴 حظر إداري'}</span></td>
           <td style="font-family:monospace; font-size:12px;">${o.expiry}</td>
           <td>
             <select style="background:var(--navy); color:#fff; border:1px solid rgba(201,168,76,0.3); padding:4px; border-radius:6px; font-family:'Cairo'; font-size:11px;" onchange="changePackage('${o.id}', this.value)">
@@ -221,151 +290,139 @@
               <option value="gold" ${o.pkg == 'gold' ? 'selected' : ''}>ذهبي VIP</option>
             </select>
           </td>
-          <td>
-            <button onclick="renewSubscriptionMonthly('${o.id}')" class="btn-renew" ${isFree ? 'disabled title="الباقة المجانية لا تحتاج لتجديد"' : ''}>
-              ${isFree ? '🚫 لا يتطلب' : '🔄 تجديد 30 يوم'}
-            </button>
-          </td>
-          <td>
-            <button onclick="togglePublishStatus('${o.id}')" class="btn-suspend" style="background:${o.allowPublish?'var(--warning)':'var(--success)'}">
-              ${o.allowPublish ? '🛑 إيقاف النشر' : '🟢 إلغاء الإيقاف'}
-            </button>
-          </td>
+          <td><button onclick="renewSubscriptionMonthly('${o.id}')" class="btn-renew" ${isFree ? 'disabled' : ''}>${isFree ? '🚫 لا يتطلب' : '🔄 تجديد 30 يوم'}</button></td>
+          <td><button onclick="togglePublishStatus('${o.id}')" class="btn-suspend" style="background:${o.allowPublish?'var(--warning)':'var(--success)'}">${o.allowPublish ? '🛑 إيقاف النشر' : '🟢 إلغاء الإيقاف'}</button></td>
         </tr>
       `;
     }).join('');
   }
 
-  // تجديد شهري يضيف 30 يوماً من اليوم للمكاتب ذات الباقات المدفوعة
   function renewSubscriptionMonthly(id) {
     const idx = mockOffices.findIndex(o => o.id === id);
-    if (idx !== -1) {
-      if(mockOffices[idx].pkg === 'free') return;
-      
-      const today = new Date();
-      today.setDate(today.getDate() + 30);
-      const expiryString = today.toISOString().split('T')[0];
-      
-      mockOffices[idx].status = 'active';
-      mockOffices[idx].expiry = expiryString;
-      
-      alert(`✅ تم تجديد الاشتراك الشهري لـ (${mockOffices[idx].name}) بنجاح!\nتنتهي الصلاحية الجديدة في: ${expiryString}.`);
-      renderOfficesTable();
+    if (idx !== -1 && mockOffices[idx].pkg !== 'free') {
+      const today = new Date(); today.setDate(today.getDate() + 30);
+      mockOffices[idx].status = 'active'; mockOffices[idx].expiry = today.toISOString().split('T')[0];
+      alert(`✅ تم تجديد الاشتراك لـ (${mockOffices[idx].name}).`); renderOfficesTable();
     }
   }
 
-  // 🛑 إيقاف/تفعيل النشر الفوري بقرار من الإدارة
   function togglePublishStatus(id) {
     const idx = mockOffices.findIndex(o => o.id === id);
-    if (idx !== -1) {
-      mockOffices[idx].allowPublish = !mockOffices[idx].allowPublish;
-      const statusText = mockOffices[idx].allowPublish ? "تم السماح له بالنشر مجدداً" : "تم إيقافه عن النشر وحجبه إدارياً بالكامل";
-      alert(`⚙️ إجراء رقابي [بصلاحية ${session.username}]:\n${mockOffices[idx].name} -> ${statusText}.`);
-      renderOfficesTable();
-    }
+    if (idx !== -1) { mockOffices[idx].allowPublish = !mockOffices[idx].allowPublish; renderOfficesTable(); }
   }
 
-  // عند تغيير الباقة، يتم تحديث الصلاحية والتواريخ تلقائياً
   function changePackage(id, newPkg) {
     const idx = mockOffices.findIndex(o => o.id === id);
     if (idx !== -1) {
       mockOffices[idx].pkg = newPkg;
-      if (newPkg === 'free') {
-        mockOffices[idx].expiry = 'مفتوح الصلاحية دائم';
-        mockOffices[idx].status = 'active';
-      } else {
-        const today = new Date();
-        today.setDate(today.getDate() + 30);
-        mockOffices[idx].expiry = today.toISOString().split('T')[0];
-        mockOffices[idx].status = 'active';
-      }
-      alert(`🔹 تم تغيير الباقة إلى [${newPkg === 'free'?'مجانية':newPkg === 'eco'?'اقتصادية':'ذهبية'}] وتعديل سقف الصلاحيات والتواريخ.`);
-      renderOfficesTable();
+      mockOffices[idx].expiry = newPkg === 'free' ? 'مفتوح الصلاحية دائم' : new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0];
+      mockOffices[idx].status = 'active'; renderOfficesTable();
     }
   }
 
-  // واجهة محاكاة صاحب المكتب
   function setupOfficeViewUI() {
     const banner = document.getElementById('officeStatusBanner');
-    const myOffice = mockOffices[0]; 
     
-    document.getElementById('currentOfficePropsCount').textContent = myOffice.publishedProps;
-    
-    let maxLimit = myOffice.pkg === 'gold' ? Infinity : myOffice.pkg === 'eco' ? 5 : 2;
-    document.getElementById('packageLimitInfo').textContent = myOffice.pkg === 'gold' ? 
-      "🥇 باقتك ذهبية: عدد العقارات المسموح بنشرها غير محدود بالدليل." : 
-      `ℹ️ سقف الباقة الحالية: مسموح لك بنشر ${maxLimit} عقارات نشطة معاً (مستهلك حالياً ${myOffice.publishedProps}).`;
-
-    // 1. فحص الإيقاف الإداري أولاً (أعلى سلطة)
-    if (!myOffice.allowPublish) {
-      banner.className = "status-suspended";
-      banner.innerHTML = `🛑 <strong>تنبيه قطعي: تم إيقاف مكتبك عن النشر من قبل إدارة الدليل!</strong><br>
-      حسابك موقف حالياً بقرار من المدير أو المشرف العقاري. يرجى مراجعة الإدارة لتسوية الحالة وإعادة تفعيل النشر.`;
-    } 
-    // 2. فحص انتهاء الصلاحية للباقات المدفوعة فقط
-    else if (myOffice.pkg !== 'free' && myOffice.status === 'expired') {
-      banner.className = "status-expired";
-      banner.innerHTML = `⚠️ <strong>اشتراكك الشهري منتهٍ!</strong><br>انتهت صلاحية باقتك المدفوعة بتاريخ ${myOffice.expiry}. يرجى تجديد الاشتراك لمتابعة العمل وتفادي حجب الإعلانات.`;
-    } 
-    // 3. الحساب نشط وطبيعي
-    else {
-      banner.className = "status-active";
-      banner.innerHTML = myOffice.pkg === 'free' ? 
-        `🟢 <strong>حسابك نشط بالباقة المجانية المفتوحة دائماً!</strong><br>لك صلاحية نشر حتى عقارين (2) في نفس الوقت بدون الحاجة للتجديد الشهري.` :
-        `🟢 <strong>حسابك نشط والاشتراك الشهري ساري!</strong><br>نوع الباقة: [${myOffice.pkg}] - ينتهي اشتراكك الحالي بتاريخ: ${myOffice.expiry}.`;
+    if (session.role === 'guest') {
+      document.getElementById('currentOfficePropsCount').textContent = guestUser.publishedProps;
+      document.getElementById('packageLimitInfo').textContent = `ℹ️ باقة الزائر المباشر: مسموح لك بنشر عقار واحد فقط مجاناً ليظهر في البحث الطبيعي بشكل طبيعي.`;
+      
+      if (guestUser.publishedProps >= guestUser.maxLimit) {
+        banner.className = "status-suspended";
+        banner.innerHTML = `⚠️ <strong>لقد استهلكت حد النشر المجاني كزائر!</strong><br>لقد قمت بنشر عقار واحد بنجاح. إذا كنت تريد إضافة عقارات إضافية، يرجى إنشاء حساب مكتب عقاري رسمي للتمتع بباقات أوسع.`;
+      } else {
+        banner.className = "status-active";
+        banner.innerHTML = `🟢 <strong>أهلاً بك كزائر في الدليل!</strong> يمكنك الآن إضافة عقارك الأول والوحيد مجاناً ليظهر في البحث الطبيعي مباشرة.`;
+      }
+    } else {
+      const myOffice = mockOffices[0]; 
+      document.getElementById('currentOfficePropsCount').textContent = myOffice.publishedProps;
+      let maxLimit = myOffice.pkg === 'gold' ? Infinity : myOffice.pkg === 'eco' ? 5 : 2;
+      document.getElementById('packageLimitInfo').textContent = myOffice.pkg === 'gold' ? "🥇 باقتك ذهبية: نشر غير محدود." : `ℹ️ سقف الباقة الحالية: مسموح لك بنشر ${maxLimit} عقارات نشطة معاً.`;
+      
+      if (!myOffice.allowPublish) {
+        banner.className = "status-suspended"; banner.innerHTML = `🛑 <strong>تم إيقاف مكتبك عن النشر من قبل الإدارة!</strong>`;
+      } else {
+        banner.className = "status-active"; banner.innerHTML = `🟢 <strong>حسابك نشط وطبيعي ومصرح له بالعمل.</strong>`;
+      }
     }
   }
 
-  // محرك فحص الصلاحيات الذكي عند النشر
-  function tryAddPropertyFromOffice() {
-    const myOffice = mockOffices[0]; 
-    
-    // الفحص 1: هل الحساب موقف إدارياً؟
-    if (!myOffice.allowPublish) {
-      alert("❌ حظر إداري: لا يمكنك إضافة عقارات! حسابك موقف عن النشر بقرار من إدارة الدليل.");
-      return;
-    }
-    
-    // الفحص 2: هل الاشتراك منتهي؟ (يُستثنى منها الحساب المجاني)
-    if (myOffice.pkg !== 'free' && myOffice.status === 'expired') {
-      alert("❌ عذراً: اشتراكك الشهري منتهي الصلاحية! يجب سداد الاشتراك وتجديده لمتابعة النشر.");
-      return;
-    }
-    
-    // الفحص 3: هل تجاوز سقف العقارات المسموح بها معاً؟
-    let maxLimit = myOffice.pkg === 'gold' ? Infinity : myOffice.pkg === 'eco' ? 5 : 2;
-    if (myOffice.publishedProps >= maxLimit) {
-      alert(`❌ تجاوز السقف المسموح: باقتك الحالية تسمح بـ (${maxLimit}) عقارات نشطة فقط كحد أقصى.\n\nيمكنك حذف عقار قديم لتفريغ مساحة، أو طلب ترقية باقتك من الإدارة!`);
-      return;
+  function openAddPropertyModal() {
+    if (session.role === 'guest') {
+      if (guestUser.publishedProps >= guestUser.maxLimit) {
+        alert("❌ تجاوز الحد: بصفتك زائر، يسمح لك السيستم بنشر عقار واحد فقط مجاناً! يرجى ترقية الحساب إلى مكتب لنشر المزيد.");
+        return;
+      }
+      document.getElementById('guestPremiumSection').style.display = 'block';
+    } else {
+      const myOffice = mockOffices[0]; 
+      if (!myOffice.allowPublish) { alert("❌ حسابك موقف عن النشر حالياً بقرار إداري!"); return; }
+      let maxLimit = myOffice.pkg === 'gold' ? Infinity : myOffice.pkg === 'eco' ? 5 : 2;
+      if (myOffice.publishedProps >= maxLimit) { alert("❌ تجاوزت السقف المحدد للباقة!"); return; }
+      document.getElementById('guestPremiumSection').style.display = 'none';
     }
 
-    myOffice.publishedProps++;
-    alert("🎉 تم التحقق من الصلاحيات بنجاح! حسابك مستوفٍ للشروط، وتم نشر العقار الجديد في الدليل.");
+    document.getElementById('addPropertyModal').style.display = 'flex';
+  }
+
+  function togglePremiumNotice(isChecked) {
+    document.getElementById('premiumNotice').style.display = isChecked ? 'block' : 'none';
+  }
+
+  function closeAddPropertyModal() {
+    document.getElementById('addPropertyModal').style.display = 'none';
+    document.getElementById('propArea').value = '';
+    document.getElementById('propPrice').value = '';
+    document.getElementById('makePremiumCheckbox').checked = false;
+    document.getElementById('premiumNotice').style.display = 'none';
+  }
+
+  function closeModalOnOutsideClick(event) {
+    if (event.target.id === 'addPropertyModal') { closeAddPropertyModal(); }
+  }
+
+  function submitNewProperty() {
+    const area = document.getElementById('propArea').value.trim();
+    const price = document.getElementById('propPrice').value.trim();
+    
+    if(!area || !price) { alert("الرجاء إدخال المنطقة والسعر أولاً!"); return; }
+
+    if (session.role === 'guest') {
+      const isPremium = document.getElementById('makePremiumCheckbox').checked;
+      if (isPremium) {
+         alert("💸 نظام الرسوم (5,000 دينار):\nتم تفعيل ميزة الإعلان الذهبي المميز! يرجى تحويل الرسوم لإدارة الدليل لتثبيت العقار في صدارة البحث.");
+      } else {
+         alert("🎉 تم نشر عقارك كزائر عادي بنجاح! سيظهر ضمن نتائج البحث الطبيعية للجمهور.");
+      }
+      guestUser.publishedProps++;
+    } else {
+      mockOffices[0].publishedProps++;
+      alert("🎉 تم نشر العقار الجديد في الدليل العقاري بنجاح!");
+    }
+    
+    closeAddPropertyModal();
     setupOfficeViewUI();
+  }
+
+  function loginAsGuest() {
+    session = { role: 'guest', username: 'زائر سريع للدليل' };
+    localStorage.setItem('basra_admin_session', JSON.stringify(session));
+    evaluateSessionUI();
   }
 
   function handleLogin() {
     const u = document.getElementById('usernameInput').value.trim();
     const p = document.getElementById('passwordInput').value.trim();
-
-    if (u === 'admin' && p === 'admin123') {
-      session = { role: 'admin', username: 'المدير العام' };
-    } else if (u === 'super' && p === 'super123') {
-      session = { role: 'supervisor', username: 'المشرف الرقابي' };
-    } else if (u === 'office' && p === 'office123') {
-      session = { role: 'office', username: 'مكتب الأمانة العقاري' };
-    } else {
-      alert('بيانات الدخول غير صحيحة!'); return;
-    }
-
+    if (u === 'admin' && p === 'admin123') session = { role: 'admin', username: 'المدير العام' };
+    else if (u === 'office' && p === 'office123') session = { role: 'office', username: 'مكتب الأمانة العقاري' };
+    else { alert('البيانات خاطئة!'); return; }
     localStorage.setItem('basra_admin_session', JSON.stringify(session));
     evaluateSessionUI();
   }
 
   function handleLogout() {
-    session = null;
-    localStorage.removeItem('basra_admin_session');
-    evaluateSessionUI();
+    session = null; delete localStorage.basra_admin_session; evaluateSessionUI();
   }
 </script>
 </body>
