@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>بوابة التحكم والإدارة - دليل البصرة العقاري</title>
+  <title>بوابة التحكم والإدارة المتقدمة - دليل البصرة العقاري</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
@@ -12,10 +12,10 @@
       --gold:#C9A84C; --gold-light:#E8C96A;
       --navy:#0A1628; --navy-mid:#1A3A5C; --navy-light:#2A5080;
       --text-on-dark:#F5F0E8; --text-muted:#8BA0B8;
+      --success:#4CAF7D; --danger:#ff4d4d; --warning:#ff9800;
     }
     body{font-family:'Cairo',sans-serif;background:var(--navy);color:var(--text-on-dark);direction:rtl;padding:2rem 1rem;}
-    
-    .container{max-width:1050px; margin:0 auto;}
+    .container{max-width:1250px; margin:0 auto;}
     
     /* LOGIN BOX */
     .login-card {
@@ -26,14 +26,13 @@
     .input-field{
       width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(201,168,76,0.2);
       border-radius:8px; padding:12px 16px; color:var(--text-on-dark); font-family:'Cairo';
-      font-size:14px; outline:none; margin-bottom:15px; transition:all 0.2s;
+      font-size:14px; outline:none; margin-bottom:15px;
     }
     .input-field:focus{ border-color:var(--gold); background:rgba(255,255,255,0.08); }
     .btn-action{
       width:100%; background:var(--gold); color:var(--navy); border:none; border-radius:8px;
       padding:14px; font-size:16px; font-weight:700; font-family:'Cairo'; cursor:pointer;
     }
-    .btn-action:hover{ background:var(--gold-light); }
     
     /* DASHBOARD */
     .dashboard-section { display:none; }
@@ -43,18 +42,23 @@
       border:1px solid rgba(201,168,76,0.2); margin-bottom:2rem; flex-wrap:wrap; gap:15px;
     }
     .badge-role { background:rgba(201,168,76,0.15); color:var(--gold); padding:6px 14px; border-radius:8px; font-weight:700; font-size:13px; }
-    
     .panel-card { background:var(--navy-mid); border:1px solid rgba(255,255,255,0.06); border-radius:14px; padding:1.5rem; margin-bottom:1.5rem; }
     .panel-title { font-size:1.2rem; font-weight:700; color:var(--gold); margin-bottom:1.2rem; display:flex; align-items:center; gap:8px; }
     
     /* TABLE */
-    table { width:100%; border-collapse:collapse; text-align:right; font-size:14px; }
+    table { width:100%; border-collapse:collapse; text-align:right; font-size:13px; }
     th { padding:12px; border-bottom:2px solid var(--gold); color:var(--text-muted); font-weight:600; }
-    td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); }
+    td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); vertical-align: middle; }
     
-    .btn-danger { background:#ff4d4d; color:white; border:none; padding:5px 12px; border-radius:6px; cursor:pointer; font-family:'Cairo'; font-size:12px; }
-    .btn-danger:hover { background:#ff3333; }
-    .btn-outline-back { background:transparent; color:var(--text-muted); border:1px solid rgba(255,255,255,0.2); padding:6px 14px; border-radius:6px; cursor:pointer; text-decoration:none; font-size:13px; }
+    .badge-status { padding:4px 8px; border-radius:6px; font-size:11px; font-weight:600; display:inline-block; }
+    .status-active { background:rgba(76,175,125,0.15); color:var(--success); border:1px solid rgba(76,175,125,0.3); }
+    .status-expired { background:rgba(255,77,77,0.15); color:var(--danger); border:1px solid rgba(255,77,77,0.3); }
+    .status-suspended { background:rgba(255,152,0,0.15); color:var(--warning); border:1px solid rgba(255,152,0,0.3); }
+
+    .btn-renew { background:var(--success); color:white; border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-family:'Cairo'; font-size:11px; font-weight:600; }
+    .btn-suspend { background:var(--warning); color:var(--navy); border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-family:'Cairo'; font-size:11px; font-weight:700; }
+    .btn-danger { background:var(--danger); color:white; border:none; padding:5px 12px; border-radius:6px; cursor:pointer; font-family:'Cairo'; font-size:12px; }
+    .btn-outline-back { background:transparent; color:var(--text-muted); border:1px solid rgba(255,255,255,0.2); padding:6px 14px; border-radius:6px; text-decoration:none; font-size:13px; }
   </style>
 </head>
 <body>
@@ -64,21 +68,13 @@
   <div id="loginFormSection" class="login-card">
     <div style="text-align:center; margin-bottom:1.5rem">
       <div style="width:56px; height:56px; background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3); border-radius:14px; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; font-size:24px">🔐</div>
-      <h2 style="font-size:1.3rem; font-weight:900; margin-bottom:.3rem">بوابة التحقق من الرتب والمسؤولين</h2>
-      <p style="font-size:12px; color:var(--text-muted)">قم بالولوج بحسابك لتفعيل لوحة التحكم والصلاحيات الخاصة بك</p>
+      <h2 style="font-size:1.3rem; font-weight:900; margin-bottom:.3rem">بوابة الإدارة ونظام الصلاحيات والاشتراكات</h2>
     </div>
     
     <div>
       <input type="text" id="usernameInput" class="input-field" placeholder="اسم المستخدم" autocomplete="off">
       <input type="password" id="passwordInput" class="input-field" placeholder="كلمة المرور">
       <button onclick="handleLogin()" class="btn-action">تسجيل الدخول الآمن 🚀</button>
-    </div>
-    
-    <div style="background:rgba(255,255,255,0.02); padding:12px; border-radius:8px; font-size:11px; color:var(--text-muted); line-height:1.6; margin-top:20px; border:1px solid rgba(255,255,255,0.05);">
-      💡 <strong>حسابات المحاكاة وفحص النظام (تدرج الصلاحيات):</strong><br>
-      • رتبة مدير (Admin): <code style="color:var(--gold)">admin</code> / كلمه سر: <code>admin123</code> (صلاحيات مطلقة وتعديل وحذف)<br>
-      • رتبة مشرف (Supervisor): <code style="color:#4A9FD4">super</code> / كلمه سر: <code>super123</code> (تعديل باقات فقط، يمنع الحذف)<br>
-      • رتبة مكتب عقاري (Office): <code style="color:#4CAF7D">office</code> / كلمه سر: <code>office123</code> (تحديث بيانات العقارات التابعة لمكتبه فقط)
     </div>
     <div style="text-align:center; margin-top:15px;">
        <a href="index.html" class="btn-outline-back">← العودة للرئيسية</a>
@@ -89,27 +85,30 @@
     
     <div class="dash-header">
       <div>
-        <h1 style="font-size:1.4rem; font-weight:900;">🛡️ لوحة الإدارة العامة والمكاتب</h1>
-        <p style="font-size:12px; color:var(--text-muted); margin-top:3px;">مرحباً بك مجدداً: <span id="displayUsername" style="color:#fff; font-weight:600;">-</span></p>
+        <h1 style="font-size:1.4rem; font-weight:900;">🛡️ نظام الرقابة والتحكم في مكاتب البصرة</h1>
+        <p style="font-size:12px; color:var(--text-muted); margin-top:3px;">المستخدم الحالي: <span id="displayUsername" style="color:#fff; font-weight:600;">-</span></p>
       </div>
       <div style="display:flex; align-items:center; gap:10px;">
         <span id="roleBadge" class="badge-role">-</span>
-        <button onclick="handleLogout()" class="btn-danger" style="padding:7px 15px; font-size:13px;">تسجيل الخروج 🚪</button>
+        <button onclick="handleLogout()" class="btn-danger" style="padding:7px 15px; font-size:13px;">خروج 🚪</button>
       </div>
     </div>
 
     <div id="adminAndSuperView" class="panel-card" style="display:none;">
-      <div class="panel-title"><i class="ti ti-users"></i> إدارة المكاتب العقارية وتعديل الباقات</div>
+      <div class="panel-title"><i class="ti ti-receipt"></i> لوحة التحكم بالاشتراكات الشهرية وحظر النشر</div>
       <div style="overflow-x:auto;">
         <table>
           <thead>
             <tr>
-              <th>اسم المكتب المسجل</th>
-              <th>المنطقة المغطاة</th>
-              <th>العقارات النشطة</th>
-              <th>نوع الباقة الحالية</th>
-              <th>ترقية/تغيير الباقة (مدير+مشرف)</th>
-              <th>إجراءات الإزالة الحساسة</th>
+              <th>المكتب العقاري</th>
+              <th>المنطقة</th>
+              <th>نوع الباقة وسقف النشر</th>
+              <th>حالة الاشتراك</th>
+              <th>حالة النشر الحالية</th>
+              <th>تاريخ انتهاء الصلاحية</th>
+              <th>تغيير الباقة</th>
+              <th>تجديد شهري (30 يوم)</th>
+              <th>التحكم بالنشر (إيقاف/تفعيل)</th>
             </tr>
           </thead>
           <tbody id="officesTableBody">
@@ -119,34 +118,23 @@
     </div>
 
     <div id="officeOnlyView" class="panel-card" style="display:none;">
-      <div class="panel-title"><i class="ti ti-building-estate"></i> إدارة عقارات مكتبك الحالية</div>
-      <div style="background:rgba(201,168,76,0.05); border:1px solid rgba(201,168,76,0.15); padding:1rem; border-radius:10px; margin-bottom:1.5rem; font-size:13px;">
-        🥇 باقة مكتبك الحالية: <strong style="color:var(--gold)">الباقة الذهبية VIP (اشتراك نشط وموثق)</strong>. يمكنك إضافة، تعديل أو سحب إعلاناتك المعروضة في الدليل الرئيسي.
-      </div>
+      <div class="panel-title"><i class="ti ti-building-estate"></i> حالة صلاحيات مكتبك الإعلانية</div>
+      
+      <div id="officeStatusBanner" style="padding:1.2rem; border-radius:10px; margin-bottom:1.5rem; font-size:14px; line-height:1.6;"></div>
+
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-        <span style="font-weight:700; font-size:14px;">قائمة العقارات المعلنة باسم مكتبك (3 عقارات):</span>
-        <button class="btn-action" style="width:auto; padding:6px 15px; font-size:12px;" onclick="alert('خاصية إضافة عقار جديد قيد الربط البرمجي بقاعدة البيانات.')">➕ أضف عقار جديد</button>
+        <span style="font-weight:700; font-size:14px;">إحصائيات الإعلانات الحالية للمكتب:</span>
+        <button class="btn-action" style="width:auto; padding:6px 15px; font-size:12px;" onclick="tryAddPropertyFromOffice()">➕ محاكاة إضافة عقار جديد</button>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>نوع العقار</th>
-            <th>نوع العرض</th>
-            <th>المساحة</th>
-            <th>السعر المطلوب</th>
-            <th>حالة الإعلان</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>بيت سكني</td><td>للبيع</td><td>200 م²</td><td>75,000$</td><td><span style="color:#4CAF7D">🟢 نشط ومعتمد</span></td></tr>
-          <tr><td>شقة فاخرة</td><td>للإيجار</td><td>120 م²</td><td>500$/شهر</td><td><span style="color:#4CAF7D">🟢 نشط ومعتمد</span></td></tr>
-          <tr><td>مجمع تجاري</td><td>للبيع</td><td>450 م²</td><td>220,000$</td><td><span style="color:var(--gold)">⏳ قيد المراجعة</span></td></tr>
-        </tbody>
-      </table>
+      
+      <div style="background:rgba(255,255,255,0.02); padding:1rem; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
+         <p>📊 العقارات المنشورة حالياً: <strong id="currentOfficePropsCount" style="color:var(--gold);">2</strong> عقارات</p>
+         <p id="packageLimitInfo" style="font-size:12px; color:var(--text-muted); margin-top:5px;"></p>
+      </div>
     </div>
 
     <div style="text-align:center; margin-top:1.5rem;">
-      <a href="index.html" class="btn-outline-back" style="background:rgba(255,255,255,0.04)">← الانتقال للواجهة وتصفح الدليل</a>
+      <a href="index.html" class="btn-outline-back" style="background:rgba(255,255,255,0.04)">← الانتقال للواجهة الرئيسية</a>
     </div>
 
   </div>
@@ -154,21 +142,17 @@
 </div>
 
 <script>
-  // الذاكرة التفاعلية ومحاكاة المكاتب المسجلة بالدليل
+  // قاعدة بيانات حية تحاكي شروط العمل الدقيقة
   let mockOffices = [
-    {id: "1", name:'مكتب الأمانة العقاري', area:'العشار', props:48, pkg:'gold'},
-    {id: "2", name:'عقارات الخليج بالبصرة', area:'الجمهورية', props:32, pkg:'eco'},
-    {id: "3", name:'مكتب الرافدين للاستثمار', area:'المعقل', props:61, pkg:'free'}
+    {id: "1", name:'مكتب الأمانة العقاري', area:'العشار', publishedProps: 2, pkg:'free', status:'active', allowPublish: true, expiry:'2026-07-10'},
+    {id: "2", name:'عقارات الخليج بالبصرة', area:'الجمهورية', publishedProps: 4, pkg:'eco', status:'active', allowPublish: false, expiry:'2026-07-24'},
+    {id: "3", name:'مكتب الرافدين للاستثمار', area:'المعقل', publishedProps: 12, pkg:'gold', status:'expired', allowPublish: true, expiry:'2026-06-01'}
   ];
 
-  // تتبع حالة الجلسة عبر الحفظ المحلي للمتصفح
   let session = JSON.parse(localStorage.getItem('basra_admin_session')) || null;
 
-  document.addEventListener('DOMContentLoaded', () => {
-    evaluateSessionUI();
-  });
+  document.addEventListener('DOMContentLoaded', () => { evaluateSessionUI(); });
 
-  // محرك فحص الجلسة وتبديل النوافذ
   function evaluateSessionUI() {
     const loginForm = document.getElementById('loginFormSection');
     const dashboard = document.getElementById('dashboardSection');
@@ -179,117 +163,188 @@
     } else {
       loginForm.style.display = 'none';
       dashboard.style.display = 'block';
-      
       document.getElementById('displayUsername').textContent = session.username;
       
       const badge = document.getElementById('roleBadge');
       const adminSuperZone = document.getElementById('adminAndSuperView');
       const officeZone = document.getElementById('officeOnlyView');
       
-      // إخفاء اللوحات أولاً للتطهير
       adminSuperZone.style.display = 'none';
       officeZone.style.display = 'none';
       
-      if (session.role === 'admin') {
-        badge.textContent = '👑 مدير النظام الرئيسي';
-        badge.style.color = 'var(--gold)';
-        adminSuperZone.style.display = 'block';
-        renderOfficesTable();
-      } else if (session.role === 'supervisor') {
-        badge.textContent = '🛡️ مشرف معتمد';
-        badge.style.color = '#4A9FD4';
+      if (session.role === 'admin' || session.role === 'supervisor') {
+        badge.textContent = session.role === 'admin' ? '👑 مدير النظام' : '🛡️ مشرف معتمد';
         adminSuperZone.style.display = 'block';
         renderOfficesTable();
       } else if (session.role === 'office') {
         badge.textContent = '🏢 مكتب عقاري شريك';
-        badge.style.color = '#4CAF7D';
         officeZone.style.display = 'block';
+        setupOfficeViewUI();
       }
     }
   }
 
-  // معالجة ضغط زر تسجيل الدخول
+  function renderOfficesTable() {
+    const tbody = document.getElementById('officesTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = mockOffices.map(o => {
+      const isExpired = o.status === 'expired';
+      let limitText = o.pkg === 'gold' ? '∞ مفتوح' : o.pkg === 'eco' ? 'اقصى 5' : 'اقصى 2';
+      
+      return `
+        <tr>
+          <td><strong>${o.name}</strong></td>
+          <td>${o.area}</td>
+          <td>
+            <span style="color:${o.pkg=='gold'?'var(--gold)':'#4A9FD4'}">
+              ${o.pkg=='gold'?'🥇 ذهبي VIP': o.pkg=='eco'?'💎 اقتصادي':'⭐ مجاني'} (${limitText})
+            </span>
+          </td>
+          <td>
+            <span class="badge-status ${isExpired ? 'status-expired' : 'status-active'}">
+              ${isExpired ? '🔴 منتهي' : '🟢 نشط'}
+            </span>
+          </td>
+          <td>
+            <span class="badge-status ${o.allowPublish ? 'status-active' : 'status-suspended'}">
+              ${o.allowPublish ? '🟢 مسموح بالنشر' : '🔴 حظر إداري'}
+            </span>
+          </td>
+          <td style="font-family:monospace;">${o.expiry}</td>
+          <td>
+            <select style="background:var(--navy); color:#fff; border:1px solid rgba(201,168,76,0.3); padding:4px; border-radius:6px; font-family:'Cairo'; font-size:11px;" onchange="changePackage('${o.id}', this.value)">
+              <option value="free" ${o.pkg == 'free' ? 'selected' : ''}>مجاني</option>
+              <option value="eco" ${o.pkg == 'eco' ? 'selected' : ''}>اقتصادي</option>
+              <option value="gold" ${o.pkg == 'gold' ? 'selected' : ''}>ذهبي VIP</option>
+            </select>
+          </td>
+          <td>
+            <button onclick="renewSubscriptionMonthly('${o.id}')" class="btn-renew">🔄 تجديد 30 يوم</button>
+          </td>
+          <td>
+            <button onclick="togglePublishStatus('${o.id}')" class="btn-suspend" style="background:${o.allowPublish?'var(--warning)':'var(--success)'}">
+              ${o.allowPublish ? '🛑 إيقاف النشر' : '🟢 إلغاء الإيقاف'}
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // دالة التجديد الشهري (إضافة 30 يوماً حركياً من تاريخ اللحظة الحالية)
+  function renewSubscriptionMonthly(id) {
+    const idx = mockOffices.findIndex(o => o.id === id);
+    if (idx !== -1) {
+      const today = new Date();
+      today.setDate(today.getDate() + 30); // حساب تاريخ الانتهاء بعد 30 يوم تماماً
+      const expiryString = today.toISOString().split('T')[0];
+      
+      mockOffices[idx].status = 'active';
+      mockOffices[idx].expiry = expiryString;
+      
+      alert(`✅ تم تجديد الاشتراك الشهري لـ (${mockOffices[idx].name}) بنجاح!\nالصلاحية الجديدة تنتهي بتاريخ: ${expiryString} (بعد 30 يوماً).`);
+      renderOfficesTable();
+    }
+  }
+
+  // 🛑 دالة الإيقاف الإداري والمنع من النشر (صلاحية كاملة للمدير والمشرف)
+  function togglePublishStatus(id) {
+    const idx = mockOffices.findIndex(o => o.id === id);
+    if (idx !== -1) {
+      mockOffices[idx].allowPublish = !mockOffices[idx].allowPublish;
+      const statusText = mockOffices[idx].allowPublish ? "تم السماح له بالنشر مجدداً" : "تم إيقافه عن النشر وحجبه إدارياً بالكامل";
+      alert(`⚙️ إجراء رقابي [بصلاحية ${session.username}]:\n${mockOffices[idx].name} -> ${statusText}.`);
+      renderOfficesTable();
+    }
+  }
+
+  function changePackage(id, newPkg) {
+    const idx = mockOffices.findIndex(o => o.id === id);
+    if (idx !== -1) {
+      mockOffices[idx].pkg = newPkg;
+      alert(`🔹 تم تحويل باقة المكتب وسقف صلاحيات النشر إلى فئة [${newPkg}].`);
+      renderOfficesTable();
+    }
+  }
+
+  // محاكاة واجهة صاحب المكتب وحساب سقفه الإعلاني بناءً على باقته
+  function setupOfficeViewUI() {
+    const banner = document.getElementById('officeStatusBanner');
+    // نربطه برمجياً ببيانات "مكتب الأمانة العقاري" للاختبار
+    const myOffice = mockOffices[0]; 
+    
+    document.getElementById('currentOfficePropsCount').textContent = myOffice.publishedProps;
+    
+    let maxLimit = myOffice.pkg === 'gold' ? Infinity : myOffice.pkg === 'eco' ? 5 : 2;
+    document.getElementById('packageLimitInfo').textContent = myOffice.pkg === 'gold' ? 
+      "🥇 باقتك ذهبية: عدد العقارات المسموح بنشرها غير محدود." : 
+      `ℹ️ سقف الباقة الحالية: مسموح لك بنشر ${maxLimit} عقارات كحد أقصى (مستهلك منها ${myOffice.publishedProps}).`;
+
+    if (!myOffice.allowPublish) {
+      banner.className = "status-suspended";
+      banner.innerHTML = `🛑 <strong>تنبيه إداري قطعي: تم إيقاف مكتبك عن النشر من قبل الإدارة!</strong><br>
+      على الرغم من أن حالة اشتراكك قد تكون سارية، إلا أن الإدارة قامت بـ (إيقاف النشر) لحسابك. يرجى التواصل مع الدليل لتسوية الحالة.`;
+    } else if (myOffice.status === 'expired') {
+      banner.className = "status-expired";
+      banner.innerHTML = `⚠️ <strong>اشتراكك الشهري منتهٍ!</strong><br>انتهت الصلاحية بتاريخ ${myOffice.expiry}. يرجى السداد وتفعيل الاشتراك الشهري لمتابعة العمل.`;
+    } else {
+      banner.className = "status-active";
+      banner.innerHTML = `🟢 <strong>حسابك نشط ومصرح له بالنشر</strong><br>باقة الحساب الحالية: [${myOffice.pkg}] - اشتراكك الشهري ينتهي بتاريخ: ${myOffice.expiry}.`;
+    }
+  }
+
+  // محاكاة ذكية لفحص الصلاحيات عند محاولة إضافة عقار جديد من قبل صاحب المكتب
+  function tryAddPropertyFromOffice() {
+    const myOffice = mockOffices[0]; 
+    
+    // 1. الفحص الرقابي الأول: هل هو موقوف من قبل المدير/المشرف؟
+    if (!myOffice.allowPublish) {
+      alert("❌ حظر إداري: لا يمكنك إضافة أي عقار! حسابك موقف عن النشر بقرار من إدارة الدليل حتى وإن كان الاشتراك مدفوعاً.");
+      return;
+    }
+    
+    // 2. الفحص الرقابي الثاني: انتهاء الصلاحية الشهرية
+    if (myOffice.status === 'expired') {
+      alert("❌ عذراً: اشتراكك الشهري منتهي الصلاحية! يجب طلب تجديد الاشتراك أولاً لتتمكن من النشر.");
+      return;
+    }
+    
+    // 3. الفحص الرقابي الثالث: حدود الباقة السحابية
+    let maxLimit = myOffice.pkg === 'gold' ? Infinity : myOffice.pkg === 'eco' ? 5 : 2;
+    if (myOffice.publishedProps >= maxLimit) {
+      alert(`❌ تجاوز الحد المسموح: لقد استهلكت كامل رصيد باقتك الحالية (${maxLimit}/${maxLimit} عقارات).\n\nقم بترقية الباقة إلى فئة أعلى من خلال الإدارة لمتابعة النشر!`);
+      return;
+    }
+
+    // إذا تخطى الفحوصات ينجح النشر
+    myOffice.publishedProps++;
+    alert("🎉 تم التحقق من الصلاحيات بنجاح! اشتراكك نشط، وبقاك تسمح، وحسابك غير موقف. تم نشر العقار بنجاح!");
+    setupOfficeViewUI();
+  }
+
   function handleLogin() {
     const u = document.getElementById('usernameInput').value.trim();
     const p = document.getElementById('passwordInput').value.trim();
 
-    if (!u || !p) { alert('الرجاء تعبئة خانات الدخول أولاً!'); return; }
-
-    if (u === 'admin' && p === 'admin2881988') {
-      session = { role: 'admin', username: 'الاستاذ كرار فاروق الخرساني (المدير العام)' };
-    } else if (u === 'admin@ms' && p === 'm2009m') {
-      session = { role: 'supervisor', username: 'الأستاذ مصطفى كرار الخرساني (المشرف العام)' };
+    if (u === 'admin' && p === 'admin123') {
+      session = { role: 'admin', username: 'المدير العام' };
+    } else if (u === 'super' && p === 'super123') {
+      session = { role: 'supervisor', username: 'المشرف الرقابي' };
     } else if (u === 'office' && p === 'office123') {
-      session = { role: 'office', username: 'مدير مكتب الأمانة العقاري' };
+      session = { role: 'office', username: 'مكتب الأمانة العقاري' };
     } else {
-      alert('❌ البيانات خاطئة! يرجى مراجعة تلميحات الحسابات التجريبية بالأسفل لتجربة لوحة التحكم تدرج الصلاحيات.');
-      return;
+      alert('بيانات غير صحيحة!'); return;
     }
 
     localStorage.setItem('basra_admin_session', JSON.stringify(session));
     evaluateSessionUI();
   }
 
-  // خروج من النظام
   function handleLogout() {
     session = null;
     localStorage.removeItem('basra_admin_session');
     evaluateSessionUI();
-  }
-
-  // ضخ جدول المكاتب للمدراء والمشرفين
-  function renderOfficesTable() {
-    const tbody = document.getElementById('officesTableBody');
-    if (!tbody) return;
-
-    tbody.innerHTML = mockOffices.map(o => `
-      <tr>
-        <td><strong>${o.name}</strong></td>
-        <td>${o.area}</td>
-        <td>${o.props} عقار</td>
-        <td style="color:${o.pkg=='gold'?'var(--gold)':'#4A9FD4'}">
-          ${o.pkg=='gold'?'🥇 ذهبي VIP': o.pkg=='eco'?'💎 اقتصادي':'⭐ باقة مجانية'}
-        </td>
-        <td>
-          <select style="background:var(--navy); color:#fff; border:1px solid rgba(201,168,76,0.3); padding:4px 8px; border-radius:6px; font-family:'Cairo';" onchange="changePackage('${o.id}', this.value)">
-            <option value="free" ${o.pkg == 'free' ? 'selected' : ''}>باقة مجانية</option>
-            <option value="eco" ${o.pkg == 'eco' ? 'selected' : ''}>باقة اقتصادية</option>
-            <option value="gold" ${o.pkg == 'gold' ? 'selected' : ''}>باقة ذهبية VIP</option>
-          </select>
-        </td>
-        <td>
-          <button onclick="deleteOffice('${o.id}')" class="btn-danger">شطب وحذف</button>
-        </td>
-      </tr>
-    `).join('');
-  }
-
-  // تمييز الصلاحيات: (مسموح للمدير والمشرف)
-  function changePackage(id, newPkg) {
-    // كلاهما يملك صلاحية تغيير الباقات
-    const idx = mockOffices.findIndex(o => o.id === id);
-    if (idx !== -1) {
-      mockOffices[idx].pkg = newPkg;
-      alert(`✅ إجراء ناجح [بصلاحية ${session.role}]: تم تبديل الباقة بنجاح للـ (${mockOffices[idx].name}).`);
-      renderOfficesTable();
-    }
-  }
-
-  // تمييز الحماية الحساسة: (حذف الحسابات مسموح للمدير فقط ومحرم على المشرفين!)
-  function deleteOffice(id) {
-    if (session.role !== 'admin') {
-      alert('❌ رفض الصلاحية الأمنية: عذراً، لا يمكن للمشرف القيام بحذف المكاتب بشكل قطعي! هذه ميزة حصرية ومحجوبة لـ (المدير العام) لحماية البيانات من التلاعب.');
-      return;
-    }
-
-    const idx = mockOffices.findIndex(o => o.id === id);
-    if (idx === -1) return;
-
-    if (confirm(`هل أنت متأكد من الحذف النهائي لمكتب (${mockOffices[idx].name}) من قواعد بيانات البصرة؟`)) {
-      mockOffices.splice(idx, 1);
-      renderOfficesTable();
-      alert('🗑️ تم إقصاء وشطب حساب المكتب العقاري بنجاح.');
-    }
   }
 </script>
 </body>
