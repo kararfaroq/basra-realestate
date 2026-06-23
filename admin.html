@@ -94,13 +94,14 @@
   <div id="loginFormSection" class="login-card">
     <div style="text-align:center; margin-bottom:1.5rem">
       <div style="width:56px; height:56px; background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3); border-radius:14px; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; font-size:24px">🔐</div>
-      <h2 style="font-size:1.3rem; font-weight:900; margin-bottom:.3rem">بوابة التحكم والاشتراكات والنشر المباشر</h2>
+      <h2 style="font-size:1.3rem; font-weight:900; margin-bottom:.3rem">بوابة الدخول الموحدة للوحة التحكم</h2>
+      <p style="font-size:12px; color:var(--text-muted);">سجل دخولك كمشرف أو مكتب لمتابعة الصلاحيات والاشتراكات</p>
     </div>
     
     <div>
-      <input type="text" id="usernameInput" class="input-field" placeholder="اسم المستخدم (للمكاتب أو الإدارة)" autocomplete="off">
+      <input type="text" id="usernameInput" class="input-field" placeholder="اسم المستخدم">
       <input type="password" id="passwordInput" class="input-field" placeholder="كلمة المرور">
-      <button onclick="handleLogin()" class="btn-action">تسجيل الدخول الآمن 🚀</button>
+      <button onclick="handleLogin()" class="btn-action">🚀 تسجيل الدخول والتحقق الآمن</button>
       
       <div style="margin: 15px 0; text-align: center; color: var(--text-muted); font-size: 12px; position: relative;">
         <span style="background: var(--navy-mid); padding: 0 10px; z-index: 2; position: relative;">أو انشر كزائر سريع</span>
@@ -179,31 +180,22 @@
       <h3 style="color: var(--gold); font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
         <i class="ti ti-circle-plus"></i> إضافة عقار جديد للدليل
       </h3>
-      <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">تأكد من إدخال المواصفات الدقيقة للعقار البصري قبل النشر الرسمي</p>
     </div>
     <div>
       <label style="font-size: 12px; color: var(--gold); display: block; margin-bottom: 5px;">نوع العقار</label>
       <select id="propType" class="input-field" style="background: var(--navy); color:#fff;">
         <option value="بيت">بيت سكني</option>
         <option value="شقة">شقة فاخرة</option>
-        <option value="أرض">أرض استثمارية / سكنية</option>
+        <option value="أرض">أرض استثمارية</option>
         <option value="محل">محل تجاري</option>
       </select>
       <label style="font-size: 12px; color: var(--gold); display: block; margin-bottom: 5px;">المنطقة في البصرة</label>
-      <input type="text" id="propArea" class="input-field" placeholder="مثال: العشار، الطويسة، الجنينة...">
+      <input type="text" id="propArea" class="input-field" placeholder="مثال: العشار، الطويسة...">
       <label style="font-size: 12px; color: var(--gold); display: block; margin-bottom: 5px;">السعر المطلوب</label>
       <input type="text" id="propPrice" class="input-field" placeholder="مثال: 140 مليون دينار">
-      <div id="guestPremiumSection" style="background: rgba(201,168,76,0.06); padding: 12px; border-radius: 8px; border: 1px dashed var(--gold); margin-bottom: 15px; display: none;">
-         <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--gold-light); cursor: pointer;">
-            <input type="checkbox" id="makePremiumCheckbox" onchange="togglePremiumNotice(this.checked)" style="accent-color: var(--gold);">
-            ✨ ترقية الإعلان إلى الباقة الذهبية المميزة (VIP)
-         </label>
-         <p id="premiumNotice" style="font-size: 11px; color: var(--text-muted); margin-top: 5px; line-height: 1.4; display: none;">
-            ⚠️ يتطلب هذا الخيار دفع رسوم معينة قدرها <strong>5,000 دينار عراقي فقط</strong> لتثبيت عقارك في صدارة نتائج البحث بشكل ملفت وضمان مشاهدات مضاعفة!
-         </p>
-      </div>
+      
       <button onclick="submitNewProperty()" class="btn-action">🚀 نشر الإعلان فوراً</button>
-      <button onclick="closeAddPropertyModal()" class="btn-close-danger">❌ إلغاء وإغلاق النافذة</button>
+      <button onclick="closeAddPropertyModal()" class="btn-close-danger">❌ إلغاء وإغلاق</button>
     </div>
   </div>
 </div>
@@ -212,7 +204,7 @@
   // تهيئة البيانات الافتراضية وحفظها بالـ LocalStorage لضمان الحفظ الدائم
   const defaultOffices = [
     {id: "1", name:'مكتب الأمانة العقاري', area:'العشار', publishedProps: 1, pkg:'free', status:'active', allowPublish: true, expiry:'مفتوح الصلاحية دائم'},
-    {id: "2", name:'عقارات الخليج بالبصرة', area:'الجمهورية', publishedProps: 4, pkg:'eco', status:'active', allowPublish: false, expiry:'2026-07-24'},
+    {id: "2", name:'عقارات الخليج بالبصرة', area:'الجمهورية', publishedProps: 4, pkg:'eco', status:'active', allowPublish: true, expiry:'2026-07-24'},
     {id: "3", name:'مكتب الرافدين للاستثمار', area:'المعقل', publishedProps: 12, pkg:'gold', status:'expired', allowPublish: true, expiry:'2026-06-01'}
   ];
 
@@ -252,7 +244,7 @@
         adminSuperZone.style.display = 'block';
         renderOfficesTable();
       } else if (session.role === 'office' || session.role === 'guest') {
-        badge.textContent = session.role === 'office' ? '🏢 مكتب عقاري شريك' : '👤 زائر عادي للدليل';
+        badge.textContent = session.role === 'office' ? '🏢 مكتب عقاري شريك' : '👤 زائر عادي لدليل';
         officeZone.style.display = 'block';
         setupOfficeViewUI();
       }
@@ -327,21 +319,15 @@
     
     if (session.role === 'guest') {
       document.getElementById('currentOfficePropsCount').textContent = guestUser.publishedProps;
-      document.getElementById('packageLimitInfo').textContent = `ℹ️ باقة الزائر المباشر: مسموح لك بنشر عقار واحد فقط مجاناً ليظهر في البحث الطبيعي بشكل طبيعي.`;
-      
-      if (guestUser.publishedProps >= guestUser.maxLimit) {
-        banner.className = "status-suspended";
-        banner.innerHTML = `⚠️ <strong>لقد استهلكت حد النشر المجاني كزائر!</strong><br>لقد قمت بنشر عقار واحد بنجاح. إذا كنت تريد إضافة عقارات إضافية، يرجى إنشاء حساب مكتب عقاري رسمي للتمتع بباقات أوسع.`;
-      } else {
-        banner.className = "status-active";
-        banner.innerHTML = `🟢 <strong>أهلاً بك كزائر في الدليل!</strong> يمكنك الآن إضافة عقارك الأول والوحيد مجاناً ليظهر في البحث الطبيعي مباشرة.`;
-      }
+      document.getElementById('packageLimitInfo').textContent = `ℹ️ باقة الزائر: مسموح بنشر عقار واحد مجاناً.`;
+      banner.className = "status-active";
+      banner.innerHTML = `🟢 دخول سريع كزائر عادي.`;
     } else {
       let offices = getOffices();
       const myOffice = offices[0]; 
       document.getElementById('currentOfficePropsCount').textContent = myOffice.publishedProps;
       let maxLimit = myOffice.pkg === 'gold' ? Infinity : myOffice.pkg === 'eco' ? 5 : 2;
-      document.getElementById('packageLimitInfo').textContent = myOffice.pkg === 'gold' ? "🥇 باقتك ذهبية: نشر غير محدود." : `ℹ️ سقف الباقة الحالية: مسموح لك بنشر ${maxLimit} عقارات نشطة معاً.`;
+      document.getElementById('packageLimitInfo').textContent = myOffice.pkg === 'gold' ? "🥇 باقتك ذهبية: نشر غير محدود." : `ℹ️ سقف الباقة الحالية: ${maxLimit} عقارات.`;
       
       if (!myOffice.allowPublish) {
         banner.className = "status-suspended"; banner.innerHTML = `🛑 <strong>تم إيقاف مكتبك عن النشر من قبل الإدارة!</strong>`;
@@ -354,34 +340,21 @@
   function openAddPropertyModal() {
     if (session.role === 'guest') {
       if (guestUser.publishedProps >= guestUser.maxLimit) {
-        alert("❌ تجاوز الحد: بصفتك زائر، يسمح لك السيستم بنشر عقار واحد فقط مجاناً! يرجى ترقية الحساب إلى مكتب لنشر المزيد.");
-        return;
+        alert("❌ تجاوز الحد المسموح للزوار!"); return;
       }
-      document.getElementById('guestPremiumSection').style.display = 'block';
     } else {
       let offices = getOffices();
       const myOffice = offices[0]; 
-      if (!myOffice.allowPublish) { alert("❌ حسابك موقف عن النشر حالياً بقرار إداري!"); return; }
-      let maxLimit = myOffice.pkg === 'gold' ? Infinity : myOffice.pkg === 'eco' ? 5 : 2;
-      if (myOffice.publishedProps >= maxLimit) { alert("❌ تجاوزت السقف المحدد للباقة!"); return; }
-      document.getElementById('guestPremiumSection').style.display = 'none';
+      if (!myOffice.allowPublish) { alert("❌ حسابك موقف عن النشر حالياً!"); return; }
     }
     document.getElementById('addPropertyModal').style.display = 'flex';
   }
 
-  function togglePremiumNotice(isChecked) {
-    document.getElementById('premiumNotice').style.display = isChecked ? 'block' : 'none';
-  }
-
   function closeAddPropertyModal() {
     document.getElementById('addPropertyModal').style.display = 'none';
-    document.getElementById('propArea').value = '';
-    document.getElementById('propPrice').value = '';
-    document.getElementById('makePremiumCheckbox').checked = false;
-    document.getElementById('premiumNotice').style.display = 'none';
   }
 
-  // السطر 293 لبيانات المشرف (super / super123)
+  // دالة تسجيل الدخول الموحدة للوحة مع الحسابات الصحيحة والمجربة
   function handleLogin() {
     const u = document.getElementById('usernameInput').value.trim();
     const p = document.getElementById('passwordInput').value.trim();
@@ -418,17 +391,16 @@
   function submitNewProperty() {
     const area = document.getElementById('propArea').value.trim();
     const price = document.getElementById('propPrice').value.trim();
-    if(!area || !price) { alert("الرجاء إدخال المنطقة والسعر أولاً!"); return; }
+    if(!area || !price) { alert("الرجاء إدخال البيانات!"); return; }
 
     if (session.role === 'guest') {
       guestUser.publishedProps++;
-      alert("🎉 تم نشر عقارك كزائر عادي بنجاح!");
     } else {
       let offices = getOffices();
       offices[0].publishedProps++;
       saveOffices(offices);
-      alert("🎉 تم نشر العقار الجديد في الدليل العقاري بنجاح!");
     }
+    alert("🎉 تم نشر العقار بنجاح!");
     closeAddPropertyModal();
     setupOfficeViewUI();
   }
