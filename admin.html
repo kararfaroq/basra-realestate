@@ -76,7 +76,6 @@
       animation: fadeIn 0.3s ease-out;
     }
     
-    /* زر التراجع الجديد باللون الأحمر الأسفل */
     .btn-close-danger {
       width: 100%; background: transparent; color: var(--danger);
       border: 1px solid var(--danger); border-radius: 8px; padding: 10px;
@@ -148,24 +147,20 @@
               <th>التحكم بالنشر (إيقاف/تفعيل)</th>
             </tr>
           </thead>
-          <tbody id="officesTableBody">
-            </tbody>
+          <tbody id="officesTableBody"></tbody>
         </table>
       </div>
     </div>
 
     <div id="officeOnlyView" class="panel-card" style="display:none;">
       <div class="panel-title"><i class="ti ti-building-estate"></i> حالة صلاحيات مكتبك الإعلانية</div>
-      
       <div id="officeStatusBanner" style="padding:1.2rem; border-radius:10px; margin-bottom:1.5rem; font-size:14px; line-height:1.6;"></div>
-
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
         <span style="font-weight:700; font-size:14px;">إحصائيات الإعلانات الحالية للمكتب:</span>
         <button class="btn-action" style="width:auto; padding:6px 15px; font-size:12px;" onclick="openAddPropertyModal()">➕ إضافة عقار جديد</button>
       </div>
-      
       <div style="background:rgba(255,255,255,0.02); padding:1rem; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
-         <p>📊 العقارات المنشورة حالياً: <strong id="currentOfficePropsCount" style="color:var(--gold);">1</strong> عقارات</p>
+         <p>📊 العقارات المنشورة حالياً: <strong id="currentOfficePropsCount" style="color:var(--gold);">0</strong> عقارات</p>
          <p id="packageLimitInfo" style="font-size:12px; color:var(--text-muted); margin-top:5px;"></p>
       </div>
     </div>
@@ -180,14 +175,12 @@
 
 <div id="addPropertyModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event)">
   <div class="modal-content">
-    
     <div style="margin-bottom: 1.5rem;">
       <h3 style="color: var(--gold); font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
         <i class="ti ti-circle-plus"></i> إضافة عقار جديد للدليل
       </h3>
       <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">تأكد من إدخال المواصفات الدقيقة للعقار البصري قبل النشر الرسمي</p>
     </div>
-
     <div>
       <label style="font-size: 12px; color: var(--gold); display: block; margin-bottom: 5px;">نوع العقار</label>
       <select id="propType" class="input-field" style="background: var(--navy); color:#fff;">
@@ -196,13 +189,10 @@
         <option value="أرض">أرض استثمارية / سكنية</option>
         <option value="محل">محل تجاري</option>
       </select>
-
       <label style="font-size: 12px; color: var(--gold); display: block; margin-bottom: 5px;">المنطقة في البصرة</label>
       <input type="text" id="propArea" class="input-field" placeholder="مثال: العشار، الطويسة، الجنينة...">
-
       <label style="font-size: 12px; color: var(--gold); display: block; margin-bottom: 5px;">السعر المطلوب</label>
       <input type="text" id="propPrice" class="input-field" placeholder="مثال: 140 مليون دينار">
-
       <div id="guestPremiumSection" style="background: rgba(201,168,76,0.06); padding: 12px; border-radius: 8px; border: 1px dashed var(--gold); margin-bottom: 15px; display: none;">
          <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--gold-light); cursor: pointer;">
             <input type="checkbox" id="makePremiumCheckbox" onchange="togglePremiumNotice(this.checked)" style="accent-color: var(--gold);">
@@ -212,20 +202,26 @@
             ⚠️ يتطلب هذا الخيار دفع رسوم معينة قدرها <strong>5,000 دينار عراقي فقط</strong> لتثبيت عقارك في صدارة نتائج البحث بشكل ملفت وضمان مشاهدات مضاعفة!
          </p>
       </div>
-
       <button onclick="submitNewProperty()" class="btn-action">🚀 نشر الإعلان فوراً</button>
-      
       <button onclick="closeAddPropertyModal()" class="btn-close-danger">❌ إلغاء وإغلاق النافذة</button>
     </div>
   </div>
 </div>
 
 <script>
-  let mockOffices = [
+  // تهيئة البيانات الافتراضية وحفظها بالـ LocalStorage لضمان الحفظ الدائم
+  const defaultOffices = [
     {id: "1", name:'مكتب الأمانة العقاري', area:'العشار', publishedProps: 1, pkg:'free', status:'active', allowPublish: true, expiry:'مفتوح الصلاحية دائم'},
     {id: "2", name:'عقارات الخليج بالبصرة', area:'الجمهورية', publishedProps: 4, pkg:'eco', status:'active', allowPublish: false, expiry:'2026-07-24'},
     {id: "3", name:'مكتب الرافدين للاستثمار', area:'المعقل', publishedProps: 12, pkg:'gold', status:'expired', allowPublish: true, expiry:'2026-06-01'}
   ];
+
+  if (!localStorage.getItem('mockOfficesData')) {
+     localStorage.setItem('mockOfficesData', JSON.stringify(defaultOffices));
+  }
+
+  function getOffices() { return JSON.parse(localStorage.getItem('mockOfficesData')); }
+  function saveOffices(data) { localStorage.setItem('mockOfficesData', JSON.stringify(data)); }
 
   let guestUser = { publishedProps: 0, maxLimit: 1, allowPublish: true };
   let session = JSON.parse(localStorage.getItem('basra_admin_session')) || null;
@@ -255,12 +251,8 @@
         badge.textContent = session.role === 'admin' ? '👑 مدير النظام' : '🛡️ مشرف معتمد';
         adminSuperZone.style.display = 'block';
         renderOfficesTable();
-      } else if (session.role === 'office') {
-        badge.textContent = '🏢 مكتب عقاري شريك';
-        officeZone.style.display = 'block';
-        setupOfficeViewUI();
-      } else if (session.role === 'guest') {
-        badge.textContent = '👤 زائر عادي للدليل';
+      } else if (session.role === 'office' || session.role === 'guest') {
+        badge.textContent = session.role === 'office' ? '🏢 مكتب عقاري شريك' : '👤 زائر عادي للدليل';
         officeZone.style.display = 'block';
         setupOfficeViewUI();
       }
@@ -271,7 +263,8 @@
     const tbody = document.getElementById('officesTableBody');
     if (!tbody) return;
 
-    tbody.innerHTML = mockOffices.map(o => {
+    let offices = getOffices();
+    tbody.innerHTML = offices.map(o => {
       const isFree = o.pkg === 'free';
       const isExpired = o.status === 'expired' && !isFree;
       let limitText = o.pkg === 'gold' ? '∞ مفتوح' : o.pkg === 'eco' ? 'اقصى 5' : 'اقصى 2';
@@ -292,32 +285,40 @@
             </select>
           </td>
           <td><button onclick="renewSubscriptionMonthly('${o.id}')" class="btn-renew" ${isFree ? 'disabled' : ''}>${isFree ? '🚫 لا يتطلب' : '🔄 تجديد 30 يوم'}</button></td>
-          <td><button onclick="togglePublishStatus('${o.id}')" class="btn-suspend" style="background:${o.allowPublish?'var(--warning)':'var(--success)'}">${o.allowPublish ? '🛑 إيقاف النشر' : '🟢 إلغاء الإيقاف'}</button></td>
+          <td><button onclick="togglePublishStatus('${o.id}')" class="btn-suspend" style="background:${o.allowPublish?'var(--warning)':'var(--success)'}; color:${o.allowPublish?'var(--navy)':'#fff'}">${o.allowPublish ? '🛑 إيقاف النشر' : '🟢 إلغاء الإيقاف'}</button></td>
         </tr>
       `;
     }).join('');
   }
 
   function renewSubscriptionMonthly(id) {
-    const idx = mockOffices.findIndex(o => o.id === id);
-    if (idx !== -1 && mockOffices[idx].pkg !== 'free') {
+    let offices = getOffices();
+    const idx = offices.findIndex(o => o.id === id);
+    if (idx !== -1 && offices[idx].pkg !== 'free') {
       const today = new Date(); today.setDate(today.getDate() + 30);
-      mockOffices[idx].status = 'active'; mockOffices[idx].expiry = today.toISOString().split('T')[0];
-      alert(`✅ تم تجديد الاشتراك لـ (${mockOffices[idx].name}).`); renderOfficesTable();
+      offices[idx].status = 'active'; offices[idx].expiry = today.toISOString().split('T')[0];
+      saveOffices(offices); alert(`✅ تم تجديد الاشتراك لـ (${offices[idx].name}).`); renderOfficesTable();
     }
   }
 
   function togglePublishStatus(id) {
-    const idx = mockOffices.findIndex(o => o.id === id);
-    if (idx !== -1) { mockOffices[idx].allowPublish = !mockOffices[idx].allowPublish; renderOfficesTable(); }
+    let offices = getOffices();
+    const idx = offices.findIndex(o => o.id === id);
+    if (idx !== -1) { 
+      offices[idx].allowPublish = !offices[idx].allowPublish; 
+      saveOffices(offices); 
+      renderOfficesTable(); 
+    }
   }
 
   function changePackage(id, newPkg) {
-    const idx = mockOffices.findIndex(o => o.id === id);
+    let offices = getOffices();
+    const idx = offices.findIndex(o => o.id === id);
     if (idx !== -1) {
-      mockOffices[idx].pkg = newPkg;
-      mockOffices[idx].expiry = newPkg === 'free' ? 'مفتوح الصلاحية دائم' : new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0];
-      mockOffices[idx].status = 'active'; renderOfficesTable();
+      offices[idx].pkg = newPkg;
+      offices[idx].expiry = newPkg === 'free' ? 'مفتوح الصلاحية دائم' : new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0];
+      offices[idx].status = 'active'; 
+      saveOffices(offices); renderOfficesTable();
     }
   }
 
@@ -336,7 +337,8 @@
         banner.innerHTML = `🟢 <strong>أهلاً بك كزائر في الدليل!</strong> يمكنك الآن إضافة عقارك الأول والوحيد مجاناً ليظهر في البحث الطبيعي مباشرة.`;
       }
     } else {
-      const myOffice = mockOffices[0]; 
+      let offices = getOffices();
+      const myOffice = offices[0]; 
       document.getElementById('currentOfficePropsCount').textContent = myOffice.publishedProps;
       let maxLimit = myOffice.pkg === 'gold' ? Infinity : myOffice.pkg === 'eco' ? 5 : 2;
       document.getElementById('packageLimitInfo').textContent = myOffice.pkg === 'gold' ? "🥇 باقتك ذهبية: نشر غير محدود." : `ℹ️ سقف الباقة الحالية: مسموح لك بنشر ${maxLimit} عقارات نشطة معاً.`;
@@ -357,13 +359,13 @@
       }
       document.getElementById('guestPremiumSection').style.display = 'block';
     } else {
-      const myOffice = mockOffices[0]; 
+      let offices = getOffices();
+      const myOffice = offices[0]; 
       if (!myOffice.allowPublish) { alert("❌ حسابك موقف عن النشر حالياً بقرار إداري!"); return; }
       let maxLimit = myOffice.pkg === 'gold' ? Infinity : myOffice.pkg === 'eco' ? 5 : 2;
       if (myOffice.publishedProps >= maxLimit) { alert("❌ تجاوزت السقف المحدد للباقة!"); return; }
       document.getElementById('guestPremiumSection').style.display = 'none';
     }
-
     document.getElementById('addPropertyModal').style.display = 'flex';
   }
 
@@ -379,46 +381,14 @@
     document.getElementById('premiumNotice').style.display = 'none';
   }
 
-  function closeModalOnOutsideClick(event) {
-    if (event.target.id === 'addPropertyModal') { closeAddPropertyModal(); }
-  }
-
-  function submitNewProperty() {
-    const area = document.getElementById('propArea').value.trim();
-    const price = document.getElementById('propPrice').value.trim();
-    
-    if(!area || !price) { alert("الرجاء إدخال المنطقة والسعر أولاً!"); return; }
-
-    if (session.role === 'guest') {
-      const isPremium = document.getElementById('makePremiumCheckbox').checked;
-      if (isPremium) {
-         alert("💸 نظام الرسوم (5,000 دينار):\nتم تفعيل ميزة الإعلان الذهبي المميز! يرجى تحويل الرسوم لإدارة الدليل لتثبيت العقار في صدارة البحث.");
-      } else {
-         alert("🎉 تم نشر عقارك كزائر عادي بنجاح! سيظهر ضمن نتائج البحث الطبيعية للجمهور.");
-      }
-      guestUser.publishedProps++;
-    } else {
-      mockOffices[0].publishedProps++;
-      alert("🎉 تم نشر العقار الجديد في الدليل العقاري بنجاح!");
-    }
-    
-    closeAddPropertyModal();
-    setupOfficeViewUI();
-  }
-
-  function loginAsGuest() {
-    session = { role: 'guest', username: 'زائر سريع للدليل' };
-    localStorage.setItem('basra_admin_session', JSON.stringify(session));
-    evaluateSessionUI();
-  }
-
+  // السطر 293 لبيانات المشرف (super / super123)
   function handleLogin() {
     const u = document.getElementById('usernameInput').value.trim();
     const p = document.getElementById('passwordInput').value.trim();
     
     if (u === 'admin' && p === 'admin123') {
       session = { role: 'admin', username: 'المدير العام للنظام' };
-    } else if (u === 'super' && p === 'super123') {
+    } else if (u === 'super' && p === 'super123') { 
       session = { role: 'supervisor', username: 'المشرف المعتمد (Super)' };
     } else if (u === 'office' && p === 'office123') {
       session = { role: 'office', username: 'مكتب الأمانة العقاري' };
@@ -432,7 +402,35 @@
   }
 
   function handleLogout() {
-    session = null; delete localStorage.basra_admin_session; evaluateSessionUI();
+    session = null; localStorage.removeItem('basra_admin_session'); evaluateSessionUI();
+  }
+
+  function loginAsGuest() {
+    session = { role: 'guest', username: 'زائر سريع للدليل' };
+    localStorage.setItem('basra_admin_session', JSON.stringify(session));
+    evaluateSessionUI();
+  }
+
+  function closeModalOnOutsideClick(event) {
+    if (event.target.id === 'addPropertyModal') { closeAddPropertyModal(); }
+  }
+
+  function submitNewProperty() {
+    const area = document.getElementById('propArea').value.trim();
+    const price = document.getElementById('propPrice').value.trim();
+    if(!area || !price) { alert("الرجاء إدخال المنطقة والسعر أولاً!"); return; }
+
+    if (session.role === 'guest') {
+      guestUser.publishedProps++;
+      alert("🎉 تم نشر عقارك كزائر عادي بنجاح!");
+    } else {
+      let offices = getOffices();
+      offices[0].publishedProps++;
+      saveOffices(offices);
+      alert("🎉 تم نشر العقار الجديد في الدليل العقاري بنجاح!");
+    }
+    closeAddPropertyModal();
+    setupOfficeViewUI();
   }
 </script>
 </body>
