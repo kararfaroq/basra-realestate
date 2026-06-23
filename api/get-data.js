@@ -8,10 +8,15 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// جعل السيرفر يعرض ملفات الواجهة (HTML, CSS, JS) تلقائياً
-app.use(express.static(path.join(__dirname, '../')));
+// تشغيل وقراءة الملفات الثابتة (CSS, JS, الصور) من المجلد الرئيسي
+app.use(express.static(path.join(__dirname, '..')));
 
-// مسار جلب البيانات المباشر من Neon
+// توجيه الرابط الرئيسي للموقع ليفتح ملف الواجهة index.html مباشرة
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'index.html'));
+});
+
+// مسار جلب البيانات الحية من قاعدة بيانات Neon
 app.get('/api/get-data', async (req, res) => {
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
