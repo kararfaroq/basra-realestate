@@ -1,97 +1,96 @@
 document.addEventListener('DOMContentLoaded', () => {
-    loadRealData();
+  loadRealData();
 });
 
+// الدالة الأساسية المحدثة لربط خادم Render بكلاسات تصميمك الفخم الأصلي
 async function loadRealData() {
-    const listingsContainer = document.getElementById('listings-container');
-    const officesContainer = document.getElementById('offices-container');
-    const totalListingsEl = document.getElementById('total-listings');
-    const totalOfficesEl = document.getElementById('total-offices');
+  const lGrid = document.getElementById('listingsGrid');
+  const oGrid = document.getElementById('officesGrid');
 
-    try {
-        // طلب البيانات من مسار الـ API التابع لسيرفر Render
-        const response = await fetch('/api/get-data');
-        
-        if (!response.ok) {
-            throw new Error('فشل في جلب البيانات من السيرفر');
-        }
+  try {
+    // الاتصال بالخادم الحي على Render
+    const response = await fetch('/api/get-data');
+    if (!response.ok) throw new Error('فشل جلب البيانات الحية');
+    
+    const data = await response.json();
 
-        const data = await response.json();
-
-        // تحديث العدادات الرقمية في أعلى الصفحة بناءً على البيانات الحية
-        if (totalListingsEl && data.listings) {
-            totalListingsEl.textContent = data.listings.length;
-        }
-        if (totalOfficesEl && data.offices) {
-            totalOfficesEl.textContent = data.offices.length;
-        }
-
-        // 1. عرض وتنسيق العقارات (Listings)
-        if (listingsContainer) {
-            listingsContainer.innerHTML = ''; 
-
-            if (data.listings && data.listings.length > 0) {
-                data.listings.forEach(item => {
-                    const card = document.createElement('div');
-                    // إذا كان العقار مميزاً VIP يحصل على كلاس إضافي للتصميم
-                    card.className = `card ${item.vip ? 'vip-card' : ''}`;
-                    
-                    card.innerHTML = `
-                        <div class="card-image">
-                            <span class="property-icon">${item.icon || '🏡'}</span>
-                            ${item.vip ? '<span class="badge-vip">⭐ تميز</span>' : ''}
-                            <span class="badge-action">${item.action}</span>
-                        </div>
-                        <div class="card-content">
-                            <h3 class="property-type">${item.type}</h3>
-                            <p class="property-district">📍 ${item.district}</p>
-                            <div class="property-details">
-                                <span>📐 ${item.area}</span>
-                                <span>🛏️ ${item.rooms} غرف</span>
-                                <span>🚿 ${item.bath} حمام</span>
-                            </div>
-                            <hr>
-                            <div class="card-footer">
-                                <span class="property-price">${item.price}</span>
-                                <span class="office-tag">🏢 ${item.office_name}</span>
-                            </div>
-                        </div>
-                    `;
-                    listingsContainer.appendChild(card);
-                });
-            } else {
-                listingsContainer.innerHTML = '<p class="no-data">لا توجد عقارات مضافة حالياً.</p>';
-            }
-        }
-
-        // 2. عرض وتنسيق مكاتب الدلالية (Offices)
-        if (officesContainer) {
-            officesContainer.innerHTML = ''; 
-
-            if (data.offices && data.offices.length > 0) {
-                data.offices.forEach(office => {
-                    const card = document.createElement('div');
-                    card.className = 'office-card';
-                    
-                    card.innerHTML = `
-                        <h3>🏢 ${office.name}</h3>
-                        <p>👤 الإدارة: ${office.manager}</p>
-                        <p>📍 الموقع: ${office.location}</p>
-                        <a href="https://wa.me/${office.phone}" target="_blank" class="whatsapp-btn">
-                            💬 تواصل عبر واتساب
-                        </a>
-                    `;
-                    officesContainer.appendChild(card);
-                });
-            } else {
-                officesContainer.innerHTML = '<p class="no-data">لا توجد مكاتب مسجلة حالياً.</p>';
-            }
-        }
-
-    } catch (error) {
-        console.error('Error fetching data:', error);
-        if (listingsContainer) {
-            listingsContainer.innerHTML = '<p class="error-msg">⚠️ عذراً، حدث خطأ أثناء تحميل البيانات الحية.</p>';
-        }
+    // تشغيل العدادات الفخمة الأصلية وتغذيتها بالأرقام الحية
+    if (document.getElementById('count-listings')) {
+      animateCount('count-listings', data.listings ? data.listings.length : 0);
     }
+    if (document.getElementById('count-offices')) {
+      animateCount('count-offices', data.offices ? data.offices.length : 0);
+    }
+
+    // 1. حقن العقارات المتاحة مع الحفاظ على القوالب والـ Icons والـ Badges الأصلية لتصميمك
+    if (lGrid) {
+      if (data.listings && data.listings.length > 0) {
+        lGrid.innerHTML = data.listings.map(l => `
+          <div class="card">
+            <div class="card-hero-img">
+              <div class="prop-icon">${l.icon || '🏡'}</div>
+              ${l.vip ? '<div class="badge-vip">⭐ تميز VIP</div>' : ''}
+              <div class="badge-type">${l.action || 'بيع'}</div>
+            </div>
+            <div class="card-body">
+              <h3 class="prop-title">${l.type || 'عقار'}</h3>
+              <div class="prop-loc">📍 ${l.district || 'البصرة'}</div>
+              <div class="prop-features">
+                <div class="feature-item">📐 ${l.area || 'غير محدد'}</div>
+                <div class="feature-item">🛏️ ${l.rooms || 0} غرف</div>
+                <div class="feature-item">🚿 ${l.bath || 0} حمام</div>
+              </div>
+              <div class="card-footer">
+                <div class="prop-price">${l.price || 'اتصال'}</div>
+                <div class="prop-owner">🏢 ${l.office_name || 'دليل البصرة'}</div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        lGrid.innerHTML = '<div class="loading-box">لا توجد عقارات مضافة حالياً في قاعدة البيانات.</div>';
+      }
+    }
+
+    // 2. حقن المكاتب العقارية الشريكة بالتنسيق الأصلي الكامل وبطاقات الـ VIP
+    if (oGrid) {
+      if (data.offices && data.offices.length > 0) {
+        oGrid.innerHTML = data.offices.map(o => `
+          <div class="office-card">
+            <div class="office-avatar">🏢</div>
+            <div class="office-info">
+              <div class="office-name">${o.name}</div>
+              <div class="office-meta">
+                <div>👤 الإدارة: ${o.manager}</div>
+                <div>📍 ${o.location}</div>
+                <div>📐 ${o.area || ''}</div>
+              </div>
+              <div class="office-pkg ${o.pkg == 'gold' ? 'pkg-gold' : 'pkg-eco'}">
+                ${o.pkg == 'gold' ? '🥇 مكتب ذهبي VIP' : '💎 عضو اقتصادي'}
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        oGrid.innerHTML = '<div class="loading-box">لا توجد مكاتب دلالية مسجلة حالياً.</div>';
+      }
+    }
+
+  } catch (error) {
+    console.error('Pipeline Error:', error);
+    if(lGrid) lGrid.innerHTML = '<div class="loading-box" style="color:#ff6b6b;">⚠️ عذراً، تعذر جلب البيانات الحية من خادم Render.</div>';
+  }
+}
+
+// دالة عد الأرقام المتحركة الفخمة الأصلية للتصميم
+function animateCount(id, target, suffix = '') {
+  const el = document.getElementById(id);
+  if (!el) return;
+  let start = 0;
+  const step = Math.ceil(target / 60) || 1;
+  const iv = setInterval(() => {
+    start = Math.min(start + step, target);
+    el.textContent = start.toLocaleString('ar-EG') + suffix;
+    if (start >= target) clearInterval(iv);
+  }, 30);
 }
