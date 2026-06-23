@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بوابة التحكم والإدارة - دليل البصرة العقاري</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --gold:#C9A84C; --gold-light:#E8C96A;
+      --navy:#0A1628; --navy-mid:#1A3A5C; --navy-light:#2A5080;
+      --text-on-dark:#F5F0E8; --text-muted:#8BA0B8;
+    }
+    body{font-family:'Cairo',sans-serif;background:var(--navy);color:var(--text-on-dark);direction:rtl;padding:2rem 1rem;}
+    
+    .container{max-width:1050px; margin:0 auto;}
+    
+    /* LOGIN BOX */
+    .login-card {
+      background:var(--navy-mid); border:1px solid rgba(201,168,76,0.3);
+      border-radius:20px; padding:2.5rem; max-width:450px; margin:5rem auto 0;
+      box-shadow:0 10px 30px rgba(0,0,0,0.3);
+    }
+    .input-field{
+      width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(201,168,76,0.2);
+      border-radius:8px; padding:12px 16px; color:var(--text-on-dark); font-family:'Cairo';
+      font-size:14px; outline:none; margin-bottom:15px; transition:all 0.2s;
+    }
+    .input-field:focus{ border-color:var(--gold); background:rgba(255,255,255,0.08); }
+    .btn-action{
+      width:100%; background:var(--gold); color:var(--navy); border:none; border-radius:8px;
+      padding:14px; font-size:16px; font-weight:700; font-family:'Cairo'; cursor:pointer;
+    }
+    .btn-action:hover{ background:var(--gold-light); }
+    
+    /* DASHBOARD */
+    .dashboard-section { display:none; }
+    .dash-header {
+      display:flex; justify-content:space-between; align-items:center;
+      background:var(--navy-mid); padding:1.5rem 2rem; border-radius:14px;
+      border:1px solid rgba(201,168,76,0.2); margin-bottom:2rem; flex-wrap:wrap; gap:15px;
+    }
+    .badge-role { background:rgba(201,168,76,0.15); color:var(--gold); padding:6px 14px; border-radius:8px; font-weight:700; font-size:13px; }
+    
+    .panel-card { background:var(--navy-mid); border:1px solid rgba(255,255,255,0.06); border-radius:14px; padding:1.5rem; margin-bottom:1.5rem; }
+    .panel-title { font-size:1.2rem; font-weight:700; color:var(--gold); margin-bottom:1.2rem; display:flex; align-items:center; gap:8px; }
+    
+    /* TABLE */
+    table { width:100%; border-collapse:collapse; text-align:right; font-size:14px; }
+    th { padding:12px; border-bottom:2px solid var(--gold); color:var(--text-muted); font-weight:600; }
+    td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); }
+    
+    .btn-danger { background:#ff4d4d; color:white; border:none; padding:5px 12px; border-radius:6px; cursor:pointer; font-family:'Cairo'; font-size:12px; }
+    .btn-danger:hover { background:#ff3333; }
+    .btn-outline-back { background:transparent; color:var(--text-muted); border:1px solid rgba(255,255,255,0.2); padding:6px 14px; border-radius:6px; cursor:pointer; text-decoration:none; font-size:13px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <div id="loginFormSection" class="login-card">
+    <div style="text-align:center; margin-bottom:1.5rem">
+      <div style="width:56px; height:56px; background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3); border-radius:14px; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; font-size:24px">🔐</div>
+      <h2 style="font-size:1.3rem; font-weight:900; margin-bottom:.3rem">بوابة التحقق من الرتب والمسؤولين</h2>
+      <p style="font-size:12px; color:var(--text-muted)">قم بالولوج بحسابك لتفعيل لوحة التحكم والصلاحيات الخاصة بك</p>
+    </div>
+    
+    <div>
+      <input type="text" id="usernameInput" class="input-field" placeholder="اسم المستخدم" autocomplete="off">
+      <input type="password" id="passwordInput" class="input-field" placeholder="كلمة المرور">
+      <button onclick="handleLogin()" class="btn-action">تسجيل الدخول الآمن 🚀</button>
+    </div>
+    
+    <div style="background:rgba(255,255,255,0.02); padding:12px; border-radius:8px; font-size:11px; color:var(--text-muted); line-height:1.6; margin-top:20px; border:1px solid rgba(255,255,255,0.05);">
+      💡 <strong>حسابات المحاكاة وفحص النظام (تدرج الصلاحيات):</strong><br>
+      • رتبة مدير (Admin): <code style="color:var(--gold)">admin</code> / كلمه سر: <code>admin123</code> (صلاحيات مطلقة وتعديل وحذف)<br>
+      • رتبة مشرف (Supervisor): <code style="color:#4A9FD4">super</code> / كلمه سر: <code>super123</code> (تعديل باقات فقط، يمنع الحذف)<br>
+      • رتبة مكتب عقاري (Office): <code style="color:#4CAF7D">office</code> / كلمه سر: <code>office123</code> (تحديث بيانات العقارات التابعة لمكتبه فقط)
+    </div>
+    <div style="text-align:center; margin-top:15px;">
+       <a href="index.html" class="btn-outline-back">← العودة للرئيسية</a>
+    </div>
+  </div>
+
+  <div id="dashboardSection" class="dashboard-section">
+    
+    <div class="dash-header">
+      <div>
+        <h1 style="font-size:1.4rem; font-weight:900;">🛡️ لوحة الإدارة العامة والمكاتب</h1>
+        <p style="font-size:12px; color:var(--text-muted); margin-top:3px;">مرحباً بك مجدداً: <span id="displayUsername" style="color:#fff; font-weight:600;">-</span></p>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span id="roleBadge" class="badge-role">-</span>
+        <button onclick="handleLogout()" class="btn-danger" style="padding:7px 15px; font-size:13px;">تسجيل الخروج 🚪</button>
+      </div>
+    </div>
+
+    <div id="adminAndSuperView" class="panel-card" style="display:none;">
+      <div class="panel-title"><i class="ti ti-users"></i> إدارة المكاتب العقارية وتعديل الباقات</div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>اسم المكتب المسجل</th>
+              <th>المنطقة المغطاة</th>
+              <th>العقارات النشطة</th>
+              <th>نوع الباقة الحالية</th>
+              <th>ترقية/تغيير الباقة (مدير+مشرف)</th>
+              <th>إجراءات الإزالة الحساسة</th>
+            </tr>
+          </thead>
+          <tbody id="officesTableBody">
+            </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="officeOnlyView" class="panel-card" style="display:none;">
+      <div class="panel-title"><i class="ti ti-building-estate"></i> إدارة عقارات مكتبك الحالية</div>
+      <div style="background:rgba(201,168,76,0.05); border:1px solid rgba(201,168,76,0.15); padding:1rem; border-radius:10px; margin-bottom:1.5rem; font-size:13px;">
+        🥇 باقة مكتبك الحالية: <strong style="color:var(--gold)">الباقة الذهبية VIP (اشتراك نشط وموثق)</strong>. يمكنك إضافة، تعديل أو سحب إعلاناتك المعروضة في الدليل الرئيسي.
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <span style="font-weight:700; font-size:14px;">قائمة العقارات المعلنة باسم مكتبك (3 عقارات):</span>
+        <button class="btn-action" style="width:auto; padding:6px 15px; font-size:12px;" onclick="alert('خاصية إضافة عقار جديد قيد الربط البرمجي بقاعدة البيانات.')">➕ أضف عقار جديد</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>نوع العقار</th>
+            <th>نوع العرض</th>
+            <th>المساحة</th>
+            <th>السعر المطلوب</th>
+            <th>حالة الإعلان</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>بيت سكني</td><td>للبيع</td><td>200 م²</td><td>75,000$</td><td><span style="color:#4CAF7D">🟢 نشط ومعتمد</span></td></tr>
+          <tr><td>شقة فاخرة</td><td>للإيجار</td><td>120 م²</td><td>500$/شهر</td><td><span style="color:#4CAF7D">🟢 نشط ومعتمد</span></td></tr>
+          <tr><td>مجمع تجاري</td><td>للبيع</td><td>450 م²</td><td>220,000$</td><td><span style="color:var(--gold)">⏳ قيد المراجعة</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="text-align:center; margin-top:1.5rem;">
+      <a href="index.html" class="btn-outline-back" style="background:rgba(255,255,255,0.04)">← الانتقال للواجهة وتصفح الدليل</a>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  // الذاكرة التفاعلية ومحاكاة المكاتب المسجلة بالدليل
+  let mockOffices = [
+    {id: "1", name:'مكتب الأمانة العقاري', area:'العشار', props:48, pkg:'gold'},
+    {id: "2", name:'عقارات الخليج بالبصرة', area:'الجمهورية', props:32, pkg:'eco'},
+    {id: "3", name:'مكتب الرافدين للاستثمار', area:'المعقل', props:61, pkg:'free'}
+  ];
+
+  // تتبع حالة الجلسة عبر الحفظ المحلي للمتصفح
+  let session = JSON.parse(localStorage.getItem('basra_admin_session')) || null;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    evaluateSessionUI();
+  });
+
+  // محرك فحص الجلسة وتبديل النوافذ
+  function evaluateSessionUI() {
+    const loginForm = document.getElementById('loginFormSection');
+    const dashboard = document.getElementById('dashboardSection');
+    
+    if (!session) {
+      loginForm.style.display = 'block';
+      dashboard.style.display = 'none';
+    } else {
+      loginForm.style.display = 'none';
+      dashboard.style.display = 'block';
+      
+      document.getElementById('displayUsername').textContent = session.username;
+      
+      const badge = document.getElementById('roleBadge');
+      const adminSuperZone = document.getElementById('adminAndSuperView');
+      const officeZone = document.getElementById('officeOnlyView');
+      
+      // إخفاء اللوحات أولاً للتطهير
+      adminSuperZone.style.display = 'none';
+      officeZone.style.display = 'none';
+      
+      if (session.role === 'admin') {
+        badge.textContent = '👑 مدير النظام الرئيسي';
+        badge.style.color = 'var(--gold)';
+        adminSuperZone.style.display = 'block';
+        renderOfficesTable();
+      } else if (session.role === 'supervisor') {
+        badge.textContent = '🛡️ مشرف معتمد';
+        badge.style.color = '#4A9FD4';
+        adminSuperZone.style.display = 'block';
+        renderOfficesTable();
+      } else if (session.role === 'office') {
+        badge.textContent = '🏢 مكتب عقاري شريك';
+        badge.style.color = '#4CAF7D';
+        officeZone.style.display = 'block';
+      }
+    }
+  }
+
+  // معالجة ضغط زر تسجيل الدخول
+  function handleLogin() {
+    const u = document.getElementById('usernameInput').value.trim();
+    const p = document.getElementById('passwordInput').value.trim();
+
+    if (!u || !p) { alert('الرجاء تعبئة خانات الدخول أولاً!'); return; }
+
+    if (u === 'admin' && p === 'admin123') {
+      session = { role: 'admin', username: 'أبو أحمد البصري (المدير العام)' };
+    } else if (u === 'super' && p === 'super123') {
+      session = { role: 'supervisor', username: 'الأستاذ جاسم (المشرف العام)' };
+    } else if (u === 'office' && p === 'office123') {
+      session = { role: 'office', username: 'مدير مكتب الأمانة العقاري' };
+    } else {
+      alert('❌ البيانات خاطئة! يرجى مراجعة تلميحات الحسابات التجريبية بالأسفل لتجربة لوحة التحكم تدرج الصلاحيات.');
+      return;
+    }
+
+    localStorage.setItem('basra_admin_session', JSON.stringify(session));
+    evaluateSessionUI();
+  }
+
+  // خروج من النظام
+  function handleLogout() {
+    session = null;
+    localStorage.removeItem('basra_admin_session');
+    evaluateSessionUI();
+  }
+
+  // ضخ جدول المكاتب للمدراء والمشرفين
+  function renderOfficesTable() {
+    const tbody = document.getElementById('officesTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = mockOffices.map(o => `
+      <tr>
+        <td><strong>${o.name}</strong></td>
+        <td>${o.area}</td>
+        <td>${o.props} عقار</td>
+        <td style="color:${o.pkg=='gold'?'var(--gold)':'#4A9FD4'}">
+          ${o.pkg=='gold'?'🥇 ذهبي VIP': o.pkg=='eco'?'💎 اقتصادي':'⭐ باقة مجانية'}
+        </td>
+        <td>
+          <select style="background:var(--navy); color:#fff; border:1px solid rgba(201,168,76,0.3); padding:4px 8px; border-radius:6px; font-family:'Cairo';" onchange="changePackage('${o.id}', this.value)">
+            <option value="free" ${o.pkg == 'free' ? 'selected' : ''}>باقة مجانية</option>
+            <option value="eco" ${o.pkg == 'eco' ? 'selected' : ''}>باقة اقتصادية</option>
+            <option value="gold" ${o.pkg == 'gold' ? 'selected' : ''}>باقة ذهبية VIP</option>
+          </select>
+        </td>
+        <td>
+          <button onclick="deleteOffice('${o.id}')" class="btn-danger">شطب وحذف</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // تمييز الصلاحيات: (مسموح للمدير والمشرف)
+  function changePackage(id, newPkg) {
+    // كلاهما يملك صلاحية تغيير الباقات
+    const idx = mockOffices.findIndex(o => o.id === id);
+    if (idx !== -1) {
+      mockOffices[idx].pkg = newPkg;
+      alert(`✅ إجراء ناجح [بصلاحية ${session.role}]: تم تبديل الباقة بنجاح للـ (${mockOffices[idx].name}).`);
+      renderOfficesTable();
+    }
+  }
+
+  // تمييز الحماية الحساسة: (حذف الحسابات مسموح للمدير فقط ومحرم على المشرفين!)
+  function deleteOffice(id) {
+    if (session.role !== 'admin') {
+      alert('❌ رفض الصلاحية الأمنية: عذراً، لا يمكن للمشرف القيام بحذف المكاتب بشكل قطعي! هذه ميزة حصرية ومحجوبة لـ (المدير العام) لحماية البيانات من التلاعب.');
+      return;
+    }
+
+    const idx = mockOffices.findIndex(o => o.id === id);
+    if (idx === -1) return;
+
+    if (confirm(`هل أنت متأكد من الحذف النهائي لمكتب (${mockOffices[idx].name}) من قواعد بيانات البصرة؟`)) {
+      mockOffices.splice(idx, 1);
+      renderOfficesTable();
+      alert('🗑️ تم إقصاء وشطب حساب المكتب العقاري بنجاح.');
+    }
+  }
+</script>
+</body>
+</html>
