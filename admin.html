@@ -146,6 +146,7 @@
               <th>تغيير الباقة</th>
               <th>تجديد شهري (30 يوم)</th>
               <th>التحكم بالنشر (إيقاف/تفعيل)</th>
+              <th>حذف المكتب</th>
             </tr>
           </thead>
           <tbody id="officesTableBody"></tbody>
@@ -278,9 +279,20 @@
           </td>
           <td><button onclick="renewSubscriptionMonthly('${o.id}')" class="btn-renew" ${isFree ? 'disabled' : ''}>${isFree ? '🚫 لا يتطلب' : '🔄 تجديد 30 يوم'}</button></td>
           <td><button onclick="togglePublishStatus('${o.id}')" class="btn-suspend" style="background:${o.allowPublish?'var(--warning)':'var(--success)'}; color:${o.allowPublish?'var(--navy)':'#fff'}">${o.allowPublish ? '🛑 إيقاف النشر' : '🟢 إلغاء الإيقاف'}</button></td>
+          <td><button onclick="deleteOffice('${o.id}')" class="btn-danger" style="background:var(--danger); padding:5px 10px;">🗑️ حذف</button></td>
         </tr>
       `;
     }).join('');
+  }
+
+  // الدالة الجديدة لحذف المكتب بالكامل
+  function deleteOffice(id) {
+    if(confirm('⚠️ تحذير: هل أنت متأكد من رغبتك في حذف هذا المكتب نهائياً من السيستم؟ لا يمكن التراجع عن هذا الإجراء!')) {
+      let offices = getOffices();
+      offices = offices.filter(o => o.id !== id);
+      saveOffices(offices);
+      renderOfficesTable();
+    }
   }
 
   function renewSubscriptionMonthly(id) {
@@ -354,7 +366,7 @@
     document.getElementById('addPropertyModal').style.display = 'none';
   }
 
-  // دالة تسجيل الدخول الموحدة للوحة مع الحسابات الصحيحة والمجربة
+  // دالة تسجيل الدخول الموحدة
   function handleLogin() {
     const u = document.getElementById('usernameInput').value.trim();
     const p = document.getElementById('passwordInput').value.trim();
