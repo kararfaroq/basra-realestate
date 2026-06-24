@@ -1,32 +1,25 @@
 /* ============================================================
-   ai-advisor.js  — النسخة المستقلة المحدثة v3.5
+   ai-advisor.js  — النسخة المستقلة المصلحة v3.6
    المستشار العقاري الذكي "داهية" — لدليل البصرة العقاري
 
+   ✅ تم إصلاح مشكلة التجمد عند عدم معرفة السؤال (ReferenceError)
    ✅ يعمل بالكامل بدون أي API خارجي
    ✅ محرك ردود ذكي مبني على قاعدة بيانات البصرة الشاملة
-   ✅ كشف تلقائي لنوع الطلب (بيع/إيجار/استثمار/نصيحة)
-   ✅ ردود ديناميكية تتغير حسب المنطقة + نوع الطلب
-   ✅ ذاكرة المحادثة (يتذكر ما سبق)
-   ✅ ترويج ذكي لباقات الموقع
-   ✅ مؤشر "يكتب..." واقتراحات سريعة
-   ✅ لا إنترنت خارجي — يعمل 100% محلياً
-
-   للتفعيل: <script src="ai-advisor.js" defer></script>
    ============================================================ */
 
 (function () {
   'use strict';
 
   /* ============================================================
-     ⚙️ إعدادات الموقع — عدّل هنا فقط
+     ⚙️ إعدادات الموقع
      ============================================================ */
   const CONFIG = {
     SITE_NAME:           'دليل البصرة العقاري',
     PACKAGES_URL:        '/packages',
     REGISTER_URL:        '/register',
-    PROMO_AFTER_MSGS:    4,   // عدد رسائل المستخدم قبل عرض ترويج الباقات
-    TYPING_DELAY_MIN:    600, // أقل تأخير لمؤشر الكتابة (ms)
-    TYPING_DELAY_MAX:    1400,// أعلى تأخير
+    PROMO_AFTER_MSGS:    4,   
+    TYPING_DELAY_MIN:    600, 
+    TYPING_DELAY_MAX:    1400,
   };
 
   /* ============================================================
@@ -104,9 +97,6 @@
     },
   };
 
-  /* ============================================================
-     🧠 محرك توليد الردود
-     ============================================================ */
   function detectIntent(txt) {
     const t = txt.toLowerCase();
     for (const [intent, data] of Object.entries(INTENTS)) {
@@ -131,7 +121,6 @@
     return null;
   }
 
-  // ردود التحية
   function replyGreet() {
     const greets = [
       `هلا هلا! 🌴 أنا داهية، مستشارك العقاري في البصرة. سواء تبي تشتري، تستأجر، أو تستثمر — اسألني وأنا بالخدمة! شو اللي تدور عليه؟`,
@@ -141,7 +130,6 @@
     return greets[Math.floor(Math.random() * greets.length)];
   }
 
-  // ردود حسب المنطقة + نوع الطلب
   function replyWithArea(area, intent, propType) {
     const a = AREAS[area];
     const prop = propType || 'العقار';
@@ -191,14 +179,12 @@
         `<em>تريد مقارنة ${area} مع منطقة ثانية؟</em>`;
     }
 
-    // عام
     return `📍 <strong>${area}</strong><br><br>${a.desc}<br><br>` +
       `💰 شراء: ${a.buyMin}-${a.buyMax} مليون | إيجار: ${a.rentMin}-${a.rentMax} ألف/شهر<br>` +
       `📊 تصنيف: ${a.tier} | استثمار: ${a.invest}<br><br>` +
       `<em>اسألني عن الشراء، الإيجار، أو الاستثمار في ${area}!</em>`;
   }
 
-  // ردود بدون منطقة محددة
   function replyWithoutArea(intent, txt) {
     if (intent === 'buy') {
       return `🏠 <strong>دليلك للشراء في البصرة:</strong><br><br>` +
@@ -272,34 +258,29 @@
         `<em>أخبرني عن اسم منطقتك المستهدفة لتقدير سعر دقيق جداً!</em>`;
     }
 
-    // عام / غير معروف
     return replyGeneral(txt);
   }
 
+  /* ============================================================
+     🛠️ هنا تم الإصلاح الحاسم لمشكلة التجمد والتوقف المتكرر
+     ============================================================ */
   function replyGeneral(txt) {
     const replies = [
       `🤔 سؤال وجيه! للأسف ما فهمت بالضبط شو تقصد. حاول تسألني عن:<br>• منطقة معينة في البصرة (مثال: "أسعار الطويسة" أو "عقارات الفاو")<br>• نوع العملية: شراء، إيجار، أو استثمار<br>• نصيحة عقارية عامة`,
       `🏠 أنا متخصص بعقارات ومناطق البصرة فقط. اسألني مثلاً:<br>• "بيت للبيع في بريهة بكم؟"<br>• "أفضل منطقة للاستثمار العقاري؟"<br>• "كم إيجار شقة في حي الحسين؟"`,
-      `💬 مو واضح عليّ السؤال تماماً! جرب تسألني بشكل أوضح، مثلاً:<br>• اذكر المنطقة (الجنينة، شط العرب، الزبير، الجمهورية...)<br>• اذكر نوع الطلب (شراء / إيجار / استثمار)`,
+      `💬 مو واضح عليّ السؤال تماماً! جرب تسألني بشكل أوضح، مثلاً:<br>• اذكر المنطقة (الجنينة، شط العرب, الزبير، الجمهورية...)<br>• اذكر نوع الطلب (شراء / إيجار / استثمار)`,
     ];
-    return replies[Math.floor(Math.random() * greets.length)] || replies[0];
+    // تم إصلاحها هنا بدقة لتأخذ طول مصفوفة الـ replies الحالية
+    return replies[Math.floor(Math.random() * replies.length)];
   }
 
-  /* ============================================================
-     🎯 الدالة الرئيسية: توليد الرد
-     ============================================================ */
   function generateReply(txt, history) {
     const intent = detectIntent(txt);
     const area   = detectArea(txt);
     const prop   = detectPropertyType(txt);
 
-    // تحية
     if (intent === 'greet') return replyGreet();
-
-    // إذا وجدنا منطقة → رد مخصص
     if (area) return replyWithArea(area, intent, prop);
-
-    // بدون منطقة → رد عام حسب النية
     return replyWithoutArea(intent, txt);
   }
 
@@ -555,7 +536,6 @@
     input.value = '';
     messageCount++;
 
-    // إخفاء الاقتراحات بعد أول رسالة
     const sugg = document.getElementById('aiSuggestions');
     if (sugg) sugg.style.display = 'none';
 
@@ -565,7 +545,6 @@
     setInputState(false);
     showTyping();
 
-    // تأخير طبيعي يوهم بالتفكير
     const delay = CONFIG.TYPING_DELAY_MIN +
       Math.random() * (CONFIG.TYPING_DELAY_MAX - CONFIG.TYPING_DELAY_MIN);
 
@@ -586,9 +565,6 @@
     }, delay);
   }
 
-  /* ============================================================
-     6) فتح/إغلاق
-     ============================================================ */
   function toggleAiChat() {
     const win = document.getElementById('aiChatWindow');
     if (!win) return;
@@ -614,9 +590,6 @@
     if (input) { input.value = btn.dataset.msg || ''; sendAiMessage(); }
   });
 
-  /* ============================================================
-     8) تصدير للاستخدام الخارجي
-     ============================================================ */
   window.toggleAiChat  = toggleAiChat;
   window.sendAiMessage = sendAiMessage;
 
