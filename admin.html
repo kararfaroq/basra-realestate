@@ -19,7 +19,7 @@
     body { background: var(--navy); color: var(--text-on-dark); direction: rtl; min-height: 100vh; padding-bottom: 3rem; }
     
     /* حماية ومظهر شاشة الدخول */
-    .login-container { max-width: 420px; margin: 10vh auto padding: 2rem; }
+    .login-container { max-width: 420px; margin: 10vh auto; padding: 2rem; }
     .login-card { background: var(--navy-mid); border: 2px solid var(--gold); border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     
     /* شريط علوي للوحة التحكم */
@@ -27,46 +27,48 @@
     .user-badge { background: rgba(201,168,76,0.15); border: 1px solid var(--gold); padding: 6px 16px; border-radius: 8px; color: var(--gold); font-weight: 700; font-size: 14px; }
     
     /* مكونات التنسيق العام والتبويبات */
-    .main-wrapper { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+    .main-wrapper { max-width: 1250px; margin: 0 auto; padding: 0 1.5rem; }
     .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-    .stat-card { background: var(--navy-mid); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 1.5rem; display: flex; align-items: center; gap: 15px; }
+    .stat-card { background: var(--navy-mid); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 1.5rem; display: flex; align-items: center; gap: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
     .stat-icon { width: 50px; height: 50px; background: rgba(201,168,76,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--gold); }
     
     /* التبويبات والمقاطع */
-    .dash-section { display: none; background: var(--navy-mid); border-radius: 16px; border: 1px solid rgba(201,168,76,0.1); padding: 2rem; margin-bottom: 2rem; }
+    .dash-section { display: none; background: var(--navy-mid); border-radius: 16px; border: 1px solid rgba(201,168,76,0.1); padding: 2rem; margin-bottom: 2rem; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
     .section-title { font-size: 18px; font-weight: 700; color: var(--gold); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
     
     /* حقول الإدخال والأزرار */
     .form-group { margin-bottom: 15px; }
     .form-label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 5px; }
-    .input-control { width: 100%; background: rgba(10,22,40,0.6); border: 1px solid rgba(201,168,76,0.2); border-radius: 8px; padding: 12px 16px; color: #fff; font-size: 14px; outline: none; }
-    .input-control:focus { border-color: var(--gold); }
+    .input-control { width: 100%; background: rgba(10,22,40,0.6); border: 1px solid rgba(201,168,76,0.2); border-radius: 8px; padding: 12px 16px; color: #fff; font-size: 14px; outline: none; transition:0.2s;}
+    .input-control:focus { border-color: var(--gold); background:rgba(255,255,255,0.05); }
     
-    .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; text-decoration: none; }
+    .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; text-decoration: none; transition:0.2s; }
     .btn-gold { background: var(--gold); color: var(--navy); }
-    .btn-gold:hover { background: var(--gold-light); }
+    .btn-gold:hover { background: var(--gold-light); transform:translateY(-1px); }
     .btn-danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
     .btn-danger:hover { background: var(--danger); color: #fff; }
     .btn-success { background: var(--success); color: #fff; }
+    .btn-success:hover { filter: brightness(1.1); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
     
     /* الجداول للمشرف والمكتب */
     .table-container { overflow-x: auto; margin-top: 1rem; }
-    table { width: 100%; border-collapse: collapse; text-align: right; font-size: 14px; }
-    th { background: rgba(255,255,255,0.03); color: var(--gold); padding: 12px; border-bottom: 2px solid rgba(201,168,76,0.2); }
-    td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #e0e0e0; }
+    table { width: 100%; border-collapse: collapse; text-align: right; font-size: 13px; white-space: nowrap; }
+    th { background: rgba(255,255,255,0.03); color: var(--gold); padding: 14px 12px; border-bottom: 2px solid rgba(201,168,76,0.2); font-size:14px; }
+    td { padding: 14px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #e0e0e0; vertical-align: middle;}
     
     /* الوسوم والأشكال */
-    .badge { padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 700; display: inline-block; }
+    .badge { padding: 5px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; display: inline-block; }
     .bg-success { background: rgba(76,175,125,0.15); color: var(--success); border: 1px solid var(--success); }
     .bg-danger { background: rgba(255,77,77,0.15); color: var(--danger); border: 1px solid var(--danger); }
     
-    /* النافذة المنبثقة (Modal) لإضافة عقار */
+    /* النافذة المنبثقة */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(10,22,40,0.85); backdrop-filter: blur(5px); z-index: 1000; justify-content: center; align-items: center; padding: 1rem; overflow-y: auto; }
-    .modal-box { background: var(--navy-mid); border: 2px solid var(--gold); border-radius: 16px; padding: 2rem; width: 100%; max-width: 600px; position: relative; margin: auto; }
+    .modal-box { background: var(--navy-mid); border: 2px solid var(--gold); border-radius: 16px; padding: 2rem; width: 100%; max-width: 600px; position: relative; margin: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.5);}
     
-    /* تصميم تقسيم لوحة تحكم المكتب بين العقارات والإعدادات */
-    .sub-nav { display: flex; gap: 10px; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
-    .tab-btn { background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid transparent; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    /* تصميم تبويبات المكتب */
+    .sub-nav { display: flex; gap: 10px; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; overflow-x:auto;}
+    .tab-btn { background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid transparent; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; white-space:nowrap;}
     .tab-btn.active { background: var(--gold); color: var(--navy); font-weight: 700; }
   </style>
 </head>
@@ -120,18 +122,19 @@
       </div>
 
       <div class="dash-section" style="display: block;">
-        <div class="section-title"><i class="ti ti-shield-half"></i> إدارة ورقابة المكاتب العقارية المشتركة</div>
+        <div class="section-title"><i class="ti ti-shield-half"></i> إدارة ورقابة المكاتب العقارية وتجديد الاشتراكات</div>
         <div class="table-container">
           <table>
             <thead>
               <tr>
                 <th>اسم المكتب</th>
-                <th>المنطقة</th>
-                <th>اسم المستخدم (الهاتف)</th>
+                <th>رقم الهاتف</th>
                 <th>الباقة الحالية</th>
                 <th>حالة الحساب</th>
                 <th>تاريخ الانتهاء</th>
-                <th>الإجراءات الرقابية</th>
+                <th>تغيير الباقة</th>
+                <th>تجديد (30 يوم)</th>
+                <th>الرقابة</th>
               </tr>
             </thead>
             <tbody id="adminOfficesTable">
@@ -143,6 +146,11 @@
 
     <div id="officeView" style="display: none;">
       
+      <div id="officeExpiryBanner" style="background:rgba(201,168,76,0.05); border:1px solid rgba(201,168,76,0.3); padding:12px 20px; border-radius:12px; margin-bottom:1.5rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+         <div style="font-size:14px;"><i class="ti ti-info-circle" style="color:var(--gold);"></i> باقتك الحالية: <strong id="lblOfficePkg" style="color:var(--gold);">...</strong></div>
+         <div style="font-size:14px;"><i class="ti ti-calendar-time" style="color:var(--warning);"></i> تنتهي صلاحية الباقة في: <strong id="lblOfficeExpiry" style="color:var(--warning); font-family:monospace;">...</strong></div>
+      </div>
+
       <div class="sub-nav">
         <button id="tabPropsBtn" class="tab-btn active" onclick="switchOfficeTab('props')"><i class="ti ti-home-cog"></i> عقاراتي المنشورة</button>
         <button id="tabSettingsBtn" class="tab-btn" onclick="switchOfficeTab('settings')"><i class="ti ti-user-edit"></i> إعدادات حسابي وبيانات الدخول</button>
@@ -244,7 +252,7 @@
         <input type="text" id="pRooms" class="input-control" placeholder="4 غرف" required>
       </div>
       <div class="form-group">
-        <label class="form-label">رابط صورة العقار (رابط مباشر أو اتركه فارغاً للأيقونة الافتراضية)</label>
+        <label class="form-label">رابط صورة العقار (اختياري)</label>
         <input type="url" id="pImgUrl" class="input-control" placeholder="https://example.com/image.jpg">
       </div>
       <div class="form-group">
@@ -261,12 +269,12 @@
 
 <script>
 const STORAGE_KEY = 'basra_data_v3';
-const SESSION_KEY = 'basra_session';
+const SESSION_KEY = 'basra_session_v3';
 
-// حساب تجريبي أولي لإعادة تشغيل النظام في حال لم يكن الـ localStorage ممتلئاً
+// حسابات تجريبية لمنع بقاء الصفحة فارغة
 const initialOffices = [
-  { id: '1', name: 'مكتب الأمانة العقاري', area: 'العشار', publishedProps: 0, pkg: 'gold', status: 'active', allowPublish: true, expiry: '2026-12-31', phone: '07701112223', password: 'office123', description: '', logo: '', listings: [] },
-  { id: '2', name: 'عقارات الخليج بالبصرة', area: 'الجمهورية', publishedProps: 0, pkg: 'eco', status: 'active', allowPublish: true, expiry: '2026-09-15', phone: '07801112224', password: '123', description: '', logo: '', listings: [] }
+  { id: '1', name: 'مكتب الأمانة العقاري', area: 'العشار', publishedProps: 0, pkg: 'gold', status: 'active', expiry: '2026-12-31', phone: '07701112223', password: 'office123', description: '', logo: '', listings: [] },
+  { id: '2', name: 'عقارات الخليج بالبصرة', area: 'الجمهورية', publishedProps: 0, pkg: 'eco', status: 'active', expiry: '2026-09-15', phone: '07801112224', password: '123', description: '', logo: '', listings: [] }
 ];
 
 function getOffices() {
@@ -282,7 +290,7 @@ function saveOffices(data) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
-// الرقابة وإدارة الجلسات
+// فحص وتسجيل الدخول
 function checkSession() {
   const session = JSON.parse(localStorage.getItem(SESSION_KEY));
   if (session) {
@@ -318,22 +326,21 @@ function handleLogin() {
   }
   
   let offices = getOffices();
-  // البحث عن الحساب برقم الهاتف (أو اسم الحساب القديم office كمكتب رقم 1)
-  let office = offices.find(o => 
+  let officeIndex = offices.findIndex(o => 
     (o.phone === u || (u === 'office' && o.id === '1')) && 
     (o.password === p || (p === 'office123' && o.id === '1'))
   );
   
-  if (office) {
-    if (office.status === 'suspended') {
-      alert('⚠️ حساب هذا المكتب معطل حالياً من قبل الرقابة العقارية!');
+  if (officeIndex !== -1) {
+    if (offices[officeIndex].status === 'suspended') {
+      alert('⚠️ حساب هذا المكتب معطل حالياً أو انتهى اشتراكه! يرجى التواصل مع الإدارة.');
       return;
     }
-    const session = { role: 'office', officeId: office.id, username: office.name };
+    const session = { role: 'office', officeId: offices[officeIndex].id, username: offices[officeIndex].name };
     localStorage.setItem(SESSION_KEY, JSON.stringify(session));
     checkSession();
   } else {
-    alert('❌ اسم المستخدم أو كلمة المرور غير صحيحة!');
+    alert('❌ رقم الهاتف أو كلمة المرور غير صحيحة!');
   }
 }
 
@@ -342,13 +349,13 @@ function handleLogout() {
   checkSession();
 }
 
-// ---------------- وظائف المشرف العام (Admin) ----------------
+// ======================= وظائف المشرف العام (Admin) =======================
 function renderAdminDashboard() {
   const offices = getOffices();
   document.getElementById('statTotalOffices').textContent = offices.length;
   document.getElementById('statActiveOffices').textContent = offices.filter(o => o.status === 'active').length;
   
-  let totalProps = 3; // الأساسيات الافتراضية بصفحة index
+  let totalProps = 3; 
   offices.forEach(o => { if(o.listings) totalProps += o.listings.length; });
   document.getElementById('statTotalProps').textContent = totalProps;
 
@@ -356,41 +363,88 @@ function renderAdminDashboard() {
   tBody.innerHTML = offices.map(o => `
     <tr>
       <td style="font-weight:700;">${o.name}</td>
-      <td>${o.area}</td>
-      <td style="font-family:monospace; color:var(--gold);">${o.phone || 'حساب قديم ثابث'}</td>
-      <td><span class="badge" style="background:rgba(201,168,76,0.2); color:#fff;">${o.pkg === 'gold' ? '🏆 ذهبية' : o.pkg === 'eco' ? '💼 اقتصادية' : '🆓 مجانية'}</span></td>
-      <td><span class="badge ${o.status === 'active' ? 'bg-success' : 'bg-danger'}">${o.status === 'active' ? 'نشط ومصرح' : 'معلق ومحجوب'}</span></td>
-      <td style="font-size:12px;">${o.expiry}</td>
+      <td style="font-family:monospace; color:var(--text-muted);">${o.phone || 'غير محدد'}</td>
+      <td>
+        <span class="badge" style="background:rgba(201,168,76,0.2); color:#fff; margin-bottom:5px; display:block; text-align:center;">
+          ${o.pkg === 'gold' ? '🏆 ذهبية' : o.pkg === 'eco' ? '💼 اقتصادية' : '🆓 مجانية'}
+        </span>
+      </td>
+      <td><span class="badge ${o.status === 'active' ? 'bg-success' : 'bg-danger'}">${o.status === 'active' ? 'نشط' : 'معلق/منتهي'}</span></td>
+      <td style="font-family:monospace; font-size:13px; color:${o.status==='suspended'?'var(--danger)':'var(--warning)'};">${o.expiry}</td>
+      
+      <td>
+        <select class="input-control" style="padding:6px; font-size:12px; width:auto; border-color:var(--gold); background:rgba(0,0,0,0.3);" onchange="changePackageByAdmin('${o.id}', this.value)">
+          <option value="free" ${o.pkg === 'free' ? 'selected' : ''}>مجانية</option>
+          <option value="eco"  ${o.pkg === 'eco'  ? 'selected' : ''}>اقتصادية</option>
+          <option value="gold" ${o.pkg === 'gold' ? 'selected' : ''}>ذهبية</option>
+        </select>
+      </td>
+      
+      <td>
+        <button class="btn btn-success" style="padding:6px 12px; font-size:11px;" onclick="renewSubscriptionByAdmin('${o.id}')" ${o.pkg === 'free' ? 'disabled' : ''}>
+          ${o.pkg === 'free' ? '🚫 غير متاح' : '🔄 تجديد 30 يوم'}
+        </button>
+      </td>
+      
       <td>
         <div style="display:flex; gap:6px;">
-          <button class="btn" style="padding:4px 8px; font-size:11px; background:var(--navy-light); color:#fff;" onclick="toggleOfficeStatus('${o.id}')">🔄 قلب الحالة</button>
-          <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="deleteOfficeByAdmin('${o.id}')">🗑️ حذف</button>
+          <button class="btn" style="padding:6px 10px; font-size:11px; background:var(--navy-light); color:#fff;" onclick="toggleOfficeStatus('${o.id}')">${o.status === 'active' ? '🛑 إيقاف' : '🟢 تفعيل'}</button>
+          <button class="btn btn-danger" style="padding:6px 10px; font-size:11px;" onclick="deleteOfficeByAdmin('${o.id}')">🗑️ حذف</button>
         </div>
       </td>
     </tr>
   `).join('');
 }
 
-function toggleOfficeStatus(id) {
+// دالة تغيير الباقة من المشرف
+function changePackageByAdmin(id, newPkg) {
   let offices = getOffices();
-  let o = offices.find(x => x.id === id);
-  if(o) {
-    o.status = o.status === 'active' ? 'suspended' : 'active';
+  let idx = offices.findIndex(x => x.id === id);
+  if(idx !== -1) {
+    offices[idx].pkg = newPkg;
+    offices[idx].status = 'active'; // تفعيل الحساب تلقائياً عند تغيير الباقة
+    // إذا مجاني مفتوح، وإذا مدفوع نعطيه 30 يوم من اليوم
+    offices[idx].expiry = newPkg === 'free' ? 'مفتوح دائم' : new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0];
     saveOffices(offices);
     renderAdminDashboard();
+    alert("✅ تم تغيير باقة المكتب وتحديث صلاحيته بنجاح.");
   }
+}
+
+// دالة تجديد الاشتراك لمدة 30 يوم إضافية
+function renewSubscriptionByAdmin(id) {
+  let offices = getOffices();
+  let idx = offices.findIndex(x => x.id === id);
+  if(idx !== -1 && offices[idx].pkg !== 'free') {
+    let currentExpiry = new Date(offices[idx].expiry);
+    let today = new Date();
+    
+    // إذا كان الاشتراك منتهياً، نبدأ الـ 30 يوم من اليوم. وإذا لم ينتهِ، نضيف 30 يوم لتاريخ الانتهاء الحالي
+    let baseDate = (currentExpiry < today || isNaN(currentExpiry)) ? today : currentExpiry;
+    baseDate.setDate(baseDate.getDate() + 30);
+    
+    offices[idx].expiry = baseDate.toISOString().split('T')[0];
+    offices[idx].status = 'active'; // إعادة تفعيله فوراً إذا كان معلقاً بسبب الانتهاء
+    
+    saveOffices(offices);
+    renderAdminDashboard();
+    alert("🎉 تم تجديد اشتراك المكتب لمدة 30 يوماً بنجاح!");
+  }
+}
+
+function toggleOfficeStatus(id) {
+  let offices = getOffices(); let o = offices.find(x => x.id === id);
+  if(o) { o.status = o.status === 'active' ? 'suspended' : 'active'; saveOffices(offices); renderAdminDashboard(); }
 }
 
 function deleteOfficeByAdmin(id) {
   if(confirm("هل أنت متأكد من مسح هذا المكتب العقاري وسحب رخصته نهائياً؟")) {
-    let offices = getOffices();
-    offices = offices.filter(x => x.id !== id);
-    saveOffices(offices);
-    renderAdminDashboard();
+    let offices = getOffices(); offices = offices.filter(x => x.id !== id); saveOffices(offices); renderAdminDashboard();
   }
 }
 
-// ---------------- وظائف المكتب العقاري (Office) ----------------
+
+// ======================= وظائف المكتب العقاري (Office) =======================
 function getCurrentOffice() {
   const session = JSON.parse(localStorage.getItem(SESSION_KEY));
   if (!session || session.role !== 'office') return null;
@@ -402,6 +456,11 @@ function renderOfficeDashboard() {
   const currentOffice = getCurrentOffice();
   if(!currentOffice) return;
   
+  // تحديث شريط معلومات الباقة للمكتب
+  const pkgName = currentOffice.pkg === 'gold' ? 'الذهبية VIP (نشر غير محدود)' : currentOffice.pkg === 'eco' ? 'الاقتصادية (حتى 10 إعلانات)' : 'المجانية (إعلانين فقط)';
+  document.getElementById('lblOfficePkg').textContent = pkgName;
+  document.getElementById('lblOfficeExpiry').textContent = currentOffice.expiry;
+
   const tBody = document.getElementById('officePropsTable');
   if(!currentOffice.listings || currentOffice.listings.length === 0) {
     tBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding:2rem;">لم تقم بنشر أي عقار حتى الآن، اضغط على زر الإضافة بالأعلى!</td></tr>`;
@@ -429,7 +488,6 @@ function switchOfficeTab(tab) {
   document.getElementById('officeSettingsSection').style.display = tab === 'settings' ? 'block' : 'none';
 }
 
-/* تعبئة حقول نموذج تغيير الهاتف/كلمة المرور ببيانات المكتب الحالية */
 function fillOfficeSettingsForm() {
   const currentOffice = getCurrentOffice();
   if(!currentOffice) return;
@@ -439,7 +497,6 @@ function fillOfficeSettingsForm() {
   document.getElementById('setOfficePass').value = currentOffice.password || '';
 }
 
-/* حفظ تعديلات الحساب (اسم المستخدم وكلمة المرور) */
 function saveOfficeAccountSettings(e) {
   e.preventDefault();
   const session = JSON.parse(localStorage.getItem(SESSION_KEY));
@@ -453,27 +510,13 @@ function saveOfficeAccountSettings(e) {
   const newPhone = document.getElementById('setOfficePhone').value.trim();
   const newPass = document.getElementById('setOfficePass').value.trim();
 
-  // التحقق من أن هاتف الدخول (اسم المستخدم) الجديد غير محجوز لمكتب آخر
   let isTaken = offices.find(o => o.phone === newPhone && o.id !== session.officeId);
-  if(isTaken) {
-    alert("❌ رقم الهاتف هذا مستخدم كـ (اسم مستخدم) لمكتب عقاري آخر بالفعل! يرجى اختيار رقم آخر.");
-    return;
-  }
+  if(isTaken) { alert("❌ رقم الهاتف مستخدم لمكتب آخر! اختر رقم آخر."); return; }
 
-  // تطبيق وحفظ التحديثات الجديدة
-  offices[officeIndex].name = newName;
-  offices[officeIndex].area = newArea;
-  offices[officeIndex].phone = newPhone;
-  offices[officeIndex].password = newPass;
-  
+  offices[officeIndex].name = newName; offices[officeIndex].area = newArea; offices[officeIndex].phone = newPhone; offices[officeIndex].password = newPass;
   saveOffices(offices);
-
-  // تحديث بيانات الجلسة الحالية لتطابق الاسم الجديد
-  session.username = newName;
-  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-
-  alert("✨ مبروك! تم تحديث بيانات مكتبك العقاري وتحديث معلومات تسجيل الدخول بنجاح.");
-  checkSession();
+  session.username = newName; localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  alert("✨ تم تحديث بيانات حسابك بنجاح."); checkSession();
 }
 
 // التحكم بنافذة إضافة العقارات للمكاتب
@@ -489,49 +532,23 @@ function submitNewPropFromOffice(e) {
   if(!office) return;
   if(!office.listings) office.listings = [];
 
-  // فحص قيود الباقة ونسبة الاستخدام المتاحة للمكتب
-  if(office.pkg === 'free' && office.listings.length >= 2) {
-    alert("⚠️ تجاوزت الحد المسموح به للباقة المجانية (إعلانين فقط)! يرجى الترقية للباقة الاقتصادية أو الذهبية."); return;
-  }
-  if(office.pkg === 'eco' && office.listings.length >= 10) {
-    alert("⚠️ تجاوزت الحد المسموح به للباقة الاقتصادية (10 إعلانات)! يرجى ترقية حسابك للمفتوح."); return;
-  }
+  if(office.pkg === 'free' && office.listings.length >= 2) { alert("⚠️ تجاوزت الحد المسموح للباقة المجانية (إعلانين)! الرجاء الترقية."); return; }
+  if(office.pkg === 'eco' && office.listings.length >= 10) { alert("⚠️ تجاوزت الحد المسموح للباقة الاقتصادية (10 إعلانات)! الرجاء الترقية."); return; }
 
-  const type = document.getElementById('pType').value;
-  const action = document.getElementById('pAction').value;
-  const district = document.getElementById('pDistrict').value.trim();
-  const price = document.getElementById('pPrice').value.trim();
-  const area = document.getElementById('pArea').value;
-  const deedType = document.getElementById('pDeed').value;
-  const rooms = document.getElementById('pRooms').value.trim();
-  const image = document.getElementById('pImgUrl').value.trim();
-  const desc = document.getElementById('pDesc').value.trim();
+  const type = document.getElementById('pType').value; const action = document.getElementById('pAction').value; const district = document.getElementById('pDistrict').value.trim();
+  const price = document.getElementById('pPrice').value.trim(); const area = document.getElementById('pArea').value; const deedType = document.getElementById('pDeed').value;
+  const rooms = document.getElementById('pRooms').value.trim(); const image = document.getElementById('pImgUrl').value.trim(); const desc = document.getElementById('pDesc').value.trim();
 
-  let icon = '🏠';
-  if(type==='شقة') icon = '🏢';
-  if(type==='أرض') icon = '🏞️';
-  if(type==='محل') icon = '🏪';
-
-  const newProperty = { type, action, district, price, area, deedType, rooms, image, desc, icon };
-  office.listings.unshift(newProperty);
+  let icon = type==='شقة'?'🏢':type==='أرض'?'🏞️':type==='محل'?'🏪':'🏠';
+  office.listings.unshift({ type, action, district, price, area, deedType, rooms, image, desc, icon });
   
-  saveOffices(offices);
-  alert("🎉 تم نشر العقار الجديد بنجاح، وستجده الآن معروضاً في واجهة الدليل الرئيسية للمواطنين!");
-  closeAddPropModal();
-  renderOfficeDashboard();
-  e.target.reset();
+  saveOffices(offices); alert("🎉 تم نشر العقار بنجاح في الدليل!"); closeAddPropModal(); renderOfficeDashboard(); e.target.reset();
 }
 
 function deletePropertyFromOffice(index) {
-  if(confirm("هل أنت متأكد من رغبتك في حذف هذا الإعلان العقاري نهائياً؟")) {
-    const session = JSON.parse(localStorage.getItem(SESSION_KEY));
-    let offices = getOffices();
-    let office = offices.find(o => o.id === session.officeId);
-    if(office && office.listings) {
-      office.listings.splice(index, 1);
-      saveOffices(offices);
-      renderOfficeDashboard();
-    }
+  if(confirm("تأكيد حذف الإعلان؟")) {
+    const session = JSON.parse(localStorage.getItem(SESSION_KEY)); let offices = getOffices(); let office = offices.find(o => o.id === session.officeId);
+    if(office && office.listings) { office.listings.splice(index, 1); saveOffices(offices); renderOfficeDashboard(); }
   }
 }
 
