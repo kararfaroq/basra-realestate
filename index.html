@@ -29,7 +29,6 @@
     .btn-add-prop{background:transparent; color:var(--gold); border:1px solid var(--gold); padding:7px 16px; border-radius:6px; font-size:13px; font-weight:700; cursor:pointer; font-family:'Cairo'; transition:0.2s;}
     .btn-add-prop:hover{background:rgba(201,168,76,0.1);}
     
-    /* زر الدخول الجديد في الهيدر */
     .nav-cta {background:var(--gold); color:var(--navy); padding:8px 16px; border-radius:8px; border:none; font-weight:700; cursor:pointer; font-family:'Cairo'; transition: 0.2s; font-size: 14px;}
     .nav-cta:hover {background: var(--gold-light);}
 
@@ -55,12 +54,12 @@
     .search-section{background:var(--navy-mid);padding:2.5rem 2rem;border-top:1px solid rgba(201,168,76,0.15);border-bottom:1px solid rgba(201,168,76,0.15)}
     .search-container{max-width:900px;margin:0 auto}
     .search-label{font-size:14px;color:var(--text-muted);margin-bottom:0.8rem;font-weight:500}
-    .search-box{background:rgba(255,255,255,0.06);border:1.5px solid rgba(201,168,76,0.25);border-radius:12px;display:flex;align-items:center;overflow:hidden;transition:border-color .2s}
+    .search-box{background:rgba(255,255,255,0.06);border:1.5px solid rgba(201,168,76,0.25);border-radius:12px;display:flex;align-items:center;overflow:hidden;transition:border-color .2s;flex-wrap:wrap;}
     .search-box:focus-within{border-color:var(--gold)}
     .search-filters{display:flex;border-left:1px solid rgba(201,168,76,0.2);flex-wrap:nowrap}
     .filter-select{background:transparent;border:none;color:var(--text-on-dark);padding:0 16px;height:54px;font-size:14px;font-family:'Cairo',sans-serif;cursor:pointer;border-left:1px solid rgba(201,168,76,0.15);outline:none;min-width:130px}
     .filter-select option{background:var(--navy-mid);color:var(--text-on-dark)}
-    .search-input-wrap{flex:1;display:flex;align-items:center;padding:0 1rem;gap:8px}
+    .search-input-wrap{flex:1;display:flex;align-items:center;padding:0 1rem;gap:8px;min-width:200px;}
     .search-input-wrap i{color:var(--text-muted);font-size:18px}
     .search-input{background:transparent;border:none;color:var(--text-on-dark);font-size:15px;font-family:'Cairo',sans-serif;outline:none;width:100%;padding:0 4px}
     .search-input::placeholder{color:var(--text-muted)}
@@ -103,6 +102,9 @@
 
     @media(max-width:700px){
       .nav-links{display:none}
+      .search-filters { flex-direction: column; width: 100%; border-left: none; }
+      .filter-select { border-left: none; border-bottom: 1px solid rgba(201,168,76,0.15); width: 100%; }
+      .search-btn { width: 100%; }
     }
   </style>
 </head>
@@ -144,13 +146,36 @@
 <section class="search-section" id="search">
   <div class="search-container">
     <div class="search-label">البحث المتقدم في عروض البصرة</div>
+    
     <div class="search-box">
+      <div class="search-filters">
+        <select class="filter-select" id="filterAction">
+          <option value="">الكل (بيع/إيجار)</option>
+          <option value="بيع">للبيع</option>
+          <option value="إيجار">للإيجار</option>
+        </select>
+        <select class="filter-select" id="filterType">
+          <option value="">نوع العقار</option>
+          <option value="بيت">بيت سكني</option>
+          <option value="شقة">شقة فاخرة</option>
+          <option value="أرض">أرض</option>
+          <option value="محل">محل تجاري</option>
+        </select>
+      </div>
       <div class="search-input-wrap">
         <i class="ti ti-search"></i>
-        <input class="search-input" type="text" placeholder="بيت للبيع في العشار، شقة إيجار..." id="searchInput" />
+        <input class="search-input" type="text" placeholder="ابحث بالمنطقة، مثل العشار، الطويسة..." id="searchInput" />
       </div>
       <button class="search-btn" onclick="alert('جاري البحث في السيستم...')">بحث سريّع</button>
     </div>
+    
+    <div class="search-tags">
+      <div class="search-tag" onclick="document.getElementById('searchInput').value='بيوت العشار'">بيوت العشار</div>
+      <div class="search-tag" onclick="document.getElementById('searchInput').value='شقق للإيجار'">شقق للإيجار</div>
+      <div class="search-tag" onclick="document.getElementById('searchInput').value='أراضي استثمارية'">أراضي استثمارية</div>
+      <div class="search-tag" onclick="document.getElementById('searchInput').value='محلات تجارية'">محلات تجارية</div>
+    </div>
+    
   </div>
 </section>
 
@@ -174,14 +199,11 @@
 
 <div id="addPropModal" style="display:none; position:fixed; inset:0; background:rgba(5,12,22,0.92); z-index:999; align-items:center; justify-content:center; padding:1rem">
   <div style="background:var(--navy-mid); border:2px solid var(--gold); border-radius:20px; padding:2.5rem; max-width:480px; width:100%; position:relative;">
-    
     <button onclick="closeAddPropertyModal()" class="modal-close-top-btn">✕</button>
-
     <div style="margin-bottom: 1.2rem;">
       <h3 style="color: var(--gold); font-weight: 700;"><i class="ti ti-circle-plus"></i> إضافة عقار سريع (زائر)</h3>
       <p style="font-size: 12px; color: var(--text-muted);">انشر عقارك مجاناً ليظهر للجمهور البصري فوراً</p>
     </div>
-
     <div>
       <label style="font-size: 11px; color: var(--gold);">نوع العقار</label>
       <select id="modalPropType" class="input-field-modal">
@@ -189,13 +211,10 @@
         <option value="شقة">شقة فاخرة</option>
         <option value="أرض">أرض استثمارية</option>
       </select>
-
       <label style="font-size: 11px; color: var(--gold);">المنطقة</label>
       <input type="text" id="modalPropArea" class="input-field-modal" placeholder="مثال: العشار، الجنينة...">
-
       <label style="font-size: 11px; color: var(--gold);">السعر</label>
       <input type="text" id="modalPropPrice" class="input-field-modal" placeholder="مثال: 140 مليون">
-
       <button onclick="submitNewPropertyFromModal()" class="search-btn" style="width:100%; border-radius:8px; height:44px;">🚀 انشر الإعلان الآن</button>
       <button onclick="closeAddPropertyModal()" class="btn-close-danger-modal">❌ إلغاء وإغلاق النافذة</button>
     </div>
@@ -203,24 +222,19 @@
 </div>
 
 <script>
-// المفتاح الموحد لقاعدة بيانات مشروع البصرة العقاري
 const STORAGE_KEY = 'basra_data_v3';
 
-// العقارات الثابتة الافتراضية بالموقع لكي لا تبدو الصفحة فارغة
 const defaultListings = [
   {type:'بيت', action:'للبيع', price:'145 مليون', area:'200 م²', district:'العشار', office:'مكتب الأمانة العقاري', officeId:'1', vip:true, icon:'🏠'},
   {type:'شقة', action:'للإيجار', price:'450 ألف/شهر', area:'120 م²', district:'الجمهورية', office:'عقارات الخليج بالبصرة', officeId:'2', vip:false, icon:'🏢'},
 ];
 
-// دالة ذكية تقوم بجلب وتوليد العقارات بشكل ديناميكي من الذاكرة الحية للمكاتب
 function getAllListings() {
   let offices = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
   let dynamicListings = [...defaultListings];
 
-  // دمج أي عقارات جديدة قام المكتب بنشرها وحفظها من لوحة الإدارة
   offices.forEach(office => {
     if(office.id === '1' && office.publishedProps > 1) {
-      // ننشئ كروت العروض الحقيقية بعدد العداد المحفوظ في لوحة التحكم
       for(let i = 1; i < office.publishedProps; i++) {
         dynamicListings.unshift({
           type: 'عقار مضاف حديثاً', 
@@ -244,7 +258,6 @@ function renderListings(){
   const g = document.getElementById('listingGrid');
   if(!g) return;
   
-  // جلب العقارات بعد دمج التحديثات الديناميكية
   const currentListings = getAllListings();
   
   g.innerHTML = currentListings.map(l => `
@@ -269,7 +282,6 @@ function renderListings(){
   `).join('');
 }
 
-/* فتح وإغلاق واجهة إضافة عقار */
 function openAddPropertyModal() { document.getElementById('addPropModal').style.display = 'flex'; }
 function closeAddPropertyModal() { document.getElementById('addPropModal').style.display = 'none'; }
 
@@ -289,7 +301,6 @@ function scrollToSearch() {
   document.getElementById('search').scrollIntoView({behavior:'smooth'});
 }
 
-// عرض القائمة عند التحميل الأولي للموقع
 document.addEventListener('DOMContentLoaded', () => {
   renderListings();
 });
