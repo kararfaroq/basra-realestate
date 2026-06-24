@@ -34,14 +34,17 @@
     .btn-suspend { background:var(--warning); color:var(--navy); border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-family:'Cairo'; font-size:11px; font-weight:700; }
     .btn-danger { background:var(--danger); color:white; border:none; padding:5px 12px; border-radius:6px; cursor:pointer; font-family:'Cairo'; font-size:12px; }
     .btn-outline-back { background:transparent; color:var(--text-muted); border:1px solid rgba(255,255,255,0.2); padding:6px 14px; border-radius:6px; text-decoration:none; font-size:13px; }
-    .modal-overlay {display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 22, 40, 0.85); backdrop-filter: blur(5px); z-index: 1000; justify-content: center; align-items: center; padding: 1rem;}
-    .modal-content {background: var(--navy-mid); border: 2px solid var(--gold); border-radius: 16px; padding: 2rem; width: 100%; max-width: 550px; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5); animation: fadeIn 0.3s ease-out;}
+    .modal-overlay {display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 22, 40, 0.9); backdrop-filter: blur(5px); z-index: 1000; justify-content: center; align-items: center; padding: 1rem; overflow-y:auto;}
+    .modal-content {background: var(--navy-mid); border: 2px solid var(--gold); border-radius: 16px; padding: 2rem; width: 100%; max-width: 600px; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5); animation: fadeIn 0.3s ease-out; margin: auto;}
     .btn-close-danger {width: 100%; background: transparent; color: var(--danger); border: 1px solid var(--danger); border-radius: 8px; padding: 10px; font-size: 14px; font-weight: 700; font-family: 'Cairo'; cursor: pointer; margin-top: 10px; transition: 0.2s; text-align: center;}
     .btn-close-danger:hover { background: var(--danger); color: white; }
     .file-upload-wrapper { position: relative; width: 100%; margin-bottom: 15px; }
     .file-upload-input { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-    .file-upload-btn { background: rgba(255,255,255,0.05); border: 1px dashed var(--gold); border-radius: 8px; padding: 15px; text-align: center; color: var(--gold); font-size: 14px; }
+    .file-upload-btn { background: rgba(255,255,255,0.05); border: 1px dashed var(--gold); border-radius: 8px; padding: 15px; text-align: center; color: var(--gold); font-size: 14px; transition: 0.2s;}
+    .file-upload-btn:hover { background: rgba(201,168,76,0.1); }
     .img-preview { max-width: 100px; max-height: 100px; border-radius: 50%; border: 2px solid var(--gold); margin: 10px auto; display: none; object-fit: cover; }
+    .prop-img-preview { width: 100%; height: 160px; border-radius: 8px; border: 1px solid var(--gold); margin-bottom: 15px; display: none; object-fit: cover; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
@@ -101,25 +104,69 @@
          <p id="packageLimitInfo" style="font-size:12px; color:var(--text-muted); margin-top:5px;"></p>
       </div>
     </div>
-    <div style="text-align:center; margin-top:1.5rem;"><a href="index.html" class="btn-outline-back" style="background:rgba(255,255,255,0.04)">← الانتقال للواجهة الرئيسية</a></div>
   </div>
 </div>
 
 <div id="addPropertyModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'addPropertyModal')">
   <div class="modal-content">
-    <div style="margin-bottom: 1.5rem;"><h3 style="color: var(--gold); font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;"><i class="ti ti-circle-plus"></i> إضافة عقار جديد للدليل</h3></div>
+    <div style="margin-bottom: 1.5rem;"><h3 style="color: var(--gold); font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;"><i class="ti ti-home"></i> إضافة وتفصيل عقار جديد</h3></div>
     <div>
-      <label style="font-size: 12px; color: var(--gold); display: block; margin-bottom: 5px;">نوع العقار</label>
-      <select id="propType" class="input-field" style="background: var(--navy); color:#fff;">
-        <option value="بيت">بيت سكني</option>
-        <option value="شقة">شقة فاخرة</option>
-        <option value="أرض">أرض استثمارية</option>
-        <option value="محل">محل تجاري</option>
+      <div class="file-upload-wrapper">
+        <div class="file-upload-btn"><i class="ti ti-camera"></i> أضف صورة رئيسية للعقار (اختياري)</div>
+        <input type="file" id="propUploadInput" class="file-upload-input" accept="image/*" onchange="handlePropImageUpload(event)">
+      </div>
+      <img id="propImagePreview" class="prop-img-preview" src="" alt="معاينة العقار">
+
+      <div class="grid-2">
+        <div>
+          <label style="font-size: 11px; color: var(--gold); margin-bottom: 5px; display:block;">نوع العقار</label>
+          <select id="propType" class="input-field">
+            <option value="بيت">بيت سكني</option><option value="شقة">شقة فاخرة</option>
+            <option value="أرض">أرض استثمارية</option><option value="محل">محل تجاري</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size: 11px; color: var(--gold); margin-bottom: 5px; display:block;">حالة العرض</label>
+          <select id="propAction" class="input-field">
+            <option value="للبيع">للبيع</option><option value="للإيجار">للإيجار</option>
+          </select>
+        </div>
+      </div>
+
+      <label style="font-size: 11px; color: var(--gold); margin-bottom: 5px; display:block;">نوع السند (الملكية)</label>
+      <select id="propDeed" class="input-field">
+        <option value="طابو صرف (ملك)">طابو صرف (ملك زراعي/عرصة)</option>
+        <option value="طابو زراعي (إقرار)">طابو زراعي (إقرار محكمة)</option>
+        <option value="زراعي (سند 25)">زراعي (سند 25)</option>
+        <option value="مساطحة / استثمار">مساطحة / استثمار</option>
+        <option value="تجاوز (طابو أسود)">تجاوز (حجة طابو أسود)</option>
       </select>
-      <label style="font-size: 12px; color: var(--gold); display: block; margin-bottom: 5px;">المنطقة في البصرة</label>
-      <input type="text" id="propArea" class="input-field" placeholder="مثال: العشار، الطويسة...">
-      <label style="font-size: 12px; color: var(--gold); display: block; margin-bottom: 5px;">السعر المطلوب</label>
-      <input type="text" id="propPrice" class="input-field" placeholder="مثال: 140 مليون دينار">
+
+      <div class="grid-2">
+        <div>
+          <label style="font-size: 11px; color: var(--gold); margin-bottom: 5px; display:block;">المساحة (م²)</label>
+          <input type="number" id="propArea" class="input-field" placeholder="مثال: 200">
+        </div>
+        <div>
+          <label style="font-size: 11px; color: var(--gold); margin-bottom: 5px; display:block;">عدد الغرف</label>
+          <input type="number" id="propRooms" class="input-field" placeholder="مثال: 4">
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <label style="font-size: 11px; color: var(--gold); margin-bottom: 5px; display:block;">المنطقة</label>
+          <input type="text" id="propDistrict" class="input-field" placeholder="مثال: العشار، الجنينة...">
+        </div>
+        <div>
+          <label style="font-size: 11px; color: var(--gold); margin-bottom: 5px; display:block;">السعر (د.ع / دولار)</label>
+          <input type="text" id="propPrice" class="input-field" placeholder="مثال: 140 مليون">
+        </div>
+      </div>
+
+      <label style="font-size: 11px; color: var(--gold); margin-bottom: 5px; display:block;">الوصف والتفاصيل التسويقية</label>
+      <textarea id="propDesc" class="input-field" placeholder="اكتب مميزات العقار، التشطيبات، القرب من الشارع والخدمات..."></textarea>
+
       <button onclick="submitNewProperty()" class="btn-action">🚀 نشر الإعلان فوراً</button>
       <button onclick="closeModal('addPropertyModal')" class="btn-close-danger">❌ إلغاء وإغلاق</button>
     </div>
@@ -131,15 +178,12 @@
     <div style="margin-bottom: 1.5rem;"><h3 style="color: var(--gold); font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;"><i class="ti ti-settings"></i> إعدادات بروفايل المكتب</h3></div>
     <div>
       <label style="font-size: 12px; color: var(--gold); display: block; margin-bottom: 5px;">شعار المكتب (اختياري)</label>
-      <div class="file-upload-wrapper">
-        <div class="file-upload-btn"><i class="ti ti-upload"></i> اضغط هنا لرفع صورة الشعار من جهازك</div>
-        <input type="file" id="logoUploadInput" class="file-upload-input" accept="image/*" onchange="handleLogoUpload(event)">
-      </div>
+      <div class="file-upload-wrapper"><div class="file-upload-btn"><i class="ti ti-upload"></i> رفع صورة الشعار</div><input type="file" id="logoUploadInput" class="file-upload-input" accept="image/*" onchange="handleLogoUpload(event)"></div>
       <div style="text-align: center;"><img id="logoPreview" class="img-preview" src="" alt="شعار المكتب"></div>
       <label style="font-size: 12px; color: var(--gold); display: block; margin-bottom: 5px;">رقم هاتف التواصل للزبائن</label>
       <input type="text" id="officePhoneInput" class="input-field" placeholder="مثال: 07701234567">
       <label style="font-size: 12px; color: var(--gold); display: block; margin-bottom: 5px;">نبذة سريعة عن المكتب (الوصف)</label>
-      <textarea id="officeDescInput" class="input-field" placeholder="اكتب نبذة عن تخصص مكتبك وخبرتك في عقارات البصرة..."></textarea>
+      <textarea id="officeDescInput" class="input-field" placeholder="اكتب نبذة عن تخصص مكتبك وخبرتك..."></textarea>
       <button onclick="saveProfileSettings()" class="btn-action">💾 حفظ التحديثات</button>
       <button onclick="closeModal('profileSettingsModal')" class="btn-close-danger">❌ إلغاء وإغلاق</button>
     </div>
@@ -150,7 +194,6 @@
   const STORAGE_KEY = 'basra_data_v3';
   const SESSION_KEY = 'basra_session_v3';
 
-  // التحديث الأهم: أضفنا مصفوفة listings فارغة افتراضياً لكي يحفظ بها العقارات
   const defaultOffices = [
     {id: "1", name:'مكتب الأمانة العقاري', area:'العشار', publishedProps: 1, pkg:'free', status:'active', allowPublish: true, expiry:'مفتوح الصلاحية دائم', phone: '', description: '', logo: '', listings: []},
     {id: "2", name:'عقارات الخليج بالبصرة', area:'الجمهورية', publishedProps: 4, pkg:'eco', status:'active', allowPublish: true, expiry:'2026-07-24', phone: '', description: '', logo: '', listings: []},
@@ -161,147 +204,98 @@
   function getOffices() { return JSON.parse(localStorage.getItem(STORAGE_KEY)); }
   function saveOffices(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 
-  let guestUser = { publishedProps: 0, maxLimit: 1, allowPublish: true };
   let session = JSON.parse(localStorage.getItem(SESSION_KEY)) || null;
   let tempLogoBase64 = "";
+  let tempPropImageBase64 = ""; // متغير لحفظ صورة العقار
 
   document.addEventListener('DOMContentLoaded', () => { evaluateSessionUI(); });
 
   function evaluateSessionUI() {
-    const loginForm = document.getElementById('loginFormSection');
-    const dashboard = document.getElementById('dashboardSection');
-    
-    if (!session) {
-      loginForm.style.display = 'block'; dashboard.style.display = 'none';
-    } else {
-      loginForm.style.display = 'none'; dashboard.style.display = 'block';
-      document.getElementById('displayUsername').textContent = session.username;
-      
-      const badge = document.getElementById('roleBadge');
-      const adminSuperZone = document.getElementById('adminAndSuperView');
-      const officeZone = document.getElementById('officeOnlyView');
-      
+    const loginForm = document.getElementById('loginFormSection'); const dashboard = document.getElementById('dashboardSection');
+    if (!session) { loginForm.style.display = 'block'; dashboard.style.display = 'none'; } else {
+      loginForm.style.display = 'none'; dashboard.style.display = 'block'; document.getElementById('displayUsername').textContent = session.username;
+      const badge = document.getElementById('roleBadge'); const adminSuperZone = document.getElementById('adminAndSuperView'); const officeZone = document.getElementById('officeOnlyView');
       adminSuperZone.style.display = 'none'; officeZone.style.display = 'none';
-      
-      if (session.role === 'admin' || session.role === 'supervisor') {
-        badge.textContent = session.role === 'admin' ? '👑 مدير النظام' : '🛡️ مشرف معتمد';
-        adminSuperZone.style.display = 'block'; renderOfficesTable();
-      } else if (session.role === 'office') {
-        badge.textContent = '🏢 مكتب عقاري شريك';
-        officeZone.style.display = 'block'; setupOfficeViewUI();
-      }
+      if (session.role === 'admin' || session.role === 'supervisor') { badge.textContent = session.role === 'admin' ? '👑 مدير النظام' : '🛡️ مشرف معتمد'; adminSuperZone.style.display = 'block'; renderOfficesTable(); } 
+      else if (session.role === 'office') { badge.textContent = '🏢 مكتب عقاري شريك'; officeZone.style.display = 'block'; setupOfficeViewUI(); }
     }
   }
 
   function renderOfficesTable() {
-    const tbody = document.getElementById('officesTableBody');
-    if (!tbody) return;
+    const tbody = document.getElementById('officesTableBody'); if (!tbody) return;
     let offices = getOffices();
-    tbody.innerHTML = offices.map(o => `
-        <tr>
-          <td><strong>${o.name}</strong></td><td>${o.area}</td>
-          <td><span style="color:${o.pkg=='gold'?'var(--gold)':'#4A9FD4'}">${o.pkg=='gold'?'🥇 ذهبي VIP': o.pkg=='eco'?'💎 اقتصادي':'⭐ مجاني'}</span></td>
-          <td><span class="badge-status ${o.pkg==='free'?'status-active':(o.status==='expired'?'status-expired':'status-active')}">${o.pkg==='free'?'🟢 نشط دائم':(o.status==='expired'?'🔴 منتهي':'🟢 نشط')}</span></td>
-          <td><span class="badge-status ${o.allowPublish ? 'status-active' : 'status-suspended'}">${o.allowPublish ? '🟢 مسموح بالنشر' : '🔴 حظر إداري'}</span></td>
-          <td style="font-family:monospace; font-size:12px;">${o.expiry}</td>
-          <td>
-            <select style="background:var(--navy); color:#fff; border:1px solid rgba(201,168,76,0.3); padding:4px; border-radius:6px;" onchange="changePackage('${o.id}', this.value)">
-              <option value="free" ${o.pkg == 'free' ? 'selected' : ''}>مجاني</option><option value="eco" ${o.pkg == 'eco' ? 'selected' : ''}>اقتصادي</option><option value="gold" ${o.pkg == 'gold' ? 'selected' : ''}>ذهبي VIP</option>
-            </select>
-          </td>
-          <td><button onclick="renewSubscriptionMonthly('${o.id}')" class="btn-renew" ${o.pkg==='free'?'disabled':''}>${o.pkg==='free'?'🚫':'🔄 تجديد'}</button></td>
-          <td><button onclick="togglePublishStatus('${o.id}')" class="btn-suspend" style="background:${o.allowPublish?'var(--warning)':'var(--success)'}; color:${o.allowPublish?'var(--navy)':'#fff'}">${o.allowPublish ? '🛑 إيقاف' : '🟢 تفعيل'}</button></td>
-          <td><button onclick="deleteOffice('${o.id}')" class="btn-danger">🗑️ حذف</button></td>
-        </tr>
-      `).join('');
+    tbody.innerHTML = offices.map(o => `<tr><td><strong>${o.name}</strong></td><td>${o.area}</td><td><span style="color:${o.pkg=='gold'?'var(--gold)':'#4A9FD4'}">${o.pkg=='gold'?'🥇 ذهبي VIP': o.pkg=='eco'?'💎 اقتصادي':'⭐ مجاني'}</span></td><td><span class="badge-status ${o.pkg==='free'?'status-active':(o.status==='expired'?'status-expired':'status-active')}">${o.pkg==='free'?'🟢 نشط دائم':(o.status==='expired'?'🔴 منتهي':'🟢 نشط')}</span></td><td><span class="badge-status ${o.allowPublish ? 'status-active' : 'status-suspended'}">${o.allowPublish ? '🟢 مسموح بالنشر' : '🔴 حظر إداري'}</span></td><td style="font-family:monospace; font-size:12px;">${o.expiry}</td><td><select style="background:var(--navy); color:#fff; border:1px solid rgba(201,168,76,0.3); padding:4px; border-radius:6px;" onchange="changePackage('${o.id}', this.value)"><option value="free" ${o.pkg == 'free' ? 'selected' : ''}>مجاني</option><option value="eco" ${o.pkg == 'eco' ? 'selected' : ''}>اقتصادي</option><option value="gold" ${o.pkg == 'gold' ? 'selected' : ''}>ذهبي VIP</option></select></td><td><button onclick="renewSubscriptionMonthly('${o.id}')" class="btn-renew" ${o.pkg==='free'?'disabled':''}>${o.pkg==='free'?'🚫':'🔄 تجديد'}</button></td><td><button onclick="togglePublishStatus('${o.id}')" class="btn-suspend" style="background:${o.allowPublish?'var(--warning)':'var(--success)'}; color:${o.allowPublish?'var(--navy)':'#fff'}">${o.allowPublish ? '🛑 إيقاف' : '🟢 تفعيل'}</button></td><td><button onclick="deleteOffice('${o.id}')" class="btn-danger">🗑️ حذف</button></td></tr>`).join('');
   }
 
-  function deleteOffice(id) { if(confirm('⚠️ تأكيد حذف المكتب؟')) { let offices = getOffices(); saveOffices(offices.filter(o => o.id !== id)); renderOfficesTable(); } }
+  function deleteOffice(id) { if(confirm('⚠️ تأكيد الحذف؟')) { let offices = getOffices(); saveOffices(offices.filter(o => o.id !== id)); renderOfficesTable(); } }
   function renewSubscriptionMonthly(id) { let offices = getOffices(); const idx = offices.findIndex(o => o.id === id); if (idx !== -1 && offices[idx].pkg !== 'free') { const today = new Date(); today.setDate(today.getDate() + 30); offices[idx].status = 'active'; offices[idx].expiry = today.toISOString().split('T')[0]; saveOffices(offices); renderOfficesTable(); } }
   function togglePublishStatus(id) { let offices = getOffices(); const idx = offices.findIndex(o => o.id === id); if (idx !== -1) { offices[idx].allowPublish = !offices[idx].allowPublish; saveOffices(offices); renderOfficesTable(); } }
   function changePackage(id, newPkg) { let offices = getOffices(); const idx = offices.findIndex(o => o.id === id); if (idx !== -1) { offices[idx].pkg = newPkg; offices[idx].expiry = newPkg === 'free' ? 'مفتوح دائم' : new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0]; offices[idx].status = 'active'; saveOffices(offices); renderOfficesTable(); } }
 
   function setupOfficeViewUI() {
-    const banner = document.getElementById('officeStatusBanner');
-    let offices = getOffices();
-    const myOffice = offices[0]; 
+    const banner = document.getElementById('officeStatusBanner'); let offices = getOffices(); const myOffice = offices[0]; 
     document.getElementById('currentOfficePropsCount').textContent = myOffice.publishedProps;
     document.getElementById('packageLimitInfo').textContent = myOffice.pkg === 'gold' ? "🥇 باقتك ذهبية: نشر غير محدود." : `ℹ️ سقف الباقة الحالية: ${myOffice.pkg === 'eco' ? 5 : 2} عقارات.`;
-    
-    if (!myOffice.allowPublish) {
-      banner.className = "status-suspended"; banner.innerHTML = `🛑 <strong>تم إيقاف مكتبك عن النشر من قبل الإدارة!</strong>`;
-    } else {
-      banner.className = "status-active"; banner.innerHTML = `🟢 <strong>حسابك نشط وطبيعي ومصرح له بالعمل.</strong>`;
-    }
+    if (!myOffice.allowPublish) { banner.className = "status-suspended"; banner.innerHTML = `🛑 <strong>تم إيقاف مكتبك عن النشر!</strong>`; } else { banner.className = "status-active"; banner.innerHTML = `🟢 <strong>حسابك نشط وطبيعي ومصرح له بالعمل.</strong>`; }
   }
 
   function openAddPropertyModal() {
-    let offices = getOffices();
-    if (!offices[0].allowPublish) { alert("❌ حسابك موقف عن النشر حالياً!"); return; }
+    let offices = getOffices(); if (!offices[0].allowPublish) { alert("❌ حسابك موقف عن النشر حالياً!"); return; }
+    // تصفير الصورة عند الفتح
+    tempPropImageBase64 = ""; document.getElementById('propImagePreview').style.display = 'none'; document.getElementById('propUploadInput').value = "";
     document.getElementById('addPropertyModal').style.display = 'flex';
   }
 
-  /* هنا يتم حفظ تفاصيل العقار الحقيقية بالذاكرة */
+  function handlePropImageUpload(event) {
+    const file = event.target.files[0];
+    if(file) { const reader = new FileReader(); reader.onload = function(e) { tempPropImageBase64 = e.target.result; document.getElementById('propImagePreview').src = tempPropImageBase64; document.getElementById('propImagePreview').style.display = 'block'; }; reader.readAsDataURL(file); }
+  }
+
+  /* تحديث دالة الحفظ لتشمل كل التفاصيل الجديدة */
   function submitNewProperty() {
     const type = document.getElementById('propType').value;
+    const action = document.getElementById('propAction').value;
+    const deed = document.getElementById('propDeed').value;
     const area = document.getElementById('propArea').value.trim();
+    const rooms = document.getElementById('propRooms').value.trim();
+    const district = document.getElementById('propDistrict').value.trim();
     const price = document.getElementById('propPrice').value.trim();
-    if(!area || !price) { alert("الرجاء إدخال البيانات!"); return; }
+    const desc = document.getElementById('propDesc').value.trim();
+    
+    if(!district || !price) { alert("الرجاء إدخال المنطقة والسعر على الأقل!"); return; }
 
     let offices = getOffices();
     offices[0].publishedProps++;
-    
-    // حفظ تفاصيل العقار في مصفوفة المكتب
     if (!offices[0].listings) offices[0].listings = [];
+    
     offices[0].listings.unshift({
-      type: type,
-      price: price,
-      district: area,
-      area: 'مساحة ممتازة',
-      action: 'للبيع',
+      type: type, action: action, deedType: deed,
+      area: area || '-', rooms: rooms || '-',
+      district: district, price: price, desc: desc,
+      image: tempPropImageBase64, // حفظ الصورة المشفرة
       icon: type === 'شقة' ? '🏢' : type === 'أرض' ? '🏞️' : '🏠'
     });
     
     saveOffices(offices);
-    alert("🎉 تم حفظ ونشر العقار بنجاح! سيظهر الآن في الصفحة الرئيسية.");
-    closeModal('addPropertyModal');
-    setupOfficeViewUI();
+    alert("🎉 تم نشر العقار بكامل تفاصيله بنجاح!");
+    closeModal('addPropertyModal'); setupOfficeViewUI();
   }
 
   function openProfileSettingsModal() {
     let offices = getOffices(); const myOffice = offices[0]; 
-    document.getElementById('officePhoneInput').value = myOffice.phone || '';
-    document.getElementById('officeDescInput').value = myOffice.description || '';
-    const preview = document.getElementById('logoPreview');
-    if (myOffice.logo) { preview.src = myOffice.logo; preview.style.display = 'block'; tempLogoBase64 = myOffice.logo; } else { preview.style.display = 'none'; tempLogoBase64 = ""; }
+    document.getElementById('officePhoneInput').value = myOffice.phone || ''; document.getElementById('officeDescInput').value = myOffice.description || '';
+    const preview = document.getElementById('logoPreview'); if (myOffice.logo) { preview.src = myOffice.logo; preview.style.display = 'block'; tempLogoBase64 = myOffice.logo; } else { preview.style.display = 'none'; tempLogoBase64 = ""; }
     document.getElementById('profileSettingsModal').style.display = 'flex';
   }
-
-  function handleLogoUpload(event) {
-    const file = event.target.files[0];
-    if(file) { const reader = new FileReader(); reader.onload = function(e) { tempLogoBase64 = e.target.result; document.getElementById('logoPreview').src = tempLogoBase64; document.getElementById('logoPreview').style.display = 'block'; }; reader.readAsDataURL(file); }
-  }
-
-  function saveProfileSettings() {
-    let offices = getOffices();
-    offices[0].phone = document.getElementById('officePhoneInput').value.trim();
-    offices[0].description = document.getElementById('officeDescInput').value.trim();
-    offices[0].logo = tempLogoBase64;
-    saveOffices(offices); alert("✅ تم حفظ إعدادات البروفايل والشعار بنجاح!"); closeModal('profileSettingsModal');
-  }
-
+  function handleLogoUpload(event) { const file = event.target.files[0]; if(file) { const reader = new FileReader(); reader.onload = function(e) { tempLogoBase64 = e.target.result; document.getElementById('logoPreview').src = tempLogoBase64; document.getElementById('logoPreview').style.display = 'block'; }; reader.readAsDataURL(file); } }
+  function saveProfileSettings() { let offices = getOffices(); offices[0].phone = document.getElementById('officePhoneInput').value.trim(); offices[0].description = document.getElementById('officeDescInput').value.trim(); offices[0].logo = tempLogoBase64; saveOffices(offices); alert("✅ تم حفظ التحديثات!"); closeModal('profileSettingsModal'); }
   function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
   function closeModalOnOutsideClick(event, modalId) { if (event.target.id === modalId) { closeModal(modalId); } }
-
   function handleLogin() {
-    const u = document.getElementById('usernameInput').value.trim();
-    const p = document.getElementById('passwordInput').value.trim();
-    if (u === 'admin' && p === 'admin123') { session = { role: 'admin', username: 'المدير العام للنظام' }; } 
-    else if (u === 'office' && p === 'office123') { session = { role: 'office', username: 'مكتب الأمانة العقاري' }; } 
-    else { alert('⚠️ اسم المستخدم أو كلمة المرور غير صحيحة!'); return; }
+    const u = document.getElementById('usernameInput').value.trim(); const p = document.getElementById('passwordInput').value.trim();
+    if (u === 'admin' && p === 'admin123') { session = { role: 'admin', username: 'المدير العام للنظام' }; } else if (u === 'office' && p === 'office123') { session = { role: 'office', username: 'مكتب الأمانة العقاري' }; } else { alert('⚠️ خطأ بالبيانات!'); return; }
     localStorage.setItem(SESSION_KEY, JSON.stringify(session)); evaluateSessionUI();
   }
-
   function handleLogout() { session = null; localStorage.removeItem(SESSION_KEY); evaluateSessionUI(); }
 </script>
 </body>
