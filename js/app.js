@@ -464,3 +464,42 @@ function quickSearch(q) {
   document.getElementById('searchInput').value = q;
   sendPrompt('ابحث عن ' + q + ' في دليل البصرة العقاري وأخبرني بنصائح للعثور على أفضل العروض');
 }
+
+// =========================================================================
+// 🚀 تحديث تطبيق الويب التقدمي (PWA) وتسجيل Service Worker
+// =========================================================================
+
+// ١. تسجيل الـ Service Worker في المتصفح
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('تم تفعيل نظام التطبيق بنجاح!'))
+      .catch(err => console.log('خطأ في تفعيل نظام التطبيق:', err));
+  });
+}
+
+// ٢. التقاط حدث التثبيت وإظهاره تلقائياً للمستخدم أول مرة
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  // منع المتصفح من إظهار النافذة التلقائية فوراً بشكل مزعج
+  e.preventDefault();
+  deferredPrompt = e;
+
+  // إظهار نافذة طلب التثبيت تلقائياً بعد مرور 4 ثوانٍ من تصفح الموقع لأول مرة
+  setTimeout(() => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt(); // إظهار نافذة المتصفح "هل تريد إضافة التطبيق للشاشة؟"
+      
+      // معرفة قرار المستخدم (هل وافق أم رفض؟)
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('وافق المستخدم على تثبيت التطبيق 🎉');
+        } else {
+          console.log('رفض المستخدم التثبيت ❌');
+        }
+        deferredPrompt = null; // تفريغ المتغير حتى لا تتكرر النافذة
+      });
+    }
+  }, 4000); // 4000 مللي ثانية تعني 4 ثوانٍ
+});
