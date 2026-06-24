@@ -126,25 +126,9 @@
     .payment-method { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
     .payment-method:hover, .payment-method.active { border-color: var(--gold); background: rgba(201,168,76,0.1); }
 
-    /* --- تنسيقات المستشار العقاري الذكي --- */
-    .ai-chat-widget { position: fixed; bottom: 25px; left: 25px; z-index: 999; display: flex; flex-direction: column; align-items: flex-start; }
-    .ai-chat-btn { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: var(--navy); border: 2px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 26px; cursor: pointer; box-shadow: 0 6px 16px rgba(0,0,0,0.4); transition: 0.3s; }
-    .ai-chat-btn:hover { transform: scale(1.08) rotate(5deg); }
-    
-    .ai-chat-window { width: 340px; height: 450px; background: var(--navy-mid); border: 2px solid var(--gold); border-radius: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: none; flex-direction: column; overflow: hidden; margin-bottom: 12px; transition: 0.3s; }
-    .ai-chat-window.active { display: flex !important; }
-    
-    .ai-chat-header { background: linear-gradient(135deg, var(--navy), var(--navy-light)); border-bottom: 1px solid rgba(201,168,76,0.2); padding: 12px; display: flex; align-items: center; justify-content: space-between; }
-    .ai-chat-body { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: rgba(10,22,40,0.3); }
-    .ai-msg { max-width: 85%; padding: 8px 12px; border-radius: 10px; font-size: 13px; line-height: 1.5; }
-    .ai-msg.bot { background: rgba(255,255,255,0.06); color: var(--text-on-dark); align-self: flex-start; border-right: 3px solid var(--gold); }
-    .ai-msg.user { background: var(--gold); color: var(--navy); align-self: flex-end; font-weight: 600; }
-    .ai-chat-footer { padding: 8px; background: var(--navy); border-top: 1px solid rgba(201,168,76,0.15); display: flex; gap: 6px; }
-    .ai-chat-input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(201,168,76,0.2); border-radius: 6px; padding: 8px 12px; color: #fff; font-family: 'Cairo'; font-size: 13px; outline: none; }
-    .ai-chat-input:focus { border-color: var(--gold); }
-    .ai-chat-send { background: var(--gold); border: none; color: var(--navy); width: 36px; height: 36px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    /* تنسيقات المستشار العقاري الذكي مفصولة بالكامل في ملف ai-advisor.js لتسريع وتأمين ملف الواجهة */
 
-    @media(max-width:700px){ .nav-links{display:none} .search-filters { flex-direction: column; width: 100%; border-left: none; } .filter-select { border-left: none; border-bottom: 1px solid rgba(201,168,76,0.15); width: 100%; } .search-btn { width: 100%; } .ai-chat-window { width: 290px; height: 400px; } }
+    @media(max-width:700px){ .nav-links{display:none} .search-filters { flex-direction: column; width: 100%; border-left: none; } .filter-select { border-left: none; border-bottom: 1px solid rgba(201,168,76,0.15); width: 100%; } .search-btn { width: 100%; } }
   </style>
 </head>
 <body>
@@ -354,25 +338,7 @@
   </div>
 </div>
 
-<div class="ai-chat-widget">
-  <div class="ai-chat-window" id="aiChatWindow">
-    <div class="ai-chat-header">
-      <div style="display:flex; align-items:center; gap:8px;">
-        <div style="width:10px; height:10px; background:var(--success); border-radius:50%;"></div>
-        <span style="font-size:13px; font-weight:700; color:var(--gold);">🧠 المستشار العقاري الذكي (الخبير)</span>
-      </div>
-      <button onclick="toggleAiChat()" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-size:16px;">✕</button>
-    </div>
-    <div class="ai-chat-body" id="aiChatBody">
-      <div class="ai-msg bot">مرحباً بك في دليل البصرة العقاري! 🌴 أنا مستشارك الذكي الشخصي. اكتب لي ماذا تبحث عنه (مثال: "أبحث عن بيت في العشار" أو "شقة إيجار") وسأقوم بالبحث والرد عليك فريّع! 🤖✨</div>
-    </div>
-    <div class="ai-chat-footer">
-      <input type="text" id="aiChatInput" class="ai-chat-input" placeholder="اسأل المستشار، مثال: شقة في الجمهورية..." onkeyup="if(event.key === 'Enter') sendAiMessage();">
-      <button onclick="sendAiMessage()" class="ai-chat-send"><i class="ti ti-send"></i></button>
-    </div>
-  </div>
-  <button class="ai-chat-btn" onclick="toggleAiChat()" style="width: auto; padding: 0 20px; border-radius: 30px; font-size: 13px; font-weight: bold; white-space: nowrap;">✨ المستشار العقاري الذكي</button>
-</div>
+<!-- ودجة المستشار العقاري الذكي تُحقن تلقائياً عبر ai-advisor.js (ملف مستقل تماماً عن الواجهة) -->
 
 <footer class="footer" style="background: #050c16; padding: 2rem; border-top: 1px solid rgba(201,168,76,0.15); margin-top: 4rem;">
   <div style="max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
@@ -559,31 +525,12 @@ function submitNewOffice() {
   closeRegisterModal();
 }
 
-function toggleAiChat() {
-  const win = document.getElementById('aiChatWindow');
-  if(win) {
-    win.classList.toggle('active');
-  }
-}
-
-function sendAiMessage() {
-  const input = document.getElementById('aiChatInput');
-  const txt = input.value.trim();
-  if(!txt) return;
-
-  const body = document.getElementById('aiChatBody');
-  body.innerHTML += `<div class="ai-msg user">${txt}</div>`;
-  input.value = '';
-  body.scrollTop = body.scrollHeight;
-
-  setTimeout(() => {
-    let reply = `أهلاً بك! لقد استلمت طلبك بخصوص "${txt}". جاري البحث عن أفضل اللقطات والعروض المتوفرة حالياً في مناطق البصرة وتصفيتها لك أستاذ.`;
-    body.innerHTML += `<div class="ai-msg bot">${reply}</div>`;
-    body.scrollTop = body.scrollHeight;
-  }, 600);
-}
+// دوال المستشار العقاري الذكي (toggleAiChat / sendAiMessage) أصبحت في ملف ai-advisor.js المستقل
 
 document.addEventListener('DOMContentLoaded', () => { renderListings(); });
 </script>
+
+<!-- المستشار العقاري الذكي: مكوّن مستقل بالكامل (CSS+HTML+JS) — حذف هذا السطر فقط يعطّل الميزة بدون أي تأثير على باقي الواجهة -->
+<script src="ai-advisor.js" defer></script>
 </body>
 </html>
