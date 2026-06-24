@@ -1,498 +1,614 @@
 /* ============================================================
-   ai-advisor.js  v2.0
-   داهية العقارات البصراوية — مدعوم بـ Claude AI حقيقي
+   ai-advisor.js  — النسخة المتطورة v2.0
+   المستشار العقاري الذكي لدليل البصرة العقاري
 
-   ما الجديد في v2؟
-   - ردود من Claude AI حقيقي (مو setTimeout وهمي)
-   - شخصية "أبو علي" — داهية عقاري بصراوي
-   - يعرف أسعار مناطق البصرة
-   - يفهم طلبات المستخدم ويصفي العقارات
-   - يعطي نصايح شراء/إيجار/استثمار
-   - يسوق للموقع والاشتراكات بذكاء
-   - تاريخ المحادثة محفوظ خلال الجلسة
-   - مؤشر "يكتب..." أثناء انتظار الرد
-   - رسائل ترحيب سريعة (Quick Replies)
+   ما الجديد في هذه النسخة؟
+   ✅ ذكاء اصطناعي حقيقي عبر Claude API (claude-sonnet-4-6)
+   ✅ System Prompt متخصص 100% بعقارات البصرة (أحياء، أسعار، مناطق)
+   ✅ كشف تلقائي لنوع الطلب (بيع / إيجار / استثمار)
+   ✅ مقارنة أسعار وتقدير عقاري ذكي
+   ✅ نصائح شراء وإيجار واستثمار مخصصة
+   ✅ ترويج ذكي لعروض الموقع وباقاته في الوقت المناسب
+   ✅ ذاكرة المحادثة (سياق كامل مع كل رسالة)
+   ✅ مؤشر "يكتب..." أثناء انتظار الرد
+   ✅ أزرار اقتراحات سريعة للمستخدم
+   ✅ يبقى ملف .js مستقلاً — لا تعديل على index.html
+
+   للتفعيل: أضف سطراً واحداً في index.html:
+   <script src="ai-advisor.js" defer></script>
    ============================================================ */
 
 (function () {
   'use strict';
 
   /* ============================================================
-     A) CSS
-  ============================================================ */
+     ⚙️ الإعدادات — عدّل هنا فقط عند الحاجة
+     ============================================================ */
+  const CONFIG = {
+    // 🔑 مفتاح Claude API — ضع مفتاحك هنا
+    // للحصول على مفتاح: https://console.anthropic.com
+    API_KEY: 'YOUR_CLAUDE_API_KEY_HERE',
+
+    // اسم الموقع — يُستخدم في ترويج الباقات
+    SITE_NAME: 'دليل البصرة العقاري',
+
+    // رابط صفحة الباقات في موقعك
+    PACKAGES_URL: '/packages',
+
+    // رابط صفحة تسجيل المعلنين
+    REGISTER_URL: '/register',
+
+    // عدد الرسائل قبل عرض ترويج الباقات تلقائياً
+    PROMO_AFTER_MESSAGES: 4,
+
+    // الحد الأقصى لسجل المحادثة المُرسل للـ API (لتوفير التوكنات)
+    MAX_HISTORY: 14,
+  };
+
+  /* ============================================================
+     🧠 System Prompt — قلب الذكاء الاصطناعي
+     ============================================================ */
+  const SYSTEM_PROMPT = `أنت "داهية"، المستشار العقاري الذكي لموقع "${CONFIG.SITE_NAME}".
+خبرتك محصورة 100% في سوق العقارات بمحافظة البصرة، العراق.
+
+═══════════════════════════════════════════
+📍 معرفتك الجغرافية بأحياء ومناطق البصرة:
+═══════════════════════════════════════════
+المناطق الراقية والمرغوبة (أسعار مرتفعة):
+- البراضعية: منطقة هادئة وراقية، مناسبة للعائلات، أسعار البيع 150-400 مليون دينار للبيت
+- الجزيرة: فلل وبيوت فاخرة، من أغلى مناطق البصرة، 200-600 مليون
+- حي الجامعة: قرب جامعة البصرة، مطلوب من الأكاديميين، 120-300 مليون
+- العشار: قلب البصرة التجاري، مزيج تجاري وسكني، إيجارات الشقق 200-500 ألف/شهر
+- أبو الخصيب: مناطق خضراء وهادئة، أسعار معقولة، 80-200 مليون
+
+المناطق المتوسطة (أسعار معتدلة):
+- الجمهورية: شعبية ومتوسطة، بيوت 60-150 مليون، شقق إيجار 150-300 ألف/شهر
+- الأصمعي: متوسط الحال، 70-160 مليون
+- الزبير: قرب الحدود السعودية، تنمو بسرعة، 50-130 مليون
+- القبلة: مركزية وحيوية، 80-180 مليون، إيجارات 200-400 ألف
+- المعقل: قرب الميناء، طلب من الموظفين، 70-150 مليون
+- الخندق: شعبية، 50-120 مليون
+
+المناطق الاقتصادية (أسعار منخفضة):
+- الحيانية: اقتصادية وواسعة، 40-100 مليون
+- الشعيبة: صناعية وسكنية، 35-90 مليون
+- أم قصر: قرب الميناء، فرص استثمارية، 40-110 مليون
+- سفوان: حدودية، فرص تجارية خاصة
+
+═══════════════════════════════════════════
+💰 معرفتك بالأسعار والسوق (2024-2025):
+═══════════════════════════════════════════
+أسعار البيع التقريبية:
+- شقة (100-150م²): 50-150 مليون دينار حسب المنطقة
+- بيت طابق واحد (150-200م²): 80-250 مليون
+- بيت طابقين (200-300م²): 150-450 مليون
+- فيلا (300م² فأكثر): 300 مليون - مليار+
+- قطعة أرض سكنية (200م²): 30-200 مليون حسب الموقع
+- محل تجاري: 80-500 مليون حسب الموقع والمساحة
+
+أسعار الإيجار الشهرية:
+- شقة صغيرة (1-2 غرفة): 100-250 ألف دينار
+- شقة متوسطة (3 غرف): 200-400 ألف دينار
+- بيت كامل: 300-800 ألف دينار
+- محل تجاري صغير: 300 ألف - مليون دينار
+
+العوامل المؤثرة في السعر:
+- القرب من الخدمات (مدارس، مستشفيات، أسواق)
+- الحالة الإنشائية والعمر
+- المساحة والتصميم الداخلي
+- الطابق (للشقق: الطوابق المنخفضة أغلى)
+- توافر الحدائق والمواقف
+- الكهرباء الحكومية مقابل المولدة
+
+═══════════════════════════════════════════
+🎯 كيف تكتشف نوع الطلب تلقائياً:
+═══════════════════════════════════════════
+- كلمات البيع: "أشتري، ابتاع، شراء، ملكية، سند، تمليك"
+- كلمات الإيجار: "أستأجر، إيجار، كراء، شهري، أجار"
+- كلمات الاستثمار: "استثمار، ربح، دخل، مشروع، تجاري، عائد، مضاعفة"
+- كلمات البيع من المالك: "أبيع، عندي عقار، للبيع، أسوّق"
+
+═══════════════════════════════════════════
+💡 نصائحك الذهبية:
+═══════════════════════════════════════════
+للمشتري:
+1. افحص السند وتأكد من خلوه من الديون في دائرة التسجيل العقاري
+2. اطلب كشف هندسي قبل الشراء
+3. تحقق من خدمات المنطقة (ماء، كهرباء، صرف صحي)
+4. لا تشتري بدون وسيط موثوق أو محامي
+5. السعر العادل = سعر السوق ±15%
+
+للمستأجر:
+1. اكتب عقد إيجار رسمي وموثق
+2. تفقد المنزل كاملاً قبل الدفع
+3. اسأل عن فاتورة الكهرباء الشهرية
+4. وضّح من يتحمل الإصلاحات
+5. احتفظ بنسخة من إيصالات الدفع
+
+للمستثمر:
+1. المناطق الواعدة: الزبير، أبو الخصيب، القرنة (توسع مخطط)
+2. المحلات التجارية في العشار والجمهورية: عائد إيجاري 8-12% سنوياً
+3. الأراضي قرب المشاريع الحكومية الجديدة: ربح رأسمالي ممتاز
+4. تجنب العقارات على أراضي دولة أو متنازع عليها
+
+═══════════════════════════════════════════
+📣 ترويج الموقع وباقاته (بشكل طبيعي وذكي):
+═══════════════════════════════════════════
+عندما يسأل شخص عن عرض معين أو يريد الإعلان:
+- اذكر أن "${CONFIG.SITE_NAME}" هو الدليل الأول للعقارات في البصرة
+- الباقات المتاحة: المجانية (3 إعلانات)، الفضية (15 إعلان/شهر)، الذهبية (إعلانات غير محدودة + تمييز)
+- وجّههم لصفحة الباقات: ${CONFIG.PACKAGES_URL}
+- لا تبالغ بالترويج — اذكره مرة واحدة بشكل طبيعي ضمن الرد
+
+═══════════════════════════════════════════
+🗣️ أسلوبك في الرد:
+═══════════════════════════════════════════
+- اللهجة: عراقية بصرية دافئة ومهنية (مثال: "حبيبي، هذا الحي من أحسن المناطق...")
+- الطول: متوسط — لا قصير جداً ولا طويل ممل
+- دائماً أعطِ رقماً أو تقديراً للسعر عند السؤال
+- استخدم إيموجي بمعقولية (🏠💰📍✅)
+- في نهاية كل رد، اقترح سؤالاً متابعة أو عرض مساعدة إضافية
+- إذا لم تعرف معلومة محددة، قل ذلك بصراحة واقترح كيف يتحقق منها
+- لا تتحدث عن أي شيء خارج نطاق عقارات البصرة`;
+
+  /* ============================================================
+     1) حقن التنسيقات CSS
+     ============================================================ */
   const style = document.createElement('style');
   style.textContent = `
-    /* --- Widget Container --- */
+    /* ── الودجة الرئيسية ── */
     .ai-chat-widget {
-      position: fixed;
-      bottom: 25px;
-      left: 25px;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
+      position: fixed; bottom: 25px; left: 25px; z-index: 9999;
+      display: flex; flex-direction: column; align-items: flex-start;
       font-family: 'Cairo', 'Segoe UI', sans-serif;
     }
 
-    /* --- Toggle Button --- */
+    /* ── زر الفتح ── */
     .ai-chat-btn {
-      padding: 0 20px;
-      height: 48px;
+      width: auto; padding: 0 18px; height: 46px;
       border-radius: 30px;
-      background: linear-gradient(135deg, var(--gold, #C9A84C), var(--gold-dark, #a07830));
-      color: var(--navy, #0a1628);
-      border: 2px solid rgba(255,255,255,0.2);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
+      background: linear-gradient(135deg, var(--gold, #c9a84c), var(--gold-dark, #a07830));
+      color: var(--navy, #0a1628); border: 2px solid rgba(255,255,255,0.25);
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap;
       box-shadow: 0 6px 20px rgba(0,0,0,0.45);
       transition: transform 0.25s, box-shadow 0.25s;
-      white-space: nowrap;
     }
-    .ai-chat-btn:hover { transform: scale(1.05); box-shadow: 0 8px 24px rgba(0,0,0,0.55); }
+    .ai-chat-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,0.55); }
     .ai-chat-btn .pulse-dot {
-      width: 9px; height: 9px;
-      background: #22c55e;
-      border-radius: 50%;
-      animation: pulseDot 1.6s ease-in-out infinite;
+      width: 8px; height: 8px; background: #22c55e;
+      border-radius: 50%; animation: ai-pulse 1.8s infinite;
     }
-    @keyframes pulseDot {
-      0%,100% { opacity:1; transform:scale(1); }
-      50%      { opacity:.4; transform:scale(1.5); }
+    @keyframes ai-pulse {
+      0%,100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.5); opacity: 0.6; }
     }
 
-    /* --- Chat Window --- */
+    /* ── نافذة الدردشة ── */
     .ai-chat-window {
-      width: 360px;
-      height: 490px;
-      background: var(--navy-mid, #0d1f3c);
-      border: 1.5px solid var(--gold, #C9A84C);
+      width: 350px; height: 500px;
+      background: var(--navy-mid, #0f2040);
+      border: 1.5px solid var(--gold, #c9a84c);
       border-radius: 16px;
       box-shadow: 0 16px 40px rgba(0,0,0,0.6);
-      display: none;
-      flex-direction: column;
-      overflow: hidden;
-      margin-bottom: 12px;
-      animation: slideUp 0.25s ease;
+      display: none; flex-direction: column;
+      overflow: hidden; margin-bottom: 12px;
+      animation: ai-slideUp 0.25s ease;
     }
-    .ai-chat-window.active { display: flex; }
-    @keyframes slideUp {
-      from { opacity:0; transform:translateY(16px); }
-      to   { opacity:1; transform:translateY(0); }
+    .ai-chat-window.active { display: flex !important; }
+    @keyframes ai-slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* --- Header --- */
+    /* ── رأس النافذة ── */
     .ai-chat-header {
-      background: linear-gradient(135deg, var(--navy, #0a1628) 0%, var(--navy-light, #1a3050) 100%);
+      background: linear-gradient(135deg, var(--navy, #0a1628), var(--navy-light, #1a3050));
       border-bottom: 1px solid rgba(201,168,76,0.25);
-      padding: 12px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      padding: 11px 14px;
+      display: flex; align-items: center; justify-content: space-between;
       flex-shrink: 0;
     }
-    .ai-chat-header .advisor-info { display:flex; align-items:center; gap:10px; }
-    .ai-chat-header .advisor-avatar {
-      width: 38px; height: 38px;
-      background: linear-gradient(135deg, var(--gold,#C9A84C), #8B6914);
-      border-radius: 50%;
+    .ai-chat-header-info { display: flex; align-items: center; gap: 9px; }
+    .ai-chat-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold,#c9a84c), #8B6914);
       display: flex; align-items: center; justify-content: center;
-      font-size: 20px;
-      flex-shrink: 0;
+      font-size: 17px; flex-shrink: 0;
     }
-    .ai-chat-header .advisor-name { font-size:13px; font-weight:700; color:var(--gold,#C9A84C); }
-    .ai-chat-header .advisor-status { font-size:10px; color:#22c55e; display:flex; align-items:center; gap:4px; margin-top:1px; }
-    .ai-chat-header .advisor-status::before { content:''; display:block; width:6px; height:6px; background:#22c55e; border-radius:50%; }
-    .ai-close-btn {
+    .ai-chat-header-texts { display: flex; flex-direction: column; }
+    .ai-chat-header-name { font-size: 12.5px; font-weight: 700; color: var(--gold, #c9a84c); }
+    .ai-chat-header-status { font-size: 10px; color: #22c55e; display: flex; align-items: center; gap: 4px; }
+    .ai-chat-header-status::before {
+      content: ''; width: 6px; height: 6px;
+      background: #22c55e; border-radius: 50%; display: inline-block;
+    }
+    .ai-chat-close-btn {
       background: transparent; border: none;
       color: rgba(255,255,255,0.4); cursor: pointer;
-      font-size: 18px; line-height:1;
-      transition: color 0.2s;
+      font-size: 18px; line-height: 1; padding: 2px 6px;
+      border-radius: 4px; transition: 0.2s;
     }
-    .ai-close-btn:hover { color: rgba(255,255,255,0.8); }
+    .ai-chat-close-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
 
-    /* --- Message Body --- */
+    /* ── منطقة الرسائل ── */
     .ai-chat-body {
-      flex: 1;
-      padding: 14px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+      flex: 1; padding: 12px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 10px;
       background: rgba(8,18,35,0.4);
-      scroll-behavior: smooth;
+      scrollbar-width: thin; scrollbar-color: rgba(201,168,76,0.3) transparent;
     }
-    .ai-chat-body::-webkit-scrollbar { width:4px; }
-    .ai-chat-body::-webkit-scrollbar-track { background: transparent; }
-    .ai-chat-body::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius:2px; }
+    .ai-chat-body::-webkit-scrollbar { width: 4px; }
+    .ai-chat-body::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 4px; }
 
-    /* --- Messages --- */
+    /* ── فقاعات الرسائل ── */
     .ai-msg {
-      max-width: 88%;
-      padding: 9px 13px;
-      border-radius: 12px;
-      font-size: 13px;
-      line-height: 1.65;
-      word-break: break-word;
+      max-width: 88%; padding: 9px 13px;
+      border-radius: 12px; font-size: 13px; line-height: 1.6;
+      word-break: break-word; direction: rtl; text-align: right;
     }
     .ai-msg.bot {
-      background: rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.06);
       color: rgba(255,255,255,0.9);
       align-self: flex-start;
-      border-right: 3px solid var(--gold,#C9A84C);
-      border-bottom-right-radius: 4px;
-    }
-    .ai-msg.user {
-      background: linear-gradient(135deg, var(--gold,#C9A84C), #a07830);
-      color: var(--navy,#0a1628);
-      align-self: flex-end;
-      font-weight: 600;
+      border-right: 3px solid var(--gold, #c9a84c);
       border-bottom-left-radius: 4px;
     }
-
-    /* --- Typing Indicator --- */
-    .ai-typing {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      padding: 9px 14px;
-      background: rgba(255,255,255,0.07);
-      border-right: 3px solid var(--gold,#C9A84C);
-      border-radius: 12px;
+    .ai-msg.user {
+      background: linear-gradient(135deg, var(--gold,#c9a84c), #a07830);
+      color: var(--navy, #0a1628);
+      align-self: flex-end; font-weight: 600;
       border-bottom-right-radius: 4px;
-      align-self: flex-start;
-      width: fit-content;
+    }
+
+    /* ── مؤشر الكتابة ── */
+    .ai-typing {
+      display: flex; align-items: center; gap: 5px;
+      align-self: flex-start; padding: 10px 14px;
+      background: rgba(255,255,255,0.06);
+      border-right: 3px solid var(--gold,#c9a84c);
+      border-radius: 12px; border-bottom-left-radius: 4px;
     }
     .ai-typing span {
-      width: 7px; height: 7px;
-      background: var(--gold,#C9A84C);
-      border-radius: 50%;
-      animation: typingBounce 1.2s ease-in-out infinite;
-      opacity: 0.6;
+      width: 7px; height: 7px; background: var(--gold,#c9a84c);
+      border-radius: 50%; animation: ai-bounce 1.2s infinite;
     }
-    .ai-typing span:nth-child(2) { animation-delay:.2s; }
-    .ai-typing span:nth-child(3) { animation-delay:.4s; }
-    @keyframes typingBounce {
-      0%,80%,100% { transform:translateY(0); opacity:.6; }
-      40%          { transform:translateY(-6px); opacity:1; }
+    .ai-typing span:nth-child(2) { animation-delay: 0.2s; }
+    .ai-typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes ai-bounce {
+      0%,60%,100% { transform: translateY(0); }
+      30% { transform: translateY(-6px); }
     }
 
-    /* --- Quick Replies --- */
-    .ai-quick-replies {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      padding: 0 14px 10px;
+    /* ── أزرار الاقتراحات السريعة ── */
+    .ai-suggestions {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      padding: 8px 12px; background: rgba(8,18,35,0.3);
+      border-top: 1px solid rgba(201,168,76,0.1);
       flex-shrink: 0;
     }
-    .ai-quick-btn {
-      background: rgba(201,168,76,0.12);
-      border: 1px solid rgba(201,168,76,0.35);
-      color: var(--gold,#C9A84C);
-      padding: 5px 11px;
-      border-radius: 20px;
-      font-size: 11.5px;
+    .ai-suggestion-btn {
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.3);
+      color: var(--gold, #c9a84c);
+      padding: 4px 10px; border-radius: 20px;
+      font-size: 11px; cursor: pointer;
       font-family: 'Cairo', sans-serif;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-      white-space: nowrap;
+      transition: 0.2s; white-space: nowrap;
     }
-    .ai-quick-btn:hover {
+    .ai-suggestion-btn:hover {
       background: rgba(201,168,76,0.25);
-      transform: scale(1.04);
+      border-color: var(--gold,#c9a84c);
     }
 
-    /* --- Footer --- */
+    /* ── بانر ترويج الباقات ── */
+    .ai-promo-banner {
+      margin: 4px 0; padding: 10px 12px;
+      background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(201,168,76,0.05));
+      border: 1px solid rgba(201,168,76,0.35);
+      border-radius: 10px; align-self: flex-start;
+      font-size: 12px; color: rgba(255,255,255,0.85);
+      direction: rtl; text-align: right; max-width: 88%;
+    }
+    .ai-promo-banner strong { color: var(--gold,#c9a84c); }
+    .ai-promo-link {
+      display: inline-block; margin-top: 6px;
+      background: var(--gold,#c9a84c); color: var(--navy,#0a1628);
+      padding: 4px 12px; border-radius: 20px;
+      font-size: 11px; font-weight: 700; text-decoration: none;
+      transition: 0.2s;
+    }
+    .ai-promo-link:hover { opacity: 0.85; }
+
+    /* ── منطقة الإدخال ── */
     .ai-chat-footer {
-      padding: 10px;
-      background: var(--navy,#0a1628);
+      padding: 9px 10px;
+      background: var(--navy, #0a1628);
       border-top: 1px solid rgba(201,168,76,0.15);
-      display: flex;
-      gap: 7px;
-      flex-shrink: 0;
+      display: flex; gap: 7px; flex-shrink: 0;
+      align-items: center;
     }
     .ai-chat-input {
       flex: 1;
       background: rgba(255,255,255,0.06);
-      border: 1.5px solid rgba(201,168,76,0.2);
-      border-radius: 8px;
-      padding: 9px 13px;
-      color: #fff;
-      font-family: 'Cairo', sans-serif;
-      font-size: 13px;
-      outline: none;
-      transition: border-color 0.2s;
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 8px; padding: 8px 13px;
+      color: #fff; font-family: 'Cairo', sans-serif;
+      font-size: 13px; outline: none;
+      direction: rtl; transition: border-color 0.2s;
     }
+    .ai-chat-input:focus { border-color: var(--gold, #c9a84c); }
     .ai-chat-input::placeholder { color: rgba(255,255,255,0.3); }
-    .ai-chat-input:focus { border-color: var(--gold,#C9A84C); }
     .ai-chat-send {
-      background: linear-gradient(135deg, var(--gold,#C9A84C), #a07830);
-      border: none;
-      color: var(--navy,#0a1628);
-      width: 40px; height: 40px;
-      border-radius: 8px;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 17px;
-      transition: transform 0.2s, opacity 0.2s;
-      flex-shrink: 0;
+      background: linear-gradient(135deg, var(--gold,#c9a84c), #a07830);
+      border: none; color: var(--navy,#0a1628);
+      width: 38px; height: 38px; border-radius: 8px;
+      cursor: pointer; display: flex; align-items: center;
+      justify-content: center; font-size: 16px;
+      flex-shrink: 0; transition: opacity 0.2s;
     }
-    .ai-chat-send:hover { transform: scale(1.08); }
-    .ai-chat-send:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .ai-chat-send:hover { opacity: 0.85; }
+    .ai-chat-send:disabled { opacity: 0.45; cursor: not-allowed; }
 
-    /* --- Error Message --- */
-    .ai-error-msg {
-      font-size: 11px;
-      color: #f87171;
-      text-align: center;
-      padding: 4px 0;
-      display: none;
-    }
-
+    /* ── ريسبونسف ── */
     @media (max-width: 700px) {
       .ai-chat-window { width: 300px; height: 430px; }
-      .ai-chat-widget { bottom: 15px; left: 15px; }
+      .ai-chat-widget { bottom: 15px; left: 12px; }
     }
   `;
   document.head.appendChild(style);
 
-
   /* ============================================================
-     B) HTML
-  ============================================================ */
+     2) حقن بنية HTML
+     ============================================================ */
   const widget = document.createElement('div');
   widget.className = 'ai-chat-widget';
   widget.innerHTML = `
     <div class="ai-chat-window" id="aiChatWindow">
 
+      <!-- رأس النافذة -->
       <div class="ai-chat-header">
-        <div class="advisor-info">
-          <div class="advisor-avatar">🧠</div>
-          <div>
-            <div class="advisor-name">أبو علي — داهية العقارات</div>
-            <div class="advisor-status">متصل ومستعد يساعدك</div>
+        <div class="ai-chat-header-info">
+          <div class="ai-chat-avatar">🧠</div>
+          <div class="ai-chat-header-texts">
+            <span class="ai-chat-header-name">داهية — المستشار العقاري</span>
+            <span class="ai-chat-header-status">متصل الآن · خبير البصرة</span>
           </div>
         </div>
-        <button class="ai-close-btn" id="aiChatCloseBtn">✕</button>
+        <button id="aiChatCloseBtn" class="ai-chat-close-btn" title="إغلاق">✕</button>
       </div>
 
+      <!-- منطقة الرسائل -->
       <div class="ai-chat-body" id="aiChatBody">
         <div class="ai-msg bot">
-          هلا والله! أنا أبو علي، داهية العقارات بالبصرة 🌴<br>
-          عندي خبرة بكل منطقة — من العشار للحيانية، ومن الجنينة للبراضعية 🏘️<br><br>
-          كولي شتريد: بيت، شقة، أرض، للشراء أو الإيجار، وأنا أوريك الصح! 💪
+          أهلاً وسهلاً! 🌴 أنا <strong>داهية</strong>، مستشارك العقاري الذكي المتخصص في سوق البصرة.<br><br>
+          سواء تريد تشتري، تستأجر، تستثمر، أو تبيع — أنا هنا. اسألني عن أي منطقة أو نوع عقار وراح أعطيك تقييم دقيق وحقيقي! 🏠💰
         </div>
       </div>
 
-      <div class="ai-quick-replies" id="aiQuickReplies">
-        <button class="ai-quick-btn">🏠 بيت للشراء</button>
-        <button class="ai-quick-btn">🏢 شقة للإيجار</button>
-        <button class="ai-quick-btn">📊 أسعار العشار</button>
-        <button class="ai-quick-btn">💰 نصيحة استثمار</button>
-        <button class="ai-quick-btn">🌍 أحسن منطقة؟</button>
+      <!-- أزرار الاقتراحات السريعة -->
+      <div class="ai-suggestions" id="aiSuggestions">
+        <button class="ai-suggestion-btn" data-msg="أسعار البيوت في العشار">🏠 أسعار العشار</button>
+        <button class="ai-suggestion-btn" data-msg="أفضل مناطق الاستثمار في البصرة">📈 أفضل للاستثمار</button>
+        <button class="ai-suggestion-btn" data-msg="كم إيجار شقة في الجمهورية؟">🔑 إيجار الجمهورية</button>
+        <button class="ai-suggestion-btn" data-msg="نصائح قبل شراء عقار في البصرة">💡 نصائح الشراء</button>
       </div>
 
-      <div class="ai-error-msg" id="aiErrorMsg">⚠️ ما قدرنا نوصلك بالمستشار، اجرب ثاني</div>
-
+      <!-- حقل الإدخال -->
       <div class="ai-chat-footer">
-        <input type="text" id="aiChatInput" class="ai-chat-input" placeholder="مثال: أبي شقة إيجار بالجمهورية...">
-        <button id="aiChatSendBtn" class="ai-chat-send">
-          <i class="ti ti-send" style="font-size:16px;"></i>
+        <input type="text" id="aiChatInput" class="ai-chat-input"
+               placeholder="اسأل داهية... مثال: بيت في البراضعية بميزانية 200 مليون">
+        <button id="aiChatSendBtn" class="ai-chat-send" title="إرسال">
+          <i class="ti ti-send"></i>
         </button>
       </div>
 
     </div>
 
+    <!-- زر فتح الودجة -->
     <button class="ai-chat-btn" id="aiChatToggleBtn">
       <span class="pulse-dot"></span>
-      ✨ داهية العقارات
+      🧠 داهية — المستشار العقاري
     </button>
   `;
   document.body.appendChild(widget);
 
+  /* ============================================================
+     3) الحالة الداخلية
+     ============================================================ */
+  let conversationHistory = []; // سجل المحادثة كاملاً
+  let messageCount        = 0;  // عداد رسائل المستخدم
+  let promoShown          = false; // هل عُرض ترويج الباقات؟
+  let isWaiting           = false; // هل نحن في انتظار رد API؟
 
   /* ============================================================
-     C) LOGIC
-  ============================================================ */
+     4) الدوال المساعدة
+     ============================================================ */
 
-  // --- Conversation History (يحفظ المحادثة خلال الجلسة) ---
-  const conversationHistory = [];
-
-  // --- System Prompt لشخصية أبو علي ---
-  const SYSTEM_PROMPT = `أنت "أبو علي"، داهية العقارات في مدينة البصرة، العراق.
-شخصيتك: ودود، ذكي، صادق، تتكلم بالعامية البصراوية الدارجة بس بشكل محترم.
-دورك: مستشار عقاري متخصص بسوق البصرة فقط.
-
-=== معلوماتك عن سوق البصرة (2024-2025) ===
-
-أسعار الشراء (تقريبية بالمليون دينار):
-- العشار (وسط البصرة): بيوت 150-400م² = 150-500 مليون | شقق = 80-200 مليون
-- المعقل: بيوت = 120-350 مليون | شقق = 60-150 مليون
-- البراضعية: بيوت = 80-200 مليون | شقق = 40-100 مليون
-- حي الحسين / الجمهورية: بيوت = 100-280 مليون | شقق = 50-130 مليون
-- الحيانية: بيوت = 70-180 مليون | أراضي = 30-80 مليون (قطعة)
-- الجنينة: بيوت = 60-160 مليون | مناسبة للعوائل
-- الزبير: أراضي = 20-60 مليون | بيوت = 50-130 مليون
-- أبو الخصيب: مناطق هادية، بيوت = 50-120 مليون
-- الفاو: أسعار أقل، استثمار مستقبلي
-
-أسعار الإيجار (شهري بالألف دينار):
-- العشار: شقة = 200-500 ألف | بيت = 350-800 ألف
-- المعقل: شقة = 150-400 ألف | بيت = 250-600 ألف
-- الجمهورية/الحسين: شقة = 120-300 ألف | بيت = 200-500 ألف
-- البراضعية/الحيانية: شقة = 80-200 ألف | بيت = 150-350 ألف
-
-نصايح عامة للسوق:
-- أحسن مناطق للاستثمار: العشار، المعقل، الجنينة
-- أحسن مناطق للعوائل: الجنينة، أبو الخصيب، البراضعية
-- أحسن مناطق للشباب والإيجار: الجمهورية، حي الحسين
-- السوق الحالي: طلب عالي على الشقق المتوسطة
-- أسعار الأراضي ترتفع خصوصاً قرب المشاريع الحكومية
-
-=== قواعد الرد ===
-1. اتكلم بالعامية البصراوية دايماً (مثل: شتريد، وين تسكن، هم-زين، لا بأس، والله، يخوي، حبيبي)
-2. اسأل عن ميزانية المستخدم وعدد الغرف إذا ما ذكرهم
-3. اعطي أسعار واقعية من المعلومات اللي عندك
-4. نصف رسالة كل فترة اذكر الموقع كمصدر للعقارات ("شايل عروض زينة بالموقع يخوي، ورح تلاكي أحسن من هذا!")
-5. إذا سأل عن منطقة ما عندك معلومات عنها، قول بصراحة وانصحه بأقرب منطقة
-6. خلي ردودك قصيرة ومركزة (مو أطول من 120 كلمة)
-7. استخدم الإيموجي باعتدال 🏠💰
-8. إذا كان الطلب غير واضح، اسأله سؤال واحد لتوضيح الطلب
-9. لا تعطي معلومات خارج العقارات والبصرة`;
-
-  // --- Toggle Window ---
-  function toggleAiChat() {
-    const win = document.getElementById('aiChatWindow');
-    if (win) win.classList.toggle('active');
-  }
-
-  // --- Scroll to bottom ---
-  function scrollToBottom() {
+  /** إضافة رسالة إلى واجهة الدردشة */
+  function appendMessage(html, role) {
     const body = document.getElementById('aiChatBody');
-    if (body) body.scrollTop = body.scrollHeight;
-  }
-
-  // --- Add Message to UI ---
-  function addMessage(text, role) {
-    const body = document.getElementById('aiChatBody');
-    const div = document.createElement('div');
+    const div  = document.createElement('div');
     div.className = `ai-msg ${role}`;
-    // دعم줄 line breaks
-    div.innerHTML = text.replace(/\n/g, '<br>');
+    div.innerHTML = html;
     body.appendChild(div);
-    scrollToBottom();
+    body.scrollTop = body.scrollHeight;
     return div;
   }
 
-  // --- Show/Hide Typing Indicator ---
+  /** إضافة مؤشر "يكتب..." */
   function showTyping() {
     const body = document.getElementById('aiChatBody');
-    const typing = document.createElement('div');
-    typing.className = 'ai-typing';
-    typing.id = 'aiTypingIndicator';
-    typing.innerHTML = '<span></span><span></span><span></span>';
-    body.appendChild(typing);
-    scrollToBottom();
+    const div  = document.createElement('div');
+    div.className = 'ai-typing';
+    div.id = 'aiTypingIndicator';
+    div.innerHTML = '<span></span><span></span><span></span>';
+    body.appendChild(div);
+    body.scrollTop = body.scrollHeight;
   }
 
+  /** إزالة مؤشر "يكتب..." */
   function hideTyping() {
     const t = document.getElementById('aiTypingIndicator');
     if (t) t.remove();
   }
 
-  // --- Show/Hide Error ---
-  function showError(show) {
-    const el = document.getElementById('aiErrorMsg');
-    if (el) el.style.display = show ? 'block' : 'none';
+  /** عرض بانر ترويج الباقات */
+  function showPromoBanner() {
+    if (promoShown) return;
+    promoShown = true;
+    const body = document.getElementById('aiChatBody');
+    const div  = document.createElement('div');
+    div.className = 'ai-promo-banner';
+    div.innerHTML = `
+      ✨ <strong>هل تريد الإعلان عن عقارك؟</strong><br>
+      انضم إلى <strong>${CONFIG.SITE_NAME}</strong> — الدليل الأول للعقارات في البصرة.
+      باقات تبدأ من المجاني وصولاً للذهبية مع تمييز كامل!
+      <br><a href="${CONFIG.PACKAGES_URL}" class="ai-promo-link" target="_blank">📋 عرض الباقات</a>
+      <a href="${CONFIG.REGISTER_URL}" class="ai-promo-link" style="margin-right:6px;" target="_blank">✍️ سجّل الآن</a>
+    `;
+    body.appendChild(div);
+    body.scrollTop = body.scrollHeight;
   }
 
-  // --- Send Message to Claude API ---
-  async function sendAiMessage(userText) {
+  /** تعطيل/تفعيل حقل الإدخال وزر الإرسال */
+  function setInputState(enabled) {
     const input = document.getElementById('aiChatInput');
-    const sendBtn = document.getElementById('aiChatSendBtn');
-    const quickReplies = document.getElementById('aiQuickReplies');
+    const btn   = document.getElementById('aiChatSendBtn');
+    if (input) input.disabled = !enabled;
+    if (btn)   btn.disabled   = !enabled;
+  }
 
-    const txt = (userText || input.value).trim();
+  /* ============================================================
+     5) الدالة الرئيسية: إرسال رسالة إلى Claude API
+     ============================================================ */
+  async function sendAiMessage() {
+    if (isWaiting) return;
+
+    const input = document.getElementById('aiChatInput');
+    const txt   = input.value.trim();
     if (!txt) return;
 
-    // إخفاء Quick Replies بعد أول رسالة
-    if (quickReplies) quickReplies.style.display = 'none';
+    // تحقق من وجود مفتاح API
+    if (CONFIG.API_KEY === 'YOUR_CLAUDE_API_KEY_HERE') {
+      appendMessage(
+        '⚠️ تنبيه: لم يتم إعداد مفتاح Claude API بعد. يرجى وضع مفتاحك في CONFIG.API_KEY داخل ملف ai-advisor.js',
+        'bot'
+      );
+      return;
+    }
 
-    // إضافة رسالة المستخدم للواجهة
-    addMessage(txt, 'user');
-    if (input) input.value = '';
+    // عرض رسالة المستخدم
+    appendMessage(txt, 'user');
+    input.value = '';
+    messageCount++;
 
-    // تعطيل الإدخال أثناء الانتظار
-    if (input) input.disabled = true;
-    if (sendBtn) sendBtn.disabled = true;
-    showError(false);
+    // أخفِ الاقتراحات بعد أول رسالة
+    const suggestions = document.getElementById('aiSuggestions');
+    if (suggestions) suggestions.style.display = 'none';
 
-    // إضافة رسالة المستخدم للتاريخ
+    // أضف الرسالة لسجل المحادثة
     conversationHistory.push({ role: 'user', content: txt });
 
-    // عرض مؤشر الكتابة
+    // اقتطع السجل إذا طال جداً
+    if (conversationHistory.length > CONFIG.MAX_HISTORY) {
+      conversationHistory = conversationHistory.slice(-CONFIG.MAX_HISTORY);
+    }
+
+    // حالة الانتظار
+    isWaiting = true;
+    setInputState(false);
     showTyping();
 
     try {
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': CONFIG.API_KEY,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-calls': 'true',
+        },
         body: JSON.stringify({
           model: 'claude-sonnet-4-6',
-          max_tokens: 1000,
+          max_tokens: 600,
           system: SYSTEM_PROMPT,
-          messages: conversationHistory
-        })
+          messages: conversationHistory,
+        }),
       });
 
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-      const data = await response.json();
-      const replyText = data.content
-        .filter(b => b.type === 'text')
-        .map(b => b.text)
-        .join('');
-
-      // إضافة رد المستشار للتاريخ والواجهة
-      conversationHistory.push({ role: 'assistant', content: replyText });
       hideTyping();
-      addMessage(replyText, 'bot');
 
-    } catch (err) {
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err?.error?.message || `HTTP ${response.status}`);
+      }
+
+      const data  = await response.json();
+      const reply = data?.content?.[0]?.text || 'عذراً، لم أستطع الرد الآن. حاول مجدداً.';
+
+      // أضف الرد لسجل المحادثة
+      conversationHistory.push({ role: 'assistant', content: reply });
+
+      // اعرض الرد (تحويل줄 السطور إلى <br>)
+      appendMessage(reply.replace(/\n/g, '<br>'), 'bot');
+
+      // اعرض ترويج الباقات بعد العدد المحدد من الرسائل
+      if (messageCount >= CONFIG.PROMO_AFTER_MESSAGES && !promoShown) {
+        setTimeout(showPromoBanner, 800);
+      }
+
+    } catch (error) {
       hideTyping();
-      showError(true);
-      console.error('AI Advisor Error:', err);
-      // إزالة آخر رسالة مستخدم من التاريخ لإعادة المحاولة
-      conversationHistory.pop();
+      console.error('[ai-advisor] API Error:', error);
+      appendMessage(
+        `⚠️ حدث خطأ في الاتصال بالمستشار: <em>${error.message}</em><br>تحقق من مفتاح API أو اتصالك بالإنترنت.`,
+        'bot'
+      );
     } finally {
-      if (input) input.disabled = false;
-      if (sendBtn) sendBtn.disabled = false;
-      if (input) input.focus();
+      isWaiting = false;
+      setInputState(true);
+      document.getElementById('aiChatInput')?.focus();
     }
   }
 
+  /* ============================================================
+     6) فتح/إغلاق النافذة
+     ============================================================ */
+  function toggleAiChat() {
+    const win = document.getElementById('aiChatWindow');
+    if (!win) return;
+    win.classList.toggle('active');
+    if (win.classList.contains('active')) {
+      setTimeout(() => document.getElementById('aiChatInput')?.focus(), 100);
+    }
+  }
 
   /* ============================================================
-     D) Event Listeners
-  ============================================================ */
+     7) ربط الأحداث
+     ============================================================ */
   document.getElementById('aiChatToggleBtn').addEventListener('click', toggleAiChat);
   document.getElementById('aiChatCloseBtn').addEventListener('click', toggleAiChat);
-  document.getElementById('aiChatSendBtn').addEventListener('click', () => sendAiMessage());
-  document.getElementById('aiChatInput').addEventListener('keyup', function (e) {
-    if (e.key === 'Enter') sendAiMessage();
+  document.getElementById('aiChatSendBtn').addEventListener('click', sendAiMessage);
+  document.getElementById('aiChatInput').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAiMessage(); }
   });
 
-  // Quick Reply Buttons
-  document.getElementById('aiQuickReplies').addEventListener('click', function (e) {
-    const btn = e.target.closest('.ai-quick-btn');
-    if (btn) sendAiMessage(btn.textContent.trim());
+  // أزرار الاقتراحات السريعة
+  document.getElementById('aiSuggestions').addEventListener('click', function (e) {
+    const btn = e.target.closest('.ai-suggestion-btn');
+    if (!btn) return;
+    const input = document.getElementById('aiChatInput');
+    if (input) {
+      input.value = btn.dataset.msg || btn.textContent.trim();
+      sendAiMessage();
+    }
   });
 
-  // إتاحة الدوال للاستخدام الخارجي
-  window.toggleAiChat = toggleAiChat;
+  /* ============================================================
+     8) تصدير الدوال العامة (للاستخدام الخارجي إن احتجت)
+     ============================================================ */
+  window.toggleAiChat  = toggleAiChat;
   window.sendAiMessage = sendAiMessage;
 
 })();
