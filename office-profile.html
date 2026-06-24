@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>بروفايل المكتب العقاري - دليل البصرة</title>
+  <title>بروفايل المكتب العقاري - دليل البصرة العقاري</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
@@ -14,157 +14,186 @@
       --text-on-dark:#F5F0E8; --text-muted:#8BA0B8;
       --success:#4CAF7D;
     }
-    body{font-family:'Cairo',sans-serif;background:var(--navy);color:var(--text-on-dark);direction:rtl; line-height: 1.6;}
+    body{font-family:'Cairo',sans-serif;background:var(--navy);color:var(--text-on-dark);direction:rtl;padding:2rem 1rem;}
+    .container{max-width:900px; margin:0 auto;}
     
-    /* Navbar */
-    .navbar { background: var(--navy-mid); padding: 1rem 2rem; border-bottom: 2px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
-    .nav-brand { font-size: 1.5rem; font-weight: 900; color: var(--gold); text-decoration: none; display: flex; align-items: center; gap: 8px; }
-    .btn-back { background: transparent; color: var(--text-on-dark); border: 1px solid rgba(255,255,255,0.2); padding: 6px 15px; border-radius: 8px; text-decoration: none; font-size: 14px; transition: 0.3s; }
-    .btn-back:hover { background: rgba(255,255,255,0.05); border-color: var(--gold); }
+    /* PROFILE CARD */
+    .profile-card {
+      background:var(--navy-mid); border:1px solid rgba(201,168,76,0.25);
+      border-radius:24px; padding:3rem 2rem; text-align:center;
+      box-shadow:0 15px 40px rgba(0,0,0,0.4); position:relative; overflow:hidden;
+    }
+    .profile-card::before {
+      content:''; position:absolute; top:0; left:0; width:100%; height:8px;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    }
+    
+    .profile-logo {
+      width:130px; height:130px; border-radius:50%; background:rgba(201,168,76,0.1);
+      border:3px solid var(--gold); margin:0 auto 1.5rem; display:flex; align-items:center;
+      justify-content:center; font-size:48px; font-weight:900; color:var(--gold); object-fit: cover;
+    }
+    
+    .profile-name { font-size:1.8rem; font-weight:900; color:#fff; margin-bottom:0.5rem; }
+    .profile-tagline { font-size:14px; color:var(--gold); font-weight:600; margin-bottom:1.5rem; display:inline-block; background:rgba(201,168,76,0.08); padding:4px 16px; border-radius:100px; }
+    
+    .profile-desc {
+      font-size:15px; color:var(--text-muted); line-height:1.8; max-width:650px;
+      margin:0 auto 2rem; padding:1.5rem; background:rgba(255,255,255,0.02);
+      border-radius:14px; border:1px solid rgba(255,255,255,0.04);
+    }
+    
+    /* CONTACT INFOS */
+    .info-grid {
+      display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap:1.2rem; margin-bottom:2.5rem;
+    }
+    .info-item {
+      background: rgba(10, 22, 40, 0.5); border: 1px solid rgba(255,255,255,0.05);
+      padding:1.2rem; border-radius:14px; display:flex; align-items:center; gap:12px; text-align:right;
+    }
+    .info-icon {
+      width:44px; height:44px; background:rgba(201,168,76,0.1); border-radius:10px;
+      display:flex; align-items:center; justify-content:center; font-size:20px; color:var(--gold);
+    }
+    .info-label { font-size:11px; color:var(--text-muted); block:inline; }
+    .info-val { font-size:14px; font-weight:700; color:#fff; margin-top:2px; }
 
-    /* Office Header / Banner */
-    .office-banner { background: linear-gradient(to bottom, var(--navy-light), var(--navy-mid)); padding: 4rem 2rem 2rem; text-align: center; border-bottom: 1px solid rgba(201,168,76,0.2); position: relative; }
-    .office-logo { width: 100px; height: 100px; background: var(--navy); border: 3px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; margin: 0 auto 1rem; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-    .office-name { font-size: 2rem; font-weight: 900; margin-bottom: 0.5rem; }
-    .verified-badge { background: rgba(76,175,125,0.15); color: var(--success); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 1rem; border: 1px solid rgba(76,175,125,0.3); }
+    .btn-call {
+      display:inline-flex; align-items:center; gap:10px; background:var(--gold);
+      color:var(--navy); padding:14px 40px; border-radius:12px; text-decoration:none;
+      font-weight:700; font-size:16px; transition:0.2s; box-shadow:0 5px 15px rgba(201,168,76,0.2);
+    }
+    .btn-call:hover { background:var(--gold-light); transform:translateY(-2px); }
     
-    .office-stats { display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem; flex-wrap: wrap; }
-    .stat-item { background: rgba(0,0,0,0.2); padding: 10px 20px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
-    .stat-value { font-size: 1.2rem; font-weight: 900; color: var(--gold); }
-    .stat-label { font-size: 12px; color: var(--text-muted); }
-
-    /* Properties Grid */
-    .container { max-width: 1200px; margin: 3rem auto; padding: 0 1rem; }
-    .section-title { font-size: 1.5rem; font-weight: 900; border-right: 4px solid var(--gold); padding-right: 15px; margin-bottom: 2rem; }
-    
-    .properties-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-    .property-card { background: var(--navy-mid); border: 1px solid rgba(255,255,255,0.05); border-radius: 14px; overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; }
-    .property-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.4); border-color: rgba(201,168,76,0.3); }
-    .property-img { height: 200px; background: #2A3B52; display: flex; justify-content: center; align-items: center; position: relative; }
-    .price-tag { position: absolute; bottom: 10px; left: 10px; background: var(--gold); color: var(--navy); padding: 5px 12px; border-radius: 8px; font-weight: 900; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-    .property-details { padding: 1.5rem; }
-    .prop-type { font-size: 12px; color: var(--gold); font-weight: 700; margin-bottom: 5px; }
-    .prop-area { font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
-    
-    .btn-contact { display: block; width: 100%; text-align: center; background: rgba(201,168,76,0.1); color: var(--gold); border: 1px solid var(--gold); padding: 10px; border-radius: 8px; text-decoration: none; font-weight: 700; transition: 0.2s; }
-    .btn-contact:hover { background: var(--gold); color: var(--navy); }
-
-    .empty-state { text-align: center; padding: 4rem 2rem; background: var(--navy-mid); border-radius: 14px; border: 1px dashed rgba(255,255,255,0.1); grid-column: 1 / -1; }
+    .btn-back {
+      display:inline-block; margin-top:2rem; color:var(--text-muted);
+      text-decoration:none; font-size:14px; transition:0.2s;
+    }
+    .btn-back:hover { color:var(--gold); }
   </style>
 </head>
 <body>
 
-  <nav class="navbar">
-    <a href="index.html" class="nav-brand"><i class="ti ti-building-skyscraper"></i> دليل البصرة</a>
-    <a href="index.html" class="btn-back">العودة للرئيسية ←</a>
-  </nav>
+<div class="container">
 
-  <header class="office-banner">
-    <div class="office-logo"><i class="ti ti-building-store"></i></div>
-    <h1 id="profileOfficeName" class="office-name">جاري التحميل...</h1>
-    <div class="verified-badge"><i class="ti ti-discount-check-filled"></i> مكتب عقاري معتمد</div>
+  <div class="profile-card">
+    <div id="officeLogoContainer">
+       <div id="officeLogoText" class="profile-logo">🏢</div>
+       <img id="officeLogoImg" class="profile-logo" src="" alt="الشعار" style="display:none;">
+    </div>
     
-    <div class="office-stats">
-      <div class="stat-item">
-        <div id="profileArea" class="stat-value">-</div>
-        <div class="stat-label">منطقة التغطية</div>
+    <h1 id="officeNameDisplay" class="profile-name">جاري تحميل اسم المكتب...</h1>
+    <span id="officeAreaDisplay" class="profile-tagline">الموقع: -</span>
+    
+    <p id="officeDescDisplay" class="profile-desc">
+      لم يقم صاحب المكتب بكتابة نبذة تعريفية حتى الآن. يمكنك التواصل معه مباشرة عبر أرقام الهاتف الموضحة بالأسفل للاستفسار عن العروض المتاحة.
+    </p>
+    
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="info-icon"><i class="ti ti-map-pin"></i></div>
+        <div>
+          <div class="info-label">المنطقة المتخصص بها</div>
+          <div id="gridAreaVal" class="info-val">-</div>
+        </div>
       </div>
-      <div class="stat-item">
-        <div id="profilePropsCount" class="stat-value">0</div>
-        <div class="stat-label">عقار متاح</div>
+      
+      <div class="info-item">
+        <div class="info-icon"><i class="ti ti-phone"></i></div>
+        <div>
+          <div class="info-label">رقم هاتف التواصل</div>
+          <div id="gridPhoneVal" class="info-val">غير مدرج حالياً</div>
+        </div>
       </div>
-      <div class="stat-item" style="border-color: var(--gold);">
-        <div class="stat-value">📞 0770XXXXXXX</div>
-        <div class="stat-label">رقم التواصل المباشر</div>
+
+      <div class="info-item">
+        <div class="info-icon"><i class="ti ti-shield-check"></i></div>
+        <div>
+          <div class="info-label">حالة التوثيق الإداري</div>
+          <div class="info-val" style="color:var(--success);">🟢 مكتب معتمد وموثق</div>
+        </div>
       </div>
     </div>
-  </header>
-
-  <div class="container">
-    <h2 class="section-title">العقارات المعروضة حالياً من هذا المكتب</h2>
     
-    <div id="propertiesGrid" class="properties-grid">
-      </div>
+    <a id="callActionBtn" href="#" class="btn-call">
+      <i class="ti ti-phone-call"></i> اتصل بالمكتب الآن مباشرة
+    </a>
+    
+    <br>
+    <a href="index.html" class="btn-back">← العودة للمعرض العقاري الرئيسي</a>
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // استخراج معرّف المكتب من الرابط، وإذا لم يوجد نستخدم المكتب الأول "1" كتجربة
-      const urlParams = new URLSearchParams(window.location.search);
-      const officeId = urlParams.get('id') || "1"; 
+</div>
 
-      loadOfficeProfile(officeId);
-    });
+<script>
+  const STORAGE_KEY = 'basra_data_v3';
 
-    function loadOfficeProfile(id) {
-      // جلب البيانات المحفوظة في LocalStorage (التي أنشأناها في لوحة التحكم)
-      const officesData = localStorage.getItem('mockOfficesData');
-      const propertiesData = localStorage.getItem('mockPropertiesData');
+  // البيانات الافتراضية للرجوع إليها في حال لم تكن محفوظة
+  const defaultOffices = [
+    {id: "1", name:'مكتب الأمانة العقاري', area:'العشار', publishedProps: 1, pkg:'free', status:'active', allowPublish: true, expiry:'مفتوح الصلاحية دائم', phone: '07701234567', description: 'نحن في مكتب الأمانة نقدم أفضل الخدمات العقارية في منطقة العشار ومركز البصرة، بيع وشراء وتأجير العقارات بأفضل الأسعار السائدة في السوق وبأمان تام.', logo: ''},
+    {id: "2", name:'عقارات الخليج بالبصرة', area:'الجمهورية', publishedProps: 4, pkg:'eco', status:'active', allowPublish: true, expiry:'2026-07-24', phone: '07809876543', description: 'متخصصون في بيع الشقق الفاخرة والأراضي السكنية في الجمهورية والمناطق المجاورة لها بأسعار تنافسية وتسهيلات ممتازة.', logo: ''},
+    {id: "3", name:'مكتب الرافدين للاستثمار', area:'المعقل', publishedProps: 12, pkg:'gold', status:'expired', allowPublish: true, expiry:'2026-06-01', phone: '07711223344', description: 'رائدون في التطوير والاستثمار العقاري في منطقة المعقل، نوفر مساحات تجارية وأراضي استثمارية ممتازة.', logo: ''}
+  ];
 
-      if (!officesData || !propertiesData) {
-        showEmptyState("لا توجد بيانات متاحة حالياً. يرجى إضافة عقارات من لوحة التحكم أولاً.");
-        return;
-      }
-
-      const offices = JSON.parse(officesData);
-      const properties = JSON.parse(propertiesData);
-
-      // البحث عن المكتب المطلوب
-      const office = offices.find(o => o.id === id);
-      
-      if (!office) {
-        document.getElementById('profileOfficeName').textContent = "المكتب غير موجود";
-        showEmptyState("عذراً، هذا المكتب غير موجود أو تم حذفه من النظام.");
-        return;
-      }
-
-      // تعبئة بيانات المكتب في الواجهة العلوية
-      document.getElementById('profileOfficeName').textContent = office.name;
-      document.getElementById('profileArea').textContent = office.area;
-      
-      // جلب عقارات هذا المكتب فقط
-      const officeProps = properties.filter(p => p.officeId === id);
-      document.getElementById('profilePropsCount').textContent = officeProps.length;
-
-      const grid = document.getElementById('propertiesGrid');
-
-      if (officeProps.length === 0) {
-        grid.innerHTML = `
-          <div class="empty-state">
-            <i class="ti ti-home-cancel" style="font-size: 40px; color: var(--text-muted); margin-bottom: 10px;"></i>
-            <h3 style="color: var(--gold); margin-bottom: 5px;">لا توجد إعلانات نشطة</h3>
-            <p style="color: var(--text-muted); font-size: 14px;">هذا المكتب لم يقم بنشر أي عقارات حالياً.</p>
-          </div>
-        `;
-        return;
-      }
-
-      // رسم بطاقات العقارات
-      grid.innerHTML = officeProps.map(p => `
-        <div class="property-card">
-          <div class="property-img">
-            <i class="ti ti-photo" style="font-size: 50px; color: rgba(255,255,255,0.1);"></i>
-            <div class="price-tag">${p.price}</div>
-          </div>
-          <div class="property-details">
-            <div class="prop-type">${p.type} • ${p.id}</div>
-            <div class="prop-area"><i class="ti ti-map-pin" style="color:var(--text-muted);"></i> ${p.area}</div>
-            <a href="#" class="btn-contact" onclick="alert('سيتم توجيه العميل للتواصل عبر واتساب أو الهاتف المحفوظ للمكتب'); return false;">
-              <i class="ti ti-phone"></i> تواصل مع المكتب
-            </a>
-          </div>
-        </div>
-      `).join('');
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1. قراءة الـ ID من الرابط
+    const urlParams = new URLSearchParams(window.location.search);
+    const officeId = urlParams.get('id') || "1"; // افتراضياً مكتب 1 إذا لم يحدد
+    
+    // 2. جلب البيانات من الذاكرة
+    let offices = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (!offices) {
+      offices = defaultOffices;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(offices));
     }
-
-    function showEmptyState(msg) {
-      document.getElementById('propertiesGrid').innerHTML = `
-        <div class="empty-state" style="grid-column: 1 / -1;">
-          <h3 style="color: var(--danger); margin-bottom: 10px;">تنبيه</h3>
-          <p style="color: var(--text-muted);">${msg}</p>
-        </div>
-      `;
+    
+    // 3. البحث عن المكتب المطلوب
+    const currentOffice = offices.find(o => o.id === officeId);
+    
+    if (currentOffice) {
+      // تحديث النصوص والاسم والمنطقة
+      document.getElementById('officeNameDisplay').textContent = currentOffice.name;
+      document.title = `${currentOffice.name} - دليل البصرة العقاري`;
+      document.getElementById('officeAreaDisplay').textContent = `منطقة العمل والتخصص: ${currentOffice.area}`;
+      document.getElementById('gridAreaVal').textContent = currentOffice.area;
+      
+      // تحديث الوصف والنبذة إذا وجدت
+      if (currentOffice.description && currentOffice.description.trim() !== "") {
+        document.getElementById('officeDescDisplay').textContent = currentOffice.description;
+      }
+      
+      // تحديث الهاتف وأزرار الاتصال
+      if (currentOffice.phone && currentOffice.phone.trim() !== "") {
+        document.getElementById('gridPhoneVal').textContent = currentOffice.phone;
+        document.getElementById('callActionBtn').href = `tel:${currentOffice.phone}`;
+        document.getElementById('callActionBtn').style.display = 'inline-flex';
+      } else {
+        document.getElementById('gridPhoneVal').textContent = "لم يدرج هاتف";
+        document.getElementById('callActionBtn').style.display = 'none'; // إخفاء الزر إن لم يكن هناك هاتف
+      }
+      
+      // تحديث شعار المكتب (صورة أو حرف مخصص)
+      const logoImg = document.getElementById('officeLogoImg');
+      const logoText = document.getElementById('officeLogoText');
+      
+      if (currentOffice.logo && currentOffice.logo.trim() !== "") {
+        logoImg.src = currentOffice.logo;
+        logoImg.style.display = 'flex';
+        logoText.style.display = 'none';
+      } else {
+        // إذا لم يرفع صورة، نأخذ أول حرف من اسم المكتب كرمز تعبيري أنيق
+        logoText.textContent = currentOffice.name.charAt(0);
+        logoText.style.display = 'flex';
+        logoImg.style.display = 'none';
+      }
+    } else {
+      // في حال تم إدخال معرف خاطئ
+      document.getElementById('officeNameDisplay').textContent = "المكتب غير موجود ⚠️";
+      document.getElementById('officeDescDisplay').textContent = "عذراً، لم نتمكن من العثور على بيانات هذا المكتب في قاعدة بيانات الدليل الحالية.";
+      document.getElementById('callActionBtn').style.display = 'none';
     }
-  </script>
+  });
+</script>
 </body>
 </html>
