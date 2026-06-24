@@ -131,7 +131,6 @@
     .ai-chat-btn { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: var(--navy); border: 2px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 26px; cursor: pointer; box-shadow: 0 6px 16px rgba(0,0,0,0.4); transition: 0.3s; }
     .ai-chat-btn:hover { transform: scale(1.08) rotate(5deg); }
     
-    /* الـ كلاس الجديد لضمان استقرار الفتح */
     .ai-chat-window { width: 340px; height: 450px; background: var(--navy-mid); border: 2px solid var(--gold); border-radius: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: none; flex-direction: column; overflow: hidden; margin-bottom: 12px; transition: 0.3s; }
     .ai-chat-window.active { display: flex !important; }
     
@@ -360,7 +359,7 @@
     <div class="ai-chat-header">
       <div style="display:flex; align-items:center; gap:8px;">
         <div style="width:10px; height:10px; background:var(--success); border-radius:50%;"></div>
-        <span style="font-size:13px; font-weight:700; color:var(--gold);">🧠 المستشار العقاري الذكي (الخبيرالعقاري)</span>
+        <span style="font-size:13px; font-weight:700; color:var(--gold);">🧠 المستشار العقاري الذكي (الخبير)</span>
       </div>
       <button onclick="toggleAiChat()" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-size:16px;">✕</button>
     </div>
@@ -372,7 +371,7 @@
       <button onclick="sendAiMessage()" class="ai-chat-send"><i class="ti ti-send"></i></button>
     </div>
   </div>
-  <button class="ai-chat-btn" onclick="toggleAiChat()"><i class="ti ti-robot"></i></button>
+  <button class="ai-chat-btn" onclick="toggleAiChat()" style="width: auto; padding: 0 20px; border-radius: 30px; font-size: 13px; font-weight: bold; white-space: nowrap;">✨ المستشار العقاري الذكي</button>
 </div>
 
 <footer class="footer" style="background: #050c16; padding: 2rem; border-top: 1px solid rgba(201,168,76,0.15); margin-top: 4rem;">
@@ -467,7 +466,6 @@ function executeSearch() {
   renderListings(filteredListings);
 }
 
-/* دوال المودال والتحكم والتأثيرات للزوار والمكاتب */
 function openAddPropertyModal() { document.getElementById('addPropModal').style.display = 'flex'; }
 function closeAddPropertyModal() { document.getElementById('addPropModal').style.display = 'none'; resetVisitorForm(); }
 function openRegisterModal(pkg) { document.getElementById('registerOfficeModal').style.display = 'flex'; document.getElementById('regOfficePkg').value = pkg; }
@@ -561,7 +559,6 @@ function submitNewOffice() {
   closeRegisterModal();
 }
 
-/* --- تعديل دالة فتح وإغلاق نافذة المستشار العقاري بمرونة وكفاءة عالية --- */
 function toggleAiChat() {
   const win = document.getElementById('aiChatWindow');
   if(win) {
