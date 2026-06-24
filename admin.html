@@ -7,29 +7,21 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
-    
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-    :root {
-      --gold: #C9A84C; --gold-light: #E8C96A; --gold-dark: #A07830;
-      --navy: #0A1628; --navy-mid: #1A3A5C; --navy-light: #2A5080;
-      --text-on-dark: #F5F0E8; --text-muted: #8BA0B8;
-      --success: #4CAF7D; --danger: #ff4d4d; --warning: #ff9800;
-    }
-    
+    :root { --gold: #C9A84C; --gold-light: #E8C96A; --navy: #0A1628; --navy-mid: #1A3A5C; --navy-light: #2A5080; --text-on-dark: #F5F0E8; --text-muted: #8BA0B8; --success: #4CAF7D; --danger: #ff4d4d; --warning: #ff9800; }
     body { background: var(--navy); color: var(--text-on-dark); direction: rtl; min-height: 100vh; padding-bottom: 3rem; }
     
     .login-container { max-width: 420px; margin: 10vh auto; padding: 2rem; }
     .login-card { background: var(--navy-mid); border: 2px solid var(--gold); border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    
     .dash-header { background: var(--navy-mid); border-bottom: 1px solid rgba(201,168,76,0.2); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
     .user-badge { background: rgba(201,168,76,0.15); border: 1px solid var(--gold); padding: 6px 16px; border-radius: 8px; color: var(--gold); font-weight: 700; font-size: 14px; }
     
     .main-wrapper { max-width: 1250px; margin: 0 auto; padding: 0 1.5rem; }
     .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-    .stat-card { background: var(--navy-mid); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 1.5rem; display: flex; align-items: center; gap: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+    .stat-card { background: var(--navy-mid); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 1.5rem; display: flex; align-items: center; gap: 15px; }
     .stat-icon { width: 50px; height: 50px; background: rgba(201,168,76,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--gold); }
     
-    .dash-section { display: none; background: var(--navy-mid); border-radius: 16px; border: 1px solid rgba(201,168,76,0.1); padding: 2rem; margin-bottom: 2rem; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
+    .dash-section { display: none; background: var(--navy-mid); border-radius: 16px; border: 1px solid rgba(201,168,76,0.1); padding: 2rem; margin-bottom: 2rem; }
     .section-title { font-size: 18px; font-weight: 700; color: var(--gold); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
     
     .form-group { margin-bottom: 15px; }
@@ -42,29 +34,24 @@
     .btn-gold:hover { background: var(--gold-light); transform:translateY(-1px); }
     .btn-danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
     .btn-danger:hover { background: var(--danger); color: #fff; }
-    .btn-success { background: var(--success); color: #fff; }
-    .btn-success:hover { filter: brightness(1.1); }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-success { background: #25D366; color: #fff; } /* لون واتساب */
+    .btn-success:hover { background: #128C7E; }
     
     .table-container { overflow-x: auto; margin-top: 1rem; }
     table { width: 100%; border-collapse: collapse; text-align: right; font-size: 13px; white-space: nowrap; }
-    th { background: rgba(255,255,255,0.03); color: var(--gold); padding: 14px 12px; border-bottom: 2px solid rgba(201,168,76,0.2); font-size:14px; }
-    td { padding: 14px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #e0e0e0; vertical-align: middle;}
-    
+    th { background: rgba(255,255,255,0.03); color: var(--gold); padding: 14px 12px; border-bottom: 2px solid rgba(201,168,76,0.2); }
+    td { padding: 14px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); vertical-align: middle;}
     .badge { padding: 5px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; display: inline-block; }
     .bg-success { background: rgba(76,175,125,0.15); color: var(--success); border: 1px solid var(--success); }
     .bg-danger { background: rgba(255,77,77,0.15); color: var(--danger); border: 1px solid var(--danger); }
     
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(10,22,40,0.85); backdrop-filter: blur(5px); z-index: 1000; justify-content: center; align-items: center; padding: 1rem; overflow-y: auto; }
-    .modal-box { background: var(--navy-mid); border: 2px solid var(--gold); border-radius: 16px; padding: 2rem; width: 100%; max-width: 600px; position: relative; margin: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.5);}
-    
+    .modal-box { background: var(--navy-mid); border: 2px solid var(--gold); border-radius: 16px; padding: 2rem; width: 100%; max-width: 600px; position: relative; margin: auto;}
+    .file-upload-btn { background: rgba(201,168,76,0.1); border: 1px dashed var(--gold); border-radius: 8px; padding: 15px; text-align: center; color: var(--gold); font-size: 14px; cursor: pointer; transition: 0.2s; }
+    .file-upload-btn:hover { background: rgba(201,168,76,0.2); }
     .sub-nav { display: flex; gap: 10px; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; overflow-x:auto;}
     .tab-btn { background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid transparent; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; white-space:nowrap;}
     .tab-btn.active { background: var(--gold); color: var(--navy); font-weight: 700; }
-
-    /* أزرار رفع الملفات (جديد) */
-    .file-upload-btn { background: rgba(201,168,76,0.1); border: 1px dashed var(--gold); border-radius: 8px; padding: 15px; text-align: center; color: var(--gold); font-size: 14px; cursor: pointer; transition: 0.2s; }
-    .file-upload-btn:hover { background: rgba(201,168,76,0.2); }
   </style>
 </head>
 <body>
@@ -74,17 +61,11 @@
     <div style="text-align: center; margin-bottom: 2rem;">
       <i class="ti ti-lock-square-rounded" style="font-size: 50px; color: var(--gold);"></i>
       <h2 style="margin-top: 10px; font-weight: 900;">بوابة تسجيل الدخول</h2>
-      <p style="color: var(--text-muted); font-size: 12px; margin-top: 5px;">لوحة تحكم المشرف العام والمكاتب العقارية في البصرة</p>
+      <p style="color: var(--text-muted); font-size: 12px; margin-top: 5px;">لوحة تحكم المشرف العام والمكاتب العقارية</p>
     </div>
-    <div class="form-group">
-      <label class="form-label">اسم المستخدم أو رقم الهاتف</label>
-      <input type="text" id="usernameInput" class="input-control" placeholder="أدخل حساب الإدارة أو هاتف مكتبك">
-    </div>
-    <div class="form-group">
-      <label class="form-label">كلمة المرور</label>
-      <input type="password" id="passwordInput" class="input-control" placeholder="••••••••">
-    </div>
-    <button onclick="handleLogin()" class="btn btn-gold" style="width: 100%; justify-content: center; margin-top: 10px; padding: 14px;">🚪 تسجيل الدخول الآمن</button>
+    <div class="form-group"><input type="text" id="usernameInput" class="input-control" placeholder="اسم المستخدم أو الهاتف"></div>
+    <div class="form-group"><input type="password" id="passwordInput" class="input-control" placeholder="كلمة المرور"></div>
+    <button onclick="handleLogin()" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 14px;">🚪 تسجيل الدخول</button>
     <a href="index.html" style="display:block; text-align:center; margin-top:15px; color:var(--text-muted); text-decoration:none; font-size:13px;">← العودة للموقع الرئيسي</a>
   </div>
 </div>
@@ -102,38 +83,16 @@
     
     <div id="adminView" style="display: none;">
       <div class="grid-stats">
-        <div class="stat-card">
-          <div class="stat-icon"><i class="ti ti-building-community"></i></div>
-          <div><div style="font-size:13px; color:var(--text-muted);">إجمالي المكاتب</div><h3 id="statTotalOffices" style="font-size:22px; font-weight:900;">0</h3></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon" style="color:var(--success);"><i class="ti ti-discount-check"></i></div>
-          <div><div style="font-size:13px; color:var(--text-muted);">الاشتراكات النشطة</div><h3 id="statActiveOffices" style="font-size:22px; font-weight:900; color:var(--success);">0</h3></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon" style="color:var(--warning);"><i class="ti ti-home-stats"></i></div>
-          <div><div style="font-size:13px; color:var(--text-muted);">إجمالي العقارات المعروضة</div><h3 id="statTotalProps" style="font-size:22px; font-weight:900; color:var(--warning);">0</h3></div>
-        </div>
+        <div class="stat-card"><div class="stat-icon"><i class="ti ti-building-community"></i></div><div><div style="font-size:13px; color:var(--text-muted);">المكاتب</div><h3 id="statTotalOffices" style="font-size:22px; font-weight:900;">0</h3></div></div>
+        <div class="stat-card"><div class="stat-icon" style="color:var(--success);"><i class="ti ti-discount-check"></i></div><div><div style="font-size:13px; color:var(--text-muted);">نشط</div><h3 id="statActiveOffices" style="font-size:22px; font-weight:900; color:var(--success);">0</h3></div></div>
+        <div class="stat-card"><div class="stat-icon" style="color:var(--warning);"><i class="ti ti-home-stats"></i></div><div><div style="font-size:13px; color:var(--text-muted);">العقارات</div><h3 id="statTotalProps" style="font-size:22px; font-weight:900; color:var(--warning);">0</h3></div></div>
       </div>
-
       <div class="dash-section" style="display: block;">
-        <div class="section-title"><i class="ti ti-shield-half"></i> إدارة ورقابة المكاتب العقارية وتجديد الاشتراكات</div>
+        <div class="section-title"><i class="ti ti-shield-half"></i> إدارة المكاتب العقارية وتجديد الاشتراكات</div>
         <div class="table-container">
           <table>
-            <thead>
-              <tr>
-                <th>اسم المكتب</th>
-                <th>رقم الهاتف</th>
-                <th>الباقة الحالية</th>
-                <th>حالة الحساب</th>
-                <th>تاريخ الانتهاء</th>
-                <th>تغيير الباقة</th>
-                <th>تجديد (30 يوم)</th>
-                <th>الرقابة</th>
-              </tr>
-            </thead>
-            <tbody id="adminOfficesTable">
-              </tbody>
+            <thead><tr><th>اسم المكتب</th><th>الهاتف</th><th>الباقة</th><th>الحالة</th><th>تاريخ الانتهاء</th><th>تغيير الباقة</th><th>تجديد (30 يوم)</th><th>الرقابة</th></tr></thead>
+            <tbody id="adminOfficesTable"></tbody>
           </table>
         </div>
       </div>
@@ -141,9 +100,14 @@
 
     <div id="officeView" style="display: none;">
       
-      <div id="officeExpiryBanner" style="background:rgba(201,168,76,0.05); border:1px solid rgba(201,168,76,0.3); padding:12px 20px; border-radius:12px; margin-bottom:1.5rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
-         <div style="font-size:14px;"><i class="ti ti-info-circle" style="color:var(--gold);"></i> باقتك الحالية: <strong id="lblOfficePkg" style="color:var(--gold);">...</strong></div>
-         <div style="font-size:14px;"><i class="ti ti-calendar-time" style="color:var(--warning);"></i> تنتهي صلاحية الباقة في: <strong id="lblOfficeExpiry" style="color:var(--warning); font-family:monospace;">...</strong></div>
+      <div id="officeExpiryBanner" style="background:rgba(201,168,76,0.05); border:1px solid rgba(201,168,76,0.3); padding:15px 20px; border-radius:12px; margin-bottom:1.5rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+         <div>
+           <div style="font-size:14px; margin-bottom: 5px;"><i class="ti ti-info-circle" style="color:var(--gold);"></i> باقتك الحالية: <strong id="lblOfficePkg" style="color:var(--gold);">...</strong></div>
+           <div style="font-size:14px;"><i class="ti ti-calendar-time" style="color:var(--warning);"></i> الصلاحية: <strong id="lblOfficeExpiry" style="color:var(--warning); font-family:monospace;">...</strong></div>
+         </div>
+         <button onclick="contactAdminForRenewal()" class="btn btn-success" style="padding: 10px 20px; font-size: 14px; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);">
+           <i class="ti ti-brand-whatsapp"></i> تجديد / ترقية عبر واتساب
+         </button>
       </div>
 
       <div class="sub-nav">
@@ -153,162 +117,66 @@
 
       <div id="officePropsSection" class="dash-section" style="display: block;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap:wrap; gap:10px;">
-          <div class="section-title" style="margin-bottom:0; border-bottom:none; padding-bottom:0;"><i class="ti ti-building-estate"></i> عروض مكتبك العقارية الحالية</div>
-          <button onclick="openAddPropModal()" class="btn btn-gold"><i class="ti ti-circle-plus"></i> ➕ إضافة عقار جديد بالصور</button>
+          <div class="section-title" style="margin-bottom:0; border-bottom:none; padding-bottom:0;"><i class="ti ti-building-estate"></i> عروض مكتبك الحالية</div>
+          <button onclick="openAddPropModal()" class="btn btn-gold"><i class="ti ti-circle-plus"></i> إضافة عقار بصورة مباشرة</button>
         </div>
         <div class="table-container">
           <table>
-            <thead>
-              <tr>
-                <th>صورة</th>
-                <th>النوع</th>
-                <th>المنطقة</th>
-                <th>السعر</th>
-                <th>المساحة</th>
-                <th>الطابو والسند</th>
-                <th>الغرف</th>
-                <th>حذف الإعلان</th>
-              </tr>
-            </thead>
-            <tbody id="officePropsTable">
-              </tbody>
+            <thead><tr><th>صورة</th><th>النوع</th><th>المنطقة</th><th>السعر</th><th>الطابو</th><th>الإجراء</th></tr></thead>
+            <tbody id="officePropsTable"></tbody>
           </table>
         </div>
       </div>
 
       <div id="officeSettingsSection" class="dash-section" style="display: none;">
-        <div class="section-title"><i class="ti ti-id"></i> إعدادات بروفايل المكتب وبيانات الدخول</div>
+        <div class="section-title"><i class="ti ti-id"></i> بيانات المكتب وتسجيل الدخول</div>
         <form onsubmit="saveOfficeAccountSettings(event)" style="max-width: 500px;">
-          
-          <div class="form-group">
-            <label class="form-label">شعار المكتب (يظهر في صفحتك الخاصة)</label>
-            <div class="file-upload-btn" onclick="document.getElementById('setOfficeLogo').click()">
-              <i class="ti ti-upload"></i> اضغط هنا لاختيار صورة الشعار
-            </div>
-            <input type="file" id="setOfficeLogo" accept="image/*" onchange="handleLogoUpload(event)" style="display:none;">
-            <div style="text-align: right; margin-top:10px;">
-               <img id="logoPreview" src="" style="display:none; width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid var(--gold);">
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label class="form-label">وصف ونبذة عن المكتب (تظهر للزوار)</label>
-            <textarea id="setOfficeDesc" class="input-control" rows="3" placeholder="اكتب نبذة عن خبرتك ومجال تخصصك..."></textarea>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">اسم المكتب العقاري</label>
-            <input type="text" id="setOfficeName" class="input-control" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">المنطقة الرئيسية</label>
-            <input type="text" id="setOfficeArea" class="input-control" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">رقم الهاتف (اسم المستخدم للدخول الحالي والمستقبلي)</label>
-            <input type="tel" id="setOfficePhone" class="input-control" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">كلمة المرور الجديدة</label>
-            <input type="text" id="setOfficePass" class="input-control" placeholder="أدخل كلمة مرور جديدة للحساب" required>
-          </div>
-          <button type="submit" class="btn btn-success" style="margin-top: 10px; width:100%; justify-content:center;"><i class="ti ti-device-floppy"></i> حفظ وتحديث البيانات فوراً</button>
+          <div class="form-group"><label class="form-label">شعار المكتب</label><div class="file-upload-btn" onclick="document.getElementById('setOfficeLogo').click()"><i class="ti ti-upload"></i> ارفع صورة الشعار</div><input type="file" id="setOfficeLogo" accept="image/*" onchange="handleLogoUpload(event)" style="display:none;"><div style="text-align: right; margin-top:10px;"><img id="logoPreview" src="" style="display:none; width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid var(--gold);"></div></div>
+          <div class="form-group"><label class="form-label">وصف المكتب</label><textarea id="setOfficeDesc" class="input-control" rows="3"></textarea></div>
+          <div class="form-group"><label class="form-label">اسم المكتب</label><input type="text" id="setOfficeName" class="input-control" required></div>
+          <div class="form-group"><label class="form-label">رقم الهاتف (للدخول)</label><input type="tel" id="setOfficePhone" class="input-control" required></div>
+          <div class="form-group"><label class="form-label">كلمة المرور</label><input type="text" id="setOfficePass" class="input-control" required></div>
+          <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center;">حفظ البيانات</button>
         </form>
       </div>
-
     </div>
-
   </main>
 </div>
 
 <div id="addPropModal" class="modal-overlay" onclick="if(event.target.id === 'addPropModal') closeAddPropModal()">
   <div class="modal-box">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px;">
-      <h3 style="color:var(--gold); font-weight:700;"><i class="ti ti-home-plus"></i> إضافة عقار احترافي جديد للمكتب</h3>
+      <h3 style="color:var(--gold); font-weight:700;">إضافة عقار للمكتب</h3>
       <button onclick="closeAddPropModal()" style="background:transparent; border:none; color:#fff; font-size:18px; cursor:pointer;">✕</button>
     </div>
     <form onsubmit="submitNewPropFromOffice(event)">
-      
-      <div class="form-group">
-        <label class="form-label">صورة العقار (مباشرة من جهازك)</label>
-        <div class="file-upload-btn" onclick="document.getElementById('pImgUpload').click()">
-          <i class="ti ti-camera"></i> اضغط هنا لرفع صورة العقار
-        </div>
-        <input type="file" id="pImgUpload" accept="image/*" onchange="handlePropImageUpload(event)" style="display:none;">
-        <img id="propImagePreview" src="" alt="معاينة" style="display:none; width:100%; height:160px; object-fit:cover; border-radius:8px; margin-top:10px; border:1px solid var(--gold);">
-      </div>
-
+      <div class="form-group"><label class="form-label">صورة العقار</label><div class="file-upload-btn" onclick="document.getElementById('pImgUpload').click()"><i class="ti ti-camera"></i> ارفع صورة العقار</div><input type="file" id="pImgUpload" accept="image/*" onchange="handlePropImageUpload(event)" style="display:none;"><img id="propImagePreview" src="" style="display:none; width:100%; height:160px; object-fit:cover; border-radius:8px; margin-top:10px; border:1px solid var(--gold);"></div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-        <div class="form-group">
-          <label class="form-label">نوع العقار</label>
-          <select id="pType" class="input-control" style="background:var(--navy);"><option value="بيت">بيت سكني</option><option value="شقة">شقة فاخرة</option><option value="أرض">أرض استثمارية</option><option value="محل">محل تجاري</option></select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">الإجراء</label>
-          <select id="pAction" class="input-control" style="background:var(--navy);"><option value="للبيع">للبيع</option><option value="للإيجار">للإيجار</option></select>
-        </div>
+        <div class="form-group"><label class="form-label">نوع العقار</label><select id="pType" class="input-control"><option value="بيت">بيت</option><option value="شقة">شقة</option><option value="أرض">أرض</option></select></div>
+        <div class="form-group"><label class="form-label">الإجراء</label><select id="pAction" class="input-control"><option value="للبيع">للبيع</option><option value="للإيجار">للإيجار</option></select></div>
+        <div class="form-group"><label class="form-label">المنطقة</label><input type="text" id="pDistrict" class="input-control" required></div>
+        <div class="form-group"><label class="form-label">السعر</label><input type="text" id="pPrice" class="input-control" required></div>
+        <div class="form-group"><label class="form-label">المساحة</label><input type="number" id="pArea" class="input-control" required></div>
+        <div class="form-group"><label class="form-label">السند</label><select id="pDeed" class="input-control"><option value="ملك">ملك</option><option value="زراعي">زراعي</option></select></div>
       </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-        <div class="form-group">
-          <label class="form-label">المنطقة في البصرة</label>
-          <input type="text" id="pDistrict" class="input-control" placeholder="مثال: الجنينة، العشار" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">السعر الكلي أو الإيجار</label>
-          <input type="text" id="pPrice" class="input-control" placeholder="مثال: 150 مليون / 500 ألف ش" required>
-        </div>
-      </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-        <div class="form-group">
-          <label class="form-label">المساحة (م²)</label>
-          <input type="number" id="pArea" class="input-control" placeholder="200" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">نوع السند / الطابو</label>
-          <select id="pDeed" class="input-control" style="background:var(--navy);"><option value="طابو صرف (ملك)">طابو صرف (ملك)</option><option value="طابو زراعي (إقرار)">طابو زراعي (إقرار)</option><option value="طابو أسهم">طابو أسهم</option></select>
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">عدد الغرف (ضع - إذا كانت أرض)</label>
-        <input type="text" id="pRooms" class="input-control" placeholder="4 غرف" required>
-      </div>
-      <div class="form-group">
-        <label class="form-label">وصف تسويقي وتفاصيل إضافية</label>
-        <textarea id="pDesc" class="input-control" rows="3" placeholder="اكتب ميزات العقار والخدمات القريبة..."></textarea>
-      </div>
-      <div style="display:flex; gap:10px; margin-top:1.5rem;">
-        <button type="submit" class="btn btn-gold" style="flex:1; justify-content:center;">🚀 نشر الإعلان في الدليل العام</button>
-        <button type="button" onclick="closeAddPropModal()" class="btn btn-danger">إلغاء</button>
-      </div>
+      <div class="form-group"><label class="form-label">الغرف</label><input type="text" id="pRooms" class="input-control" required></div>
+      <div class="form-group"><label class="form-label">وصف إضافي</label><textarea id="pDesc" class="input-control" rows="2"></textarea></div>
+      <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center;">🚀 نشر الإعلان</button>
     </form>
   </div>
 </div>
+
 
 <script>
 const STORAGE_KEY = 'basra_data_v3';
 const SESSION_KEY = 'basra_session_v3';
 
-// متغيرات حفظ الصور المباشرة (Base64)
 let tempLogoBase64 = "";
 let tempPropImageBase64 = "";
 
-const initialOffices = [
-  { id: '1', name: 'مكتب الأمانة العقاري', area: 'العشار', publishedProps: 0, pkg: 'gold', status: 'active', expiry: '2026-12-31', phone: '07701112223', password: 'office123', description: 'متخصصون في بيع وشراء العقارات في مناطق العشار ومحيطها.', logo: '', listings: [] },
-  { id: '2', name: 'عقارات الخليج بالبصرة', area: 'الجمهورية', publishedProps: 0, pkg: 'eco', status: 'active', expiry: '2026-09-15', phone: '07801112224', password: '123', description: '', logo: '', listings: [] }
-];
-
-function getOffices() {
-  let offices = localStorage.getItem(STORAGE_KEY);
-  if (!offices) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(initialOffices));
-    return initialOffices;
-  }
-  return JSON.parse(offices);
-}
-
+function getOffices() { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
 function saveOffices(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 
-// فحص وتسجيل الدخول
 function checkSession() {
   const session = JSON.parse(localStorage.getItem(SESSION_KEY));
   if (session) {
@@ -333,85 +201,63 @@ function checkSession() {
 }
 
 function handleLogin() {
-  const u = document.getElementById('usernameInput').value.trim();
-  const p = document.getElementById('passwordInput').value.trim();
-  
+  const u = document.getElementById('usernameInput').value.trim(); const p = document.getElementById('passwordInput').value.trim();
   if (u === 'admin' && p === 'admin123') {
-    const session = { role: 'admin', username: 'المدير العام للنظام' };
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-    checkSession();
-    return;
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ role: 'admin', username: 'المدير' })); checkSession(); return;
   }
-  
   let offices = getOffices();
-  let officeIndex = offices.findIndex(o => 
-    (o.phone === u || (u === 'office' && o.id === '1')) && 
-    (o.password === p || (p === 'office123' && o.id === '1'))
-  );
+  let office = offices.find(o => (o.phone === u || u === 'office') && (o.password === p || p === '123'));
   
-  if (officeIndex !== -1) {
-    if (offices[officeIndex].status === 'suspended') {
-      alert('⚠️ حساب هذا المكتب معطل حالياً أو انتهى اشتراكه! يرجى التواصل مع الإدارة.');
-      return;
-    }
-    const session = { role: 'office', officeId: offices[officeIndex].id, username: offices[officeIndex].name };
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  if (office) {
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ role: 'office', officeId: office.id, username: office.name }));
     checkSession();
-  } else {
-    alert('❌ رقم الهاتف أو كلمة المرور غير صحيحة!');
-  }
+  } else { alert('❌ البيانات غير صحيحة!'); }
 }
-
 function handleLogout() { localStorage.removeItem(SESSION_KEY); checkSession(); }
 
-// ======================= وظائف المشرف العام (Admin) =======================
 function renderAdminDashboard() {
   const offices = getOffices();
   document.getElementById('statTotalOffices').textContent = offices.length;
   document.getElementById('statActiveOffices').textContent = offices.filter(o => o.status === 'active').length;
-  let totalProps = 3; offices.forEach(o => { if(o.listings) totalProps += o.listings.length; });
-  document.getElementById('statTotalProps').textContent = totalProps;
+  let props = 0; offices.forEach(o => props += o.listings ? o.listings.length : 0);
+  document.getElementById('statTotalProps').textContent = props;
 
-  const tBody = document.getElementById('adminOfficesTable');
-  tBody.innerHTML = offices.map(o => `
+  document.getElementById('adminOfficesTable').innerHTML = offices.map(o => `
     <tr>
-      <td style="font-weight:700;">${o.name}</td>
-      <td style="font-family:monospace; color:var(--text-muted);">${o.phone || 'غير محدد'}</td>
+      <td style="font-weight:700;">${o.name}</td><td>${o.phone}</td>
+      <td><span class="badge" style="background:rgba(201,168,76,0.2); color:#fff;">${o.pkg}</span></td>
+      <td><span class="badge ${o.status === 'active' ? 'bg-success' : 'bg-danger'}">${o.status}</span></td>
+      <td style="font-family:monospace; font-size:12px;">${o.expiry}</td>
+      
       <td>
-        <span class="badge" style="background:rgba(201,168,76,0.2); color:#fff; margin-bottom:5px; display:block; text-align:center;">
-          ${o.pkg === 'gold' ? '🏆 ذهبية' : o.pkg === 'eco' ? '💼 اقتصادية' : '🆓 مجانية'}
-        </span>
-      </td>
-      <td><span class="badge ${o.status === 'active' ? 'bg-success' : 'bg-danger'}">${o.status === 'active' ? 'نشط' : 'معلق/منتهي'}</span></td>
-      <td style="font-family:monospace; font-size:13px; color:${o.status==='suspended'?'var(--danger)':'var(--warning)'};">${o.expiry}</td>
-      <td>
-        <select class="input-control" style="padding:6px; font-size:12px; width:auto; border-color:var(--gold); background:rgba(0,0,0,0.3);" onchange="changePackageByAdmin('${o.id}', this.value)">
+        <select class="input-control" style="padding:4px; font-size:11px; width:auto;" onchange="changePackageByAdmin('${o.id}', this.value)">
           <option value="free" ${o.pkg === 'free' ? 'selected' : ''}>مجانية</option>
           <option value="eco"  ${o.pkg === 'eco'  ? 'selected' : ''}>اقتصادية</option>
           <option value="gold" ${o.pkg === 'gold' ? 'selected' : ''}>ذهبية</option>
         </select>
       </td>
       <td>
-        <button class="btn btn-success" style="padding:6px 12px; font-size:11px;" onclick="renewSubscriptionByAdmin('${o.id}')" ${o.pkg === 'free' ? 'disabled' : ''}>
-          ${o.pkg === 'free' ? '🚫 غير متاح' : '🔄 تجديد 30 يوم'}
+        <button class="btn btn-success" style="padding:4px 8px; font-size:11px;" onclick="renewSubscriptionByAdmin('${o.id}')" ${o.pkg === 'free' ? 'disabled' : ''}>
+          تجديد 30 يوم
         </button>
       </td>
       <td>
-        <div style="display:flex; gap:6px;">
-          <button class="btn" style="padding:6px 10px; font-size:11px; background:var(--navy-light); color:#fff;" onclick="toggleOfficeStatus('${o.id}')">${o.status === 'active' ? '🛑 إيقاف' : '🟢 تفعيل'}</button>
-          <button class="btn btn-danger" style="padding:6px 10px; font-size:11px;" onclick="deleteOfficeByAdmin('${o.id}')">🗑️ حذف</button>
+        <div style="display:flex; gap:4px;">
+          <button class="btn" style="padding:4px 8px; font-size:11px; background:var(--navy-light); color:#fff;" onclick="toggleOfficeStatus('${o.id}')">${o.status === 'active' ? 'إيقاف' : 'تفعيل'}</button>
+          <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="deleteOffice('${o.id}')">حذف</button>
         </div>
       </td>
     </tr>
   `).join('');
 }
 
+// دوال إدارة المشرف (Admin Functions)
 function changePackageByAdmin(id, newPkg) {
   let offices = getOffices(); let idx = offices.findIndex(x => x.id === id);
   if(idx !== -1) {
     offices[idx].pkg = newPkg; offices[idx].status = 'active';
     offices[idx].expiry = newPkg === 'free' ? 'مفتوح دائم' : new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0];
-    saveOffices(offices); renderAdminDashboard(); alert("✅ تم تغيير باقة المكتب وتحديث صلاحيته بنجاح.");
+    saveOffices(offices); renderAdminDashboard();
   }
 }
 
@@ -422,7 +268,7 @@ function renewSubscriptionByAdmin(id) {
     let baseDate = (currentExpiry < today || isNaN(currentExpiry)) ? today : currentExpiry;
     baseDate.setDate(baseDate.getDate() + 30);
     offices[idx].expiry = baseDate.toISOString().split('T')[0]; offices[idx].status = 'active';
-    saveOffices(offices); renderAdminDashboard(); alert("🎉 تم تجديد اشتراك المكتب لمدة 30 يوماً بنجاح!");
+    saveOffices(offices); renderAdminDashboard(); alert("تم تجديد الاشتراك 30 يوم!");
   }
 }
 
@@ -430,176 +276,75 @@ function toggleOfficeStatus(id) {
   let offices = getOffices(); let o = offices.find(x => x.id === id);
   if(o) { o.status = o.status === 'active' ? 'suspended' : 'active'; saveOffices(offices); renderAdminDashboard(); }
 }
-function deleteOfficeByAdmin(id) {
-  if(confirm("تأكيد مسح هذا المكتب العقاري وسحب رخصته نهائياً؟")) {
-    let offices = getOffices(); offices = offices.filter(x => x.id !== id); saveOffices(offices); renderAdminDashboard();
-  }
-}
 
-// ======================= وظائف المكتب العقاري (Office) =======================
+function deleteOffice(id){ if(confirm('تأكيد حذف المكتب؟')) { saveOffices(getOffices().filter(o=>o.id!==id)); renderAdminDashboard(); } }
+
 function getCurrentOffice() {
   const session = JSON.parse(localStorage.getItem(SESSION_KEY));
   if (!session || session.role !== 'office') return null;
-  let offices = getOffices(); return offices.find(o => o.id === session.officeId);
+  return getOffices().find(o => o.id === session.officeId);
 }
 
 function renderOfficeDashboard() {
   const currentOffice = getCurrentOffice();
   if(!currentOffice) return;
   
-  const pkgName = currentOffice.pkg === 'gold' ? 'الذهبية VIP' : currentOffice.pkg === 'eco' ? 'الاقتصادية' : 'المجانية';
-  document.getElementById('lblOfficePkg').textContent = pkgName;
+  document.getElementById('lblOfficePkg').textContent = currentOffice.pkg === 'gold' ? 'الذهبية VIP' : currentOffice.pkg === 'eco' ? 'الاقتصادية' : 'المجانية';
   document.getElementById('lblOfficeExpiry').textContent = currentOffice.expiry;
 
   const tBody = document.getElementById('officePropsTable');
   if(!currentOffice.listings || currentOffice.listings.length === 0) {
-    tBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding:2rem;">لم تقم بنشر أي عقار حتى الآن، اضغط على زر الإضافة!</td></tr>`;
-    return;
+    tBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">لا توجد عقارات</td></tr>`; return;
   }
-
   tBody.innerHTML = currentOffice.listings.map((p, idx) => `
     <tr>
-      <td>
-        ${p.image ? `<img src="${p.image}" style="width:40px; height:40px; border-radius:6px; object-fit:cover; border:1px solid var(--gold);">` : `<div style="font-size:24px;">${p.icon}</div>`}
-      </td>
-      <td style="font-weight:700; color:var(--gold);">${p.type}</td>
-      <td>${p.district}</td>
-      <td style="font-weight:bold; color:#fff;">${p.price}</td>
-      <td>${p.area} م²</td>
-      <td style="font-size:12px;">${p.deedType}</td>
-      <td>${p.rooms}</td>
-      <td><button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="deletePropertyFromOffice(${idx})">🗑️ حذف</button></td>
+      <td>${p.image ? `<img src="${p.image}" style="width:40px; height:40px; border-radius:6px; object-fit:cover;">` : p.icon}</td>
+      <td style="color:var(--gold);">${p.type}</td><td>${p.district}</td><td>${p.price}</td><td>${p.deedType}</td>
+      <td><button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="delProp(${idx})">حذف</button></td>
     </tr>
   `).join('');
 }
+function delProp(idx){ if(confirm('حذف؟')){ let o=getOffices(); let i=o.findIndex(x=>x.id===JSON.parse(localStorage.getItem(SESSION_KEY)).officeId); o[i].listings.splice(idx,1); saveOffices(o); renderOfficeDashboard(); } }
 
-function switchOfficeTab(tab) {
-  document.getElementById('tabPropsBtn').classList.toggle('active', tab === 'props');
-  document.getElementById('tabSettingsBtn').classList.toggle('active', tab === 'settings');
-  document.getElementById('officePropsSection').style.display = tab === 'props' ? 'block' : 'none';
-  document.getElementById('officeSettingsSection').style.display = tab === 'settings' ? 'block' : 'none';
+function switchOfficeTab(t){ document.getElementById('officePropsSection').style.display=t==='props'?'block':'none'; document.getElementById('officeSettingsSection').style.display=t==='settings'?'block':'none'; }
+function fillOfficeSettingsForm(){
+  const o = getCurrentOffice(); if(!o) return;
+  document.getElementById('setOfficeName').value = o.name; document.getElementById('setOfficePhone').value = o.phone; document.getElementById('setOfficePass').value = o.password; document.getElementById('setOfficeDesc').value = o.description||'';
+  tempLogoBase64 = o.logo||''; if(tempLogoBase64){ document.getElementById('logoPreview').src=tempLogoBase64; document.getElementById('logoPreview').style.display='inline-block'; }
+}
+function handleLogoUpload(e){ const f=e.target.files[0]; if(f){ const r=new FileReader(); r.onload=e=>{ tempLogoBase64=e.target.result; document.getElementById('logoPreview').src=tempLogoBase64; document.getElementById('logoPreview').style.display='inline-block'; }; r.readAsDataURL(f); } }
+function saveOfficeAccountSettings(e){
+  e.preventDefault(); let o=getOffices(); let i=o.findIndex(x=>x.id===JSON.parse(localStorage.getItem(SESSION_KEY)).officeId);
+  o[i].name=document.getElementById('setOfficeName').value; o[i].phone=document.getElementById('setOfficePhone').value; o[i].password=document.getElementById('setOfficePass').value; o[i].description=document.getElementById('setOfficeDesc').value; o[i].logo=tempLogoBase64;
+  saveOffices(o); alert('✅ تم الحفظ');
 }
 
-/* رفع وعرض شعار المكتب (مباشر) */
-function handleLogoUpload(event) {
-  const file = event.target.files[0];
-  if(file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      tempLogoBase64 = e.target.result;
-      document.getElementById('logoPreview').src = tempLogoBase64;
-      document.getElementById('logoPreview').style.display = 'inline-block';
-    };
-    reader.readAsDataURL(file);
-  }
+function handlePropImageUpload(e){ const f=e.target.files[0]; if(f){ const r=new FileReader(); r.onload=e=>{ tempPropImageBase64=e.target.result; document.getElementById('propImagePreview').src=tempPropImageBase64; document.getElementById('propImagePreview').style.display='block'; }; r.readAsDataURL(f); } }
+function openAddPropModal(){ tempPropImageBase64=""; document.getElementById('propImagePreview').style.display='none'; document.getElementById('addPropModal').style.display='flex'; }
+function closeAddPropModal(){ document.getElementById('addPropModal').style.display='none'; }
+
+function submitNewPropFromOffice(e){
+  e.preventDefault(); let o=getOffices(); let i=o.findIndex(x=>x.id===JSON.parse(localStorage.getItem(SESSION_KEY)).officeId);
+  if(!o[i].listings) o[i].listings=[];
+  if(o[i].pkg==='free' && o[i].listings.length>=2){ alert('تجاوزت الحد المجاني'); return; }
+  o[i].listings.unshift({type:document.getElementById('pType').value, action:document.getElementById('pAction').value, district:document.getElementById('pDistrict').value, price:document.getElementById('pPrice').value, area:document.getElementById('pArea').value, deedType:document.getElementById('pDeed').value, rooms:document.getElementById('pRooms').value, desc:document.getElementById('pDesc').value, image:tempPropImageBase64, icon:'🏠'});
+  saveOffices(o); alert('تم النشر'); closeAddPropModal(); renderOfficeDashboard();
 }
 
-function fillOfficeSettingsForm() {
+// ---------------- وظيفة التجديد الذكي والآمن عبر الواتساب ----------------
+function contactAdminForRenewal() {
   const currentOffice = getCurrentOffice();
   if(!currentOffice) return;
-  document.getElementById('setOfficeName').value = currentOffice.name;
-  document.getElementById('setOfficeArea').value = currentOffice.area;
-  document.getElementById('setOfficePhone').value = currentOffice.phone || '';
-  document.getElementById('setOfficePass').value = currentOffice.password || '';
-  document.getElementById('setOfficeDesc').value = currentOffice.description || '';
+
+  // 🔴 تنبيه هام: ضع رقم هاتفك (الواتساب) الحقيقي للإدارة هنا بدلاً من الاصفار! (بدون علامة +)
+  const adminWhatsAppNumber = "9647719994201"; 
   
-  tempLogoBase64 = currentOffice.logo || "";
-  if(tempLogoBase64) {
-    document.getElementById('logoPreview').src = tempLogoBase64;
-    document.getElementById('logoPreview').style.display = 'inline-block';
-  } else {
-    document.getElementById('logoPreview').style.display = 'none';
-  }
-}
-
-function saveOfficeAccountSettings(e) {
-  e.preventDefault();
-  const session = JSON.parse(localStorage.getItem(SESSION_KEY));
-  let offices = getOffices();
-  let officeIndex = offices.findIndex(o => o.id === session.officeId);
-  if(officeIndex === -1) return;
-
-  const newName = document.getElementById('setOfficeName').value.trim();
-  const newArea = document.getElementById('setOfficeArea').value.trim();
-  const newPhone = document.getElementById('setOfficePhone').value.trim();
-  const newPass = document.getElementById('setOfficePass').value.trim();
-  const newDesc = document.getElementById('setOfficeDesc').value.trim();
-
-  let isTaken = offices.find(o => o.phone === newPhone && o.id !== session.officeId);
-  if(isTaken) { alert("❌ رقم الهاتف مستخدم لمكتب آخر! اختر رقم آخر."); return; }
-
-  offices[officeIndex].name = newName; 
-  offices[officeIndex].area = newArea; 
-  offices[officeIndex].phone = newPhone; 
-  offices[officeIndex].password = newPass;
-  offices[officeIndex].description = newDesc;
-  offices[officeIndex].logo = tempLogoBase64; // حفظ اللوجو المباشر
+  // تجهيز الرسالة تلقائياً ليتم إرسالها لك
+  const message = `مرحباً إدارة دليل البصرة العقاري،%0Aأود تجديد أو ترقية باقة اشتراك مكتبي.%0A%0A🏢 اسم المكتب: ${currentOffice.name}%0A📱 رقم الهاتف: ${currentOffice.phone}%0A📦 الباقة الحالية: ${currentOffice.pkg === 'gold' ? 'الذهبية' : currentOffice.pkg === 'eco' ? 'الاقتصادية' : 'المجانية'}%0A%0Aيرجى تزويدي بتفاصيل الدفع (زين كاش / حوالة).`;
   
-  saveOffices(offices);
-  session.username = newName; localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-  alert("✨ تم تحديث بيانات حسابك وبروفايلك بنجاح."); checkSession();
-}
-
-// ================== التعامل مع إضافة عقار بصورة مباشرة ==================
-function handlePropImageUpload(event) {
-  const file = event.target.files[0];
-  if(file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      tempPropImageBase64 = e.target.result;
-      document.getElementById('propImagePreview').src = tempPropImageBase64;
-      document.getElementById('propImagePreview').style.display = 'block';
-    };
-    reader.readAsDataURL(file);
-  }
-}
-
-function openAddPropModal() { 
-  // تصفير الصورة عند إضافة عقار جديد
-  tempPropImageBase64 = "";
-  document.getElementById('propImagePreview').style.display = 'none';
-  document.getElementById('propImagePreview').src = "";
-  document.getElementById('pImgUpload').value = "";
-  document.getElementById('addPropModal').style.display = 'flex'; 
-}
-
-function closeAddPropModal() { document.getElementById('addPropModal').style.display = 'none'; }
-
-function submitNewPropFromOffice(e) {
-  e.preventDefault();
-  const session = JSON.parse(localStorage.getItem(SESSION_KEY));
-  let offices = getOffices();
-  let office = offices.find(o => o.id === session.officeId);
-  
-  if(!office) return;
-  if(!office.listings) office.listings = [];
-
-  if(office.pkg === 'free' && office.listings.length >= 2) { alert("⚠️ تجاوزت الحد المسموح للباقة المجانية (إعلانين)! الرجاء الترقية."); return; }
-  if(office.pkg === 'eco' && office.listings.length >= 10) { alert("⚠️ تجاوزت الحد المسموح للباقة الاقتصادية (10 إعلانات)! الرجاء الترقية."); return; }
-
-  const type = document.getElementById('pType').value; 
-  const action = document.getElementById('pAction').value; 
-  const district = document.getElementById('pDistrict').value.trim();
-  const price = document.getElementById('pPrice').value.trim(); 
-  const area = document.getElementById('pArea').value; 
-  const deedType = document.getElementById('pDeed').value;
-  const rooms = document.getElementById('pRooms').value.trim(); 
-  const image = tempPropImageBase64; // أخذ الصورة المحولة (المباشرة)
-  const desc = document.getElementById('pDesc').value.trim();
-
-  let icon = type==='شقة'?'🏢':type==='أرض'?'🏞️':type==='محل'?'🏪':'🏠';
-  office.listings.unshift({ type, action, district, price, area, deedType, rooms, image, desc, icon });
-  
-  saveOffices(offices); 
-  alert("🎉 تم نشر العقار بنجاح في الدليل (متضمناً الصورة المباشرة)!"); 
-  closeAddPropModal(); renderOfficeDashboard(); e.target.reset();
-}
-
-function deletePropertyFromOffice(index) {
-  if(confirm("تأكيد حذف الإعلان؟")) {
-    const session = JSON.parse(localStorage.getItem(SESSION_KEY)); let offices = getOffices(); let office = offices.find(o => o.id === session.officeId);
-    if(office && office.listings) { office.listings.splice(index, 1); saveOffices(offices); renderOfficeDashboard(); }
-  }
+  // فتح الواتساب في نافذة جديدة
+  const whatsappUrl = `https://wa.me/${adminWhatsAppNumber}?text=${message}`;
+  window.open(whatsappUrl, '_blank');
 }
 
 document.addEventListener('DOMContentLoaded', checkSession);
