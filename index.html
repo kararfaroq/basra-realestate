@@ -129,8 +129,40 @@
     /* تنسيقات المستشار العقاري الذكي مفصولة بالكامل في ملف ai-advisor.js لتسريع وتأمين ملف الواجهة */
 
     @media(max-width:700px){ .nav-links{display:none} .search-filters { flex-direction: column; width: 100%; border-left: none; } .filter-select { border-left: none; border-bottom: 1px solid rgba(201,168,76,0.15); width: 100%; } .search-btn { width: 100%; } }
-  </style>
+  /* تنسيق زر إضافة عقار العائم للهواتف والشاشات الصغيرة */
+.mobile-add-property-btn {
+    display: none;
+}
+@media (max-width: 768px) {
+    .mobile-add-property-btn {
+        display: flex;
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        z-index: 9999;
+        background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+        color: var(--navy);
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-family: 'Cairo', sans-serif;
+        font-size: 13px;
+        font-weight: bold;
+        text-decoration: none;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        border: 2px solid rgba(255,255,255,0.2);
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    .mobile-add-property-btn:active {
+        transform: scale(0.95);
+    }
+}
+</style>
 </head>
+<link rel="manifest" href="/manifest.json">
 <body>
 <nav class="nav">
   <div class="nav-logo">
