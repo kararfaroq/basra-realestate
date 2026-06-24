@@ -203,20 +203,56 @@
 </div>
 
 <script>
-const listings=[
-  {type:'بيت',action:'للبيع',price:'145 مليون',area:'200 م²',district:'العشار',office:'مكتب الأمانة العقاري',officeId:'1',vip:true,icon:'🏠',color:'#C9A84C'},
-  {type:'شقة',action:'للإيجار',price:'450 ألف/شهر',area:'120 م²',district:'الجمهورية',office:'عقارات الخليج بالبصرة',officeId:'2',vip:false,icon:'🏢',color:'#4A9FD4'},
+// المفتاح الموحد لقاعدة بيانات مشروع البصرة العقاري
+const STORAGE_KEY = 'basra_data_v3';
+
+// العقارات الثابتة الافتراضية بالموقع لكي لا تبدو الصفحة فارغة
+const defaultListings = [
+  {type:'بيت', action:'للبيع', price:'145 مليون', area:'200 م²', district:'العشار', office:'مكتب الأمانة العقاري', officeId:'1', vip:true, icon:'🏠'},
+  {type:'شقة', action:'للإيجار', price:'450 ألف/شهر', area:'120 م²', district:'الجمهورية', office:'عقارات الخليج بالبصرة', officeId:'2', vip:false, icon:'🏢'},
 ];
 
+// دالة ذكية تقوم بجلب وتوليد العقارات بشكل ديناميكي من الذاكرة الحية للمكاتب
+function getAllListings() {
+  let offices = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  let dynamicListings = [...defaultListings];
+
+  // دمج أي عقارات جديدة قام المكتب بنشرها وحفظها من لوحة الإدارة
+  offices.forEach(office => {
+    if(office.id === '1' && office.publishedProps > 1) {
+      // ننشئ كروت العروض الحقيقية بعدد العداد المحفوظ في لوحة التحكم
+      for(let i = 1; i < office.publishedProps; i++) {
+        dynamicListings.unshift({
+          type: 'عقار مضاف حديثاً', 
+          action: 'للبيع / للإيجار', 
+          price: 'يرجى الاتصال بالمكتب', 
+          area: 'مساحة ممتازة', 
+          district: office.area || 'البصرة', 
+          office: office.name, 
+          officeId: office.id, 
+          vip: false, 
+          icon: '🏗️'
+        });
+      }
+    }
+  });
+
+  return dynamicListings;
+}
+
 function renderListings(){
-  const g=document.getElementById('listingGrid');
+  const g = document.getElementById('listingGrid');
   if(!g) return;
-  g.innerHTML=listings.map(l=>`
+  
+  // جلب العقارات بعد دمج التحديثات الديناميكية
+  const currentListings = getAllListings();
+  
+  g.innerHTML = currentListings.map(l => `
     <div class="listing-card">
       <div class="card-img">
         <div class="card-img-placeholder">${l.icon}</div>
         <div class="card-badge badge-sale">${l.action}</div>
-        ${l.vip?'<div class="badge-vip">👑 VIP</div>':''}
+        ${l.vip ? '<div class="badge-vip">👑 VIP</div>' : ''}
       </div>
       <div class="card-body">
         <div class="card-price">${l.price} <span>${l.area}</span></div>
@@ -226,7 +262,7 @@ function renderListings(){
             <div class="office-avatar">م</div>
             <a href="office-profile.html?id=${l.officeId}" style="color:var(--text-on-dark); text-decoration:none; font-weight:700; transition:0.2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-on-dark)'">${l.office}</a>
           </div>
-          <button class="card-btn">اتصال 📞</button>
+          <button class="card-btn" onclick="window.location.href='office-profile.html?id=${l.officeId}'">اتصال 📞</button>
         </div>
       </div>
     </div>
@@ -243,7 +279,7 @@ function submitNewPropertyFromModal() {
   const type = document.getElementById('modalPropType').value;
   if(!area || !price) { alert("يرجى ملء كافة التفاصيل!"); return; }
   
-  listings.unshift({type:type, action:'للبيع', price:price, area:'150 م²', district:area, office:'زائر', officeId:'guest', vip:false, icon:'🏠'});
+  defaultListings.unshift({type:type, action:'للبيع', price:price, area:'150 م²', district:area, office:'زائر', officeId:'guest', vip:false, icon:'🏠'});
   alert("🎉 تم نشر العقار بنجاح في المعرض العام للدليل!");
   closeAddPropertyModal();
   renderListings();
@@ -253,7 +289,10 @@ function scrollToSearch() {
   document.getElementById('search').scrollIntoView({behavior:'smooth'});
 }
 
-renderListings();
+// عرض القائمة عند التحميل الأولي للموقع
+document.addEventListener('DOMContentLoaded', () => {
+  renderListings();
+});
 </script>
 </body>
 </html>
