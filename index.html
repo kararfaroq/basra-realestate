@@ -92,7 +92,7 @@
     .ai-chat-widget { position: fixed; bottom: 25px; left: 25px; z-index: 999; display: flex; flex-direction: column; align-items: flex-start; }
     .ai-chat-btn { padding: 12px 22px; border-radius: 50px; background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: var(--navy); border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 6px 16px rgba(0,0,0,0.4); transition: 0.3s; font-family: 'Cairo', sans-serif; }
     .ai-chat-btn:hover { transform: scale(1.05); }
-    .ai-chat-window { width: 360px; height: 500px; background: var(--navy-mid); border: 2px solid var(--gold); border-radius: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: none; flex-direction: column; overflow: hidden; margin-bottom: 12px; transition: 0.3s; }
+    .ai-chat-window { width: 350px; height: 480px; background: var(--navy-mid); border: 2px solid var(--gold); border-radius: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: none; flex-direction: column; overflow: hidden; margin-bottom: 12px; transition: 0.3s; }
     .ai-chat-header { background: linear-gradient(135deg, var(--navy), var(--navy-light)); border-bottom: 1px solid rgba(201,168,76,0.2); padding: 12px; display: flex; align-items: center; justify-content: space-between; }
     .ai-chat-body { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: rgba(10,22,40,0.3); }
     .ai-msg { max-width: 88%; padding: 10px 14px; border-radius: 10px; font-size: 13px; line-height: 1.6; text-align: right; }
@@ -103,7 +103,7 @@
     .ai-chat-input:focus { border-color: var(--gold); }
     .ai-chat-send { background: var(--gold); border: none; color: var(--navy); width: 36px; height: 36px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; }
 
-    @media(max-width:700px){ .nav-links{display:none} .search-filters { flex-direction: column; width: 100%; border-left: none; } .filter-select { border-left: none; border-bottom: 1px solid rgba(201,168,76,0.15); width: 100%; } .search-btn { width: 100%; } .ai-chat-window { width: 300px; height: 440px; } }
+    @media(max-width:700px){ .nav-links{display:none} .search-filters { flex-direction: column; width: 100%; border-left: none; } .filter-select { border-left: none; border-bottom: 1px solid rgba(201,168,76,0.15); width: 100%; } .search-btn { width: 100%; } .ai-chat-window { width: 295px; height: 420px; } }
   </style>
 </head>
 <body>
@@ -224,10 +224,10 @@
       <button onclick="toggleAiChat()" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-size:16px;">✕</button>
     </div>
     <div class="ai-chat-body" id="aiChatBody">
-      <div class="ai-msg bot">مرحباً أستاذ! 🌴 أنا <b>الخبير العقاري ومستشارك الشخصي (داهية العقارات في البصرة)</b> 😎. <br><br>مهمتي مو بس أبحث الك بحث تقليدي، أنا أقتنص الصفقات واللقطات الاستثمارية بالسوق وأوجهك لأقوى الفرص وأنسب الأسعار.<br><br>💬 <b>اكتبلي هسة شنو تدور ببالك؟</b> (مثال: "بيت لقطة طابو صرف"، "فرصة استثمارية بالعشار"، "شقة رخيصة") وسأعطيك كامل تفاصيل الصفقة مع رقم الهاتف للاتصال المباشر فوراً! 🚀🔥</div>
+      <div class="ai-msg bot">مرحباً بك يا فندم! 🌴 أنا <b>الخبير العقاري ومستشارك الشخصي (داهية العقارات في البصرة)</b> 😎. <br><br>مهمتي ليست مجرد البحث التقليدي، بل صيادة اللقطات الاستثمارية وتوجيهك لأفضل العقارات وبأقل الأسعار. <br><br>💬 <b>اكتب لي الآن ماذا تبحث عنه؟</b> (مثال: "بيت لقطة في العشار"، "فرصة استثمارية"، "شقة رخيصة للإيجار") وسأعطيك كامل معلومات الصفقة ورقم الهاتف للاتصال المباشر فوراً! 🚀🔥</div>
     </div>
     <div class="ai-chat-footer">
-      <input type="text" id="aiChatInput" class="ai-chat-input" placeholder="اسأل داهية العقار، مثال: مشتمل رخيص..." onkeyup="if(event.key === 'Enter') sendAiMessage();">
+      <input type="text" id="aiChatInput" class="ai-chat-input" placeholder="اسأل داهية العقار، مثال: فرصة استثمارية..." onkeyup="if(event.key === 'Enter') sendAiMessage();">
       <button onclick="sendAiMessage()" class="ai-chat-send"><i class="ti ti-send"></i></button>
     </div>
   </div>
@@ -239,6 +239,7 @@
 
 <script>
 const STORAGE_KEY = 'basra_data_v3';
+// تم تزويد العقارات بأرقام هواتف لتسويقها مباشرة عبر المستشار الذكي
 let defaultListings = [
   {type:'بيت', action:'للبيع', price:'145 مليون', area:'200', district:'العشار', deedType:'طابو صرف (ملك)', rooms:'4', desc:'بيت بناء حديث درجة أولى قرب الشارع التجاري، جاهز للسكن.', office:'مكتب الأمانة العقاري', officeId:'1', vip:true, icon:'🏠', image:'', phone:'07701112223'},
   {type:'شقة', action:'للإيجار', price:'450 ألف/شهر', area:'120', district:'الجمهورية', deedType:'طابو صرف', rooms:'2', desc:'شقة مؤثثة بالكامل ضمن مجمع آمن مع موقف للسيارات.', office:'عقارات الخليج بالبصرة', officeId:'2', vip:false, icon:'🏢', image:'', phone:'07804445556'},
@@ -328,7 +329,7 @@ function submitNewPropertyFromModal() {
 }
 function scrollToSearch() { document.getElementById('search').scrollIntoView({behavior:'smooth'}); }
 
-// --- ذكاء المستشار العقاري المطور (داهية التسويق والردود البصرية) ---
+// --- ذكاء المستشار العقاري المطور (داهية التسويق والردود) ---
 function toggleAiChat() {
   const win = document.getElementById('aiChatWindow');
   win.style.display = (win.style.display === 'flex') ? 'none' : 'flex';
@@ -348,58 +349,47 @@ function sendAiMessage() {
     let reply = "";
     const allListings = getAllListings();
     const txtLower = txt.toLowerCase();
-    
-    // فلترة مرنة للبحث عبر الكلمات الدلالية
-    const found = allListings.filter(l => 
-      txtLower.includes(l.district.toLowerCase()) || 
-      txtLower.includes(l.type.toLowerCase()) || 
-      txtLower.includes(l.action.toLowerCase()) ||
-      (txtLower.includes('رخيص') && (l.price.includes('ألف') || parseInt(l.price) < 200))
-    );
+    const found = allListings.filter(l => txtLower.includes(l.district.toLowerCase()) || txtLower.includes(l.type.toLowerCase()) || txtLower.includes(l.action.toLowerCase()));
 
-    // التحليل والذكاء الاستراتيجي وصياغة رد داهية محترف
+    // تحليل ذكي للمناطق والطلبات لصياغة رد تسويقي مقنع (داهية عقاري)
     let marketingIntro = "";
     if(txtLower.includes('العشار')) {
-      marketingIntro = "🔥 <b>تحليل الداهية:</b> منطقة العشار هي الشريان التجاري والقلب النابض للبصرة! شراء العقار هناك يعتبر استثماراً من ذهب وعوائده مضمونة جداً بسبب الحركة المستمرة. صيدت الك هذه العروض المتاحة فوراً أستاذ:<br><br>";
+      marketingIntro = "🔥 <b>تحليل الداهية:</b> منطقة العشار هي الشريان التجاري النابض في البصرة! شراء العقار هناك يعتبر استثماراً من ذهب وعوائده مضمونة جداً. إليك أفضل الفرص المتاحة فوراً:<br><br>";
     } else if(txtLower.includes('المعقل')) {
-      marketingIntro = "🌳 <b>تحليل الداهية:</b> المعقل التاريخية.. الهدوء، الشوارع الفسيحة والتنظيم الإنجليزي العريق. الطلب عليها في تصاعد جنوني والفرص هناك ما تتفوت. تفضل أفضل العروض أستاذ:<br><br>";
+      marketingIntro = "🌳 <b>تحليل الداهية:</b> المعقل التاريخية.. حيث الهدوء، الشوارع الواسعة، والتنظيم المتميز. الطلب عليها في تصاعد مستمر والفرص هناك لا تفوت! تفضل العروض المتاحة:<br><br>";
     } else if(txtLower.includes('الجمهورية')) {
-      marketingIntro = "📍 <b>تحليل الداهية:</b> منطقة الجمهورية خيار استراتيجي ممتاز لقربها من الخدمات المركزية والأسواق الحيوية، مثالية جداً للسكن العائلي المستقر أو التأجير المربح. إليك الصفقات المتاحة هسة أستاذ:<br><br>";
-    } else if(txtLower.includes('طابو') || txtLower.includes('ملك') || txtLower.includes('صرف')) {
-      marketingIntro = "🔒 <b>توجيه استثماري أمن:</b> بحثك عن (الطابو الملك الصرف) يدل على وعي عقاري كبير! هذا هو الاستثمار المضمون 100% في البصرة. لقد تتبعت لك العروض ذات السندات القانونية القطعية المتاحة حالياً أستاذ:<br><br>";
-    } else if(txtLower.includes('استثمار') || txtLower.includes('فرصة') || txtLower.includes('رخيص') || txtLower.includes('لقطة') || txtLower.includes('مشتمل')) {
-      marketingIntro = "💰 <b>سر عقاري حصرّي من الداهية:</b> في سوق البصرة الواعد، الأسعار اللقطة والمشتملات الرخيصة تُقنص في الساعات الأولى من نزولها! تفضل هذه الصفقات الاستثنائية التي نوصي بها بشدة قبل الارتفاع المتوقع للأسعار أستاذ:<br><br>";
+      marketingIntro = "📍 <b>تحليل الداهية:</b> منطقة الجمهورية خيار استراتيجي ممتاز لقربها من الخدمات والأسواق الحيوية، مثالية جداً للسكن العائلي المستقر. إليك الخيارات:<br><br>";
+    } else if(txtLower.includes('استثمار') || txtLower.includes('فرصة') || txtLower.includes('رخيص') || txtLower.includes('ارخص') || txtLower.includes('لقطة')) {
+      marketingIntro = "💰 <b>سر عقاري حصرّي:</b> في عقارات البصرة، الفرص الذهبية والأسعار اللقطة يتم قنصها في الساعات الأولى! تفضل هذه الخيارات التي نوصي بها بشدة للاستثمار المربح:<br><br>";
     }
 
-    // صياغة الردود بناءً على مدخلات الزائر
-    if(txtLower.includes('مرحبا') || txtLower.includes('اهلين') || txtLower.includes('السلام') || txtLower.includes('هلا') || txtLower.includes('شلونك')) {
-      reply = "أهلاً ومرحباً بك أستاذنا العزيز! 😎 معكم <b>الداهية العقاري</b> مستشارك الخاص الذي يمتلك خريطة عقارات البصرة بالكامل في رأسه. <br><br>أنا لست مجرد أداة بحث، أنا صياد صفقات حصرية لا تظهر للعلن بسهولة! أخبرني أستاذ، ما هي المنطقة، المساحة، أو الميزانية التي تدور في بالك الآن؟ وسأدهشك بأقوى الفرص المباشرة مع أرقام الهواتف فورا!";
+    if(txtLower.includes('مرحبا') || txtLower.includes('اهلين') || txtLower.includes('السلام')) {
+      reply = "أهلاً ومرحباً بك يا فندم! 😎 معكم <b>الداهية العقاري</b> مستشارك الذي لا ينام حتى يجد لك أفضل عقار بأرخص سعر في البصرة. <br><br>أنا لست مجرد محرك بحث، أنا صياد صفقات حصرية! أخبرني بصراحة، ما هي المساحة أو المنطقة والميزانية التي تدور في بالك الآن؟ وسأدهشك بالنتائج المباشرة مع أرقام الهواتف!";
     } else if(txtLower.includes('باقة') || txtLower.includes('اسعار') || txtLower.includes('اشتراك')) {
-      reply = "💡 <b>نصيحة تسويقية من الخبير:</b> إذا كنت صاحب مكتب عقاري بالبصرة، فالبقاء بدون اشتراك يضيع عليك مئات الزبائن الباحثين يومياً! أنصحك فوراً باكتساح السوق عبر <b>الباقة الذهبية VIP</b> لتظهر عقاراتك في الصدارة بعلامة الملوك (👑) وتكسب ثقة المشتري فوراً، أو ابدأ بـ <b>الباقة الاقتصادية</b> بـ 25 ألف فقط شهرياً!";
+      reply = "💡 <b>نصيحة تسويقية من الخبير:</b> إذا كنت صاحب مكتب عقاري، فالبقاء بدون اشتراك يضيع عليك مئات الزبائن الباحثين يومياً! أنصحك فوراً بـ <b>الباقة الذهبية VIP</b> لتظهر عقاراتك في الصدارة بعلامة الملوك (👑)، أو ابدأ بـ <b>الباقة الاقتصادية</b> بـ 25 ألف فقط شهرياً لتبدأ باكتساح السوق العقاري في البصرة!";
     } else if(txtLower.includes('انشر') || txtLower.includes('اعلان') || txtLower.includes('اضيف')) {
-      reply = "🚀 <b>تريد تسوق لعقارك وتبيعه بسرعة صاروخية؟</b> منصتنا توفر لك وصولاً مباشراً لآلاف المشترين المستعدين للدفع كاش! اضغط على الزر بالأسفل لتعبئة تفاصيل عقارك فوراً كزائر، واترك لي مهمة إقناع الزوار بذكاء وروعة الردود!<br><button onclick='openAddPropertyModal()' style='background:var(--gold); border:none; padding:8px 14px; border-radius:6px; font-weight:700; font-family:Cairo; margin-top:8px; cursor:pointer; color:var(--navy); font-size:12px; box-shadow:0 4px 10px rgba(0,0,0,0.2);'>➕ افتح نافذة النشر السريع</button>";
+      reply = "🚀 <b>تبي تسوق لعقارك وتبيعه بسرعة صاروخية؟</b> منصتنا توفر لك وصولاً لآلاف المشترين يومياً مجاناً! اضغط على الزر بالأسفل لتعبئة تفاصيل عقارك، واترك لي مهمة تسويقه وإقناع الزوار بذكاء!<br><button onclick='openAddPropertyModal()' style='background:var(--gold); border:none; padding:8px 14px; border-radius:6px; font-weight:700; font-family:Cairo; margin-top:8px; cursor:pointer; color:var(--navy); font-size:12px; box-shadow:0 4px 10px rgba(0,0,0,0.2);'>➕ افتح نافذة النشر السريع</button>";
     } else if(found.length > 0) {
-      reply = marketingIntro ? marketingIntro : `🎯 <b>صيد ثمين أستاذ!</b> قمت بفحص السوق فوراً ووجدت لك <b>(${found.length})</b> عرض عقاري استراتيجي يطابق طلبك تماماً وبأعلى عوائد استثمارية:<br><br>`;
+      reply = marketingIntro ? marketingIntro : `🎯 <b>صيد ثمين!</b> قمت بفحص السوق فوراً ووجدت لك <b>(${found.length})</b> عرض عقاري ممتاز يعتبر صفقة استراتيجية لطلبك:<br><br>`;
       
       found.slice(0, 3).forEach(f => {
         reply += `
           <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:10px; margin-bottom:10px; border-right:4px solid var(--gold); border-top:1px solid rgba(201,168,76,0.15);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
               <span style="font-weight:700; color:#fff;">${f.icon} ${f.type} (${f.action})</span>
-              <span style="background:rgba(76,175,125,0.2); color:var(--success); padding:1px 6px; border-radius:4px; font-size:11px; font-weight:700;">💯 صفقة لقطة</span>
+              <span style="background:rgba(76,175,125,0.2); color:var(--success); padding:1px 6px; border-radius:4px; font-size:11px; font-weight:700;">💯 لقطة</span>
             </div>
             📍 <b>الموقع:</b> في قلب منطقة ${f.district}<br>
-            💰 <b>السعر الاستراتيجي:</b> <span style="color:var(--gold); font-weight:900; font-size:14px;">${f.price}</span> (بمساحة ${f.area}م² / سند ${f.deedType})<br>
-            🏢 <b>المكتب المسؤول:</b> ${f.office}<br>
-            📞 <a href="tel:${f.phone}" style="color:var(--navy); text-decoration:none; font-weight:900; display:inline-block; margin-top:8px; background:var(--gold); padding:4px 14px; border-radius:6px; font-size:12px; transition:0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2);"><i class="ti ti-phone"></i> اتصل فوراً بالوكيل: ${f.phone}</a>
+            💰 <b>السعر الاستراتيجي:</b> <span style="color:var(--gold); font-weight:900; font-size:14px;">${f.price}</span> (مساحة ${f.area}م²)<br>
+            🏢 <b>الجهة المسؤولة:</b> ${f.office}<br>
+            📞 <a href="tel:${f.phone}" style="color:var(--navy); text-decoration:none; font-weight:900; display:inline-block; margin-top:6px; background:var(--gold); padding:4px 12px; border-radius:6px; font-size:12px; transition:0.2s;"><i class="ti ti-phone"></i> اتصل فوراً بالوكيل: ${f.phone}</a>
           </div>
         `;
       });
-      reply += `<br>🔮 **ملاحظة تسويقية:** قمت أيضاً بتصفية المعرض العام أسفل الموقع تلقائياً ليعرض لك هذه الصفقات بشكل مرئي ومفصل لتتأملها براحتك أستاذ!`;
+      reply += `<br>🔮 **ملاحظة تسويقية:** قمت أيضاً بتصفية المعرض العام أسفل الموقع تلقائياً ليعرض لك هذه الصفقات بشكل مرئي ومفصل. تصفحها الآن ولا تتردد بالاتصال فوراً بالأرقام المرفقة قبل أن يسبقك مستثمر آخر!`;
       renderListings(found);
     } else {
-      // في حال عدم وجود تطابق، يظهر النص المطلوب ورقم الهاتف الخاص بالإدارة بدقة
-      reply = "🧐 **تحليل ذكي من الداهية:** لم أجد حالياً عقاراً مسجلاً يطابق هذه الكلمات بالتحديد في قاعدة البيانات العامة، ولكن الفرص في سوق البصرة تتحدث على مدار الساعة!<br><br>💡 **نصيحة مستشار:** حاول كتابة اسم منطقة رئيسية في البصرة بدقة (مثل: العشار، المعقل، الجمهورية)، أو تصفح المعرض العام بالأسفل.<br><br><b>يمكنك الاستفسار اكثر من ادارة الموقع</b> مباشرة لنوفر لك طلبك بشكل خاص وحصري عبر الهاتف:<br><a href='tel:07719994201' style='display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg, var(--gold), var(--gold-dark)); color:var(--navy); padding:8px 16px; border-radius:6px; font-weight:900; font-size:14px; text-decoration:none; margin-top:10px; box-shadow:0 4px 10px rgba(0,0,0,0.3);'><i class="ti ti-phone-call"></i> إضغط للاتصال بالإدارة: 07719994201</a>";
+      reply = "🧐 **ذكاء تسويقي:** لم أجد عقاراً يطابق هذه الكلمات بالتحديد في هذه اللحظة، ولكن سوق البصرة يتحرك بسرعة البرق!<br><br>💡 **نصيحة مستشار:** أنصحك بكتابة اسم منطقة رئيسية مثل (العشار، المعقل، الجمهورية) أو تصفح المعرض العام بالأسفل لرؤية أحدث ما نزل في السوق اليوم، أو اترك لي رسالة بطلبك وميزانيتك وسأقوم بصيادتها وتوفيرها لك فوراً!";
     }
 
     body.innerHTML += `<div class="ai-msg bot">${reply}</div>`;
