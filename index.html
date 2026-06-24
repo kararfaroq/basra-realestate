@@ -632,8 +632,58 @@ function resetVisitorForm() {
 }
 
 function submitNewOffice() {
-  alert("✅ تم تقديم طلب تسجيل مكتبك بنجاح! بانتظار موافقة الرقابة الإدارية.");
+  const name     = document.getElementById('regOfficeName').value.trim();
+  const phone    = document.getElementById('regOfficePhone').value.trim();
+  const district = document.getElementById('regOfficeDistrict').value.trim();
+  const pkg      = document.getElementById('regOfficePkg').value;
+  const pass     = document.getElementById('regOfficePass').value.trim();
+
+  if (!name || !phone || !pass) {
+    alert("⚠️ يرجى ملء اسم المكتب ورقم الهاتف وكلمة المرور على الأقل.");
+    return;
+  }
+
+  // قراءة المكاتب الموجودة
+  let offices = [];
+  try { offices = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { offices = []; }
+
+  // التحقق من عدم تكرار رقم الهاتف
+  if (offices.find(o => o.phone === phone)) {
+    alert("⚠️ رقم الهاتف هذا مسجّل مسبقاً. يرجى تسجيل الدخول من بوابة المكاتب.");
+    return;
+  }
+
+  // إنشاء كائن المكتب الجديد
+  const newOffice = {
+    id: 'office_' + Date.now(),
+    name, phone, district, pkg, pass,
+    listings: [],
+    createdAt: new Date().toISOString()
+  };
+
+  offices.push(newOffice);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(offices));
+
   closeRegisterModal();
+
+  // مسح الحقول
+  ['regOfficeName','regOfficePhone','regOfficeDistrict','regOfficePass'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('regOfficePkg').value = 'free';
+  document.getElementById('logoPreviewCircle').innerHTML = '<i class="ti ti-building-store"></i>';
+
+  // تحديث عداد المكاتب
+  const counter = document.getElementById('count-offices');
+  if (counter) counter.textContent = offices.length + 140;
+
+  // رسالة نجاح مع توجيه لصفحة التسجيل الكاملة
+  const goRegister = confirm(
+    "🎉 تم تسجيل مكتبك بنجاح!\n\nاسم المكتب: " + name +
+    "\nالباقة: " + pkg +
+    "\n\nهل تريد الانتقال إلى صفحة إكمال بيانات مكتبك؟"
+  );
+  if (goRegister) window.location.href = 'register.html';
 }
 
 // دوال المستشار العقاري الذكي (toggleAiChat / sendAiMessage) أصبحت في ملف ai-advisor.js المستقل
