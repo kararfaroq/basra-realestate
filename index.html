@@ -11,9 +11,12 @@
     :root { --gold: #C9A84C; --gold-light: #E8C96A; --navy: #0A1628; --navy-mid: #1A3A5C; --navy-light: #2A5080; --text-on-dark: #F5F0E8; --text-muted: #8BA0B8; --success: #4CAF7D; --danger: #ff4d4d; --warning: #ff9800; }
     body { background: var(--navy); color: var(--text-on-dark); direction: rtl; min-height: 100vh; padding-bottom: 3rem; }
     
+    /* حل مشكلة القوائم المنسدلة البيضاء */
+    select option { background-color: var(--navy-mid); color: #fff; }
+    
     .login-container { max-width: 420px; margin: 10vh auto; padding: 2rem; }
     .login-card { background: var(--navy-mid); border: 2px solid var(--gold); border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    .dash-header { background: var(--navy-mid); border-bottom: 1px solid rgba(201,168,76,0.2); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .dash-header { background: var(--navy-mid); border-bottom: 1px solid rgba(201,168,76,0.2); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 10px;}
     .user-badge { background: rgba(201,168,76,0.15); border: 1px solid var(--gold); padding: 6px 16px; border-radius: 8px; color: var(--gold); font-weight: 700; font-size: 14px; }
     
     .main-wrapper { max-width: 1250px; margin: 0 auto; padding: 0 1.5rem; }
@@ -34,7 +37,7 @@
     .btn-gold:hover { background: var(--gold-light); transform:translateY(-1px); }
     .btn-danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
     .btn-danger:hover { background: var(--danger); color: #fff; }
-    .btn-success { background: #25D366; color: #fff; } /* لون واتساب */
+    .btn-success { background: #25D366; color: #fff; }
     .btn-success:hover { background: #128C7E; }
     
     .table-container { overflow-x: auto; margin-top: 1rem; }
@@ -76,11 +79,14 @@
       <h1 style="font-size: 20px; font-weight: 900; color: #fff;">لوحة تحكم <span style="color:var(--gold);">النظام</span></h1>
       <div id="userBadgeDisplay" class="user-badge">مرحباً بك</div>
     </div>
-    <button onclick="handleLogout()" class="btn btn-danger"><i class="ti ti-logout"></i> خروج</button>
+    
+    <div style="display: flex; gap: 10px;">
+      <a href="index.html" class="btn" style="background: rgba(255,255,255,0.1); color: #fff;"><i class="ti ti-home"></i> الرئيسية</a>
+      <button onclick="handleLogout()" class="btn btn-danger"><i class="ti ti-logout"></i> خروج</button>
+    </div>
   </header>
 
   <main class="main-wrapper">
-    
     <div id="adminView" style="display: none;">
       <div class="grid-stats">
         <div class="stat-card"><div class="stat-icon"><i class="ti ti-building-community"></i></div><div><div style="font-size:13px; color:var(--text-muted);">المكاتب</div><h3 id="statTotalOffices" style="font-size:22px; font-weight:900;">0</h3></div></div>
@@ -99,7 +105,6 @@
     </div>
 
     <div id="officeView" style="display: none;">
-      
       <div id="officeExpiryBanner" style="background:rgba(201,168,76,0.05); border:1px solid rgba(201,168,76,0.3); padding:15px 20px; border-radius:12px; margin-bottom:1.5rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
          <div>
            <div style="font-size:14px; margin-bottom: 5px;"><i class="ti ti-info-circle" style="color:var(--gold);"></i> باقتك الحالية: <strong id="lblOfficePkg" style="color:var(--gold);">...</strong></div>
@@ -166,7 +171,6 @@
   </div>
 </div>
 
-
 <script>
 const STORAGE_KEY = 'basra_data_v3';
 const SESSION_KEY = 'basra_session_v3';
@@ -228,7 +232,6 @@ function renderAdminDashboard() {
       <td><span class="badge" style="background:rgba(201,168,76,0.2); color:#fff;">${o.pkg}</span></td>
       <td><span class="badge ${o.status === 'active' ? 'bg-success' : 'bg-danger'}">${o.status}</span></td>
       <td style="font-family:monospace; font-size:12px;">${o.expiry}</td>
-      
       <td>
         <select class="input-control" style="padding:4px; font-size:11px; width:auto;" onchange="changePackageByAdmin('${o.id}', this.value)">
           <option value="free" ${o.pkg === 'free' ? 'selected' : ''}>مجانية</option>
@@ -251,7 +254,6 @@ function renderAdminDashboard() {
   `).join('');
 }
 
-// دوال إدارة المشرف (Admin Functions)
 function changePackageByAdmin(id, newPkg) {
   let offices = getOffices(); let idx = offices.findIndex(x => x.id === id);
   if(idx !== -1) {
@@ -276,7 +278,6 @@ function toggleOfficeStatus(id) {
   let offices = getOffices(); let o = offices.find(x => x.id === id);
   if(o) { o.status = o.status === 'active' ? 'suspended' : 'active'; saveOffices(offices); renderAdminDashboard(); }
 }
-
 function deleteOffice(id){ if(confirm('تأكيد حذف المكتب؟')) { saveOffices(getOffices().filter(o=>o.id!==id)); renderAdminDashboard(); } }
 
 function getCurrentOffice() {
@@ -288,10 +289,8 @@ function getCurrentOffice() {
 function renderOfficeDashboard() {
   const currentOffice = getCurrentOffice();
   if(!currentOffice) return;
-  
   document.getElementById('lblOfficePkg').textContent = currentOffice.pkg === 'gold' ? 'الذهبية VIP' : currentOffice.pkg === 'eco' ? 'الاقتصادية' : 'المجانية';
   document.getElementById('lblOfficeExpiry').textContent = currentOffice.expiry;
-
   const tBody = document.getElementById('officePropsTable');
   if(!currentOffice.listings || currentOffice.listings.length === 0) {
     tBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">لا توجد عقارات</td></tr>`; return;
@@ -331,20 +330,12 @@ function submitNewPropFromOffice(e){
   saveOffices(o); alert('تم النشر'); closeAddPropModal(); renderOfficeDashboard();
 }
 
-// ---------------- وظيفة التجديد الذكي والآمن عبر الواتساب ----------------
 function contactAdminForRenewal() {
   const currentOffice = getCurrentOffice();
   if(!currentOffice) return;
-
-  // 🔴 تنبيه هام: ضع رقم هاتفك (الواتساب) الحقيقي للإدارة هنا بدلاً من الاصفار! (بدون علامة +)
-  const adminWhatsAppNumber = "9647719994201"; 
-  
-  // تجهيز الرسالة تلقائياً ليتم إرسالها لك
+  const adminWhatsAppNumber = "9647700000000"; // 🔴 ضع رقمك الحقيقي هنا
   const message = `مرحباً إدارة دليل البصرة العقاري،%0Aأود تجديد أو ترقية باقة اشتراك مكتبي.%0A%0A🏢 اسم المكتب: ${currentOffice.name}%0A📱 رقم الهاتف: ${currentOffice.phone}%0A📦 الباقة الحالية: ${currentOffice.pkg === 'gold' ? 'الذهبية' : currentOffice.pkg === 'eco' ? 'الاقتصادية' : 'المجانية'}%0A%0Aيرجى تزويدي بتفاصيل الدفع (زين كاش / حوالة).`;
-  
-  // فتح الواتساب في نافذة جديدة
-  const whatsappUrl = `https://wa.me/${adminWhatsAppNumber}?text=${message}`;
-  window.open(whatsappUrl, '_blank');
+  window.open(`https://wa.me/${adminWhatsAppNumber}?text=${message}`, '_blank');
 }
 
 document.addEventListener('DOMContentLoaded', checkSession);
