@@ -8,16 +8,8 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap');
     *{margin:0;padding:0;box-sizing:border-box}
-    :root{
-      --gold:#C9A84C;--gold-light:#E8C96A;--gold-dark:#A07830;
-      --navy:#0A1628;--navy-mid:#1A3A5C;--navy-light:#2A5080;
-      --sand:#F5F0E8;--water:#E8F4F8;--white:#ffffff;
-      --text-on-dark:#F5F0E8;--text-muted:#8BA0B8;
-      --success:#4CAF7D;--danger:#ff4d4d;--warning:#ff9800;
-    }
+    :root{ --gold:#C9A84C;--gold-light:#E8C96A;--gold-dark:#A07830; --navy:#0A1628;--navy-mid:#1A3A5C;--navy-light:#2A5080; --text-on-dark:#F5F0E8;--text-muted:#8BA0B8; --success:#4CAF7D;--danger:#ff4d4d;--warning:#ff9800;}
     body{font-family:'Cairo',sans-serif;background:var(--navy);color:var(--text-on-dark);direction:rtl;overflow-x:hidden}
-
-    /* NAV */
     .nav{background:rgba(10,22,40,0.95);border-bottom:1px solid rgba(201,168,76,0.2);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
     .nav-logo{display:flex;align-items:center;gap:10px}
     .nav-logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--navy)}
@@ -27,12 +19,7 @@
     .nav-links a{color:var(--text-muted);text-decoration:none;font-size:14px;transition:color .2s}
     .nav-links a:hover{color:var(--gold)}
     .btn-add-prop{background:transparent; color:var(--gold); border:1px solid var(--gold); padding:7px 16px; border-radius:6px; font-size:13px; font-weight:700; cursor:pointer; font-family:'Cairo'; transition:0.2s;}
-    .btn-add-prop:hover{background:rgba(201,168,76,0.1);}
-    
     .nav-cta {background:var(--gold); color:var(--navy); padding:8px 16px; border-radius:8px; border:none; font-weight:700; cursor:pointer; font-family:'Cairo'; transition: 0.2s; font-size: 14px;}
-    .nav-cta:hover {background: var(--gold-light);}
-
-    /* HERO */
     .hero{min-height:92vh;background:var(--navy);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 2rem;overflow:hidden}
     .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(201,168,76,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.07) 1px,transparent 1px);background-size:60px 60px}
     .hero-glow{position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(201,168,76,0.08) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-60%);pointer-events:none}
@@ -42,41 +29,30 @@
     .hero-subtitle{font-size:1.1rem;color:var(--text-muted);text-align:center;max-width:560px;line-height:1.8;margin-bottom:2.5rem}
     .hero-actions{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-bottom:3.5rem}
     .btn-primary{background:var(--gold);color:var(--navy);padding:14px 32px;border-radius:8px;font-size:16px;font-weight:700;border:none;cursor:pointer;font-family:'Cairo',sans-serif;transition:all .2s}
-    .btn-primary:hover{background:var(--gold-light);transform:translateY(-1px)}
     .btn-secondary{background:transparent;color:var(--text-on-dark);padding:14px 32px;border-radius:8px;font-size:16px;font-weight:600;border:1px solid rgba(255,255,255,0.2);cursor:pointer;font-family:'Cairo',sans-serif;transition:all .2s}
-    .btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
     .hero-stats{display:flex;gap:3rem;justify-content:center;flex-wrap:wrap}
     .stat{text-align:center}
     .stat-num{font-size:2rem;font-weight:900;color:var(--gold)}
     .stat-label{font-size:13px;color:var(--text-muted);margin-top:2px}
-
-    /* SEARCH BAR */
     .search-section{background:var(--navy-mid);padding:2.5rem 2rem;border-top:1px solid rgba(201,168,76,0.15);border-bottom:1px solid rgba(201,168,76,0.15)}
     .search-container{max-width:900px;margin:0 auto}
     .search-label{font-size:14px;color:var(--text-muted);margin-bottom:0.8rem;font-weight:500}
     .search-box{background:rgba(255,255,255,0.06);border:1.5px solid rgba(201,168,76,0.25);border-radius:12px;display:flex;align-items:center;overflow:hidden;transition:border-color .2s;flex-wrap:wrap;}
-    .search-box:focus-within{border-color:var(--gold)}
     .search-filters{display:flex;border-left:1px solid rgba(201,168,76,0.2);flex-wrap:nowrap}
     .filter-select{background:transparent;border:none;color:var(--text-on-dark);padding:0 16px;height:54px;font-size:14px;font-family:'Cairo',sans-serif;cursor:pointer;border-left:1px solid rgba(201,168,76,0.15);outline:none;min-width:130px}
     .filter-select option{background:var(--navy-mid);color:var(--text-on-dark)}
     .search-input-wrap{flex:1;display:flex;align-items:center;padding:0 1rem;gap:8px;min-width:200px;}
     .search-input-wrap i{color:var(--text-muted);font-size:18px}
     .search-input{background:transparent;border:none;color:var(--text-on-dark);font-size:15px;font-family:'Cairo',sans-serif;outline:none;width:100%;padding:0 4px}
-    .search-input::placeholder{color:var(--text-muted)}
-    .search-btn{background:var(--gold);color:var(--navy);border:none;height:54px;padding:0 24px;font-size:15px;font-weight:700;font-family:'Cairo',sans-serif;cursor:pointer;transition:background .2s;white-space:nowrap}
-    .search-btn:hover{background:var(--gold-light)}
+    .search-btn{background:var(--gold);color:var(--navy);border:none;height:54px;padding:0 24px;font-size:15px;font-weight:700;font-family:'Cairo',sans-serif;cursor:pointer;}
     .search-tags{display:flex;gap:0.6rem;margin-top:1rem;flex-wrap:wrap}
-    .search-tag{background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);color:var(--gold);padding:5px 14px;border-radius:100px;font-size:13px;cursor:pointer;transition:all .2s}
-    .search-tag:hover{background:rgba(201,168,76,0.2)}
-
-    /* LISTINGS */
+    .search-tag{background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);color:var(--gold);padding:5px 14px;border-radius:100px;font-size:13px;cursor:pointer;}
     .listings-section{padding:0 2rem 3rem;max-width:1100px;margin:0 auto; margin-top: 3rem;}
     .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
     .section-title{font-size:1.5rem;font-weight:700}
     .section-title span{color:var(--gold)}
     .listing-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.2rem}
     .listing-card{background:var(--navy-mid);border:1px solid rgba(201,168,76,0.12);border-radius:14px;overflow:hidden;cursor:pointer;transition:all .25s;position:relative}
-    .listing-card:hover{border-color:rgba(201,168,76,0.4);transform:translateY(-3px)}
     .card-img{height:170px;background:var(--navy-light);position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
     .card-img-placeholder{font-size:2.5rem;opacity:0.3}
     .card-badge{position:absolute;top:10px;right:10px;padding:4px 12px;border-radius:100px;font-size:11px;font-weight:700}
@@ -89,238 +65,142 @@
     .card-footer{border-top:1px solid rgba(255,255,255,0.06);padding-top:10px;display:flex;align-items:center;justify-content:space-between}
     .card-office{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted)}
     .office-avatar{width:22px;height:22px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--navy)}
-    .card-btn{border:1px solid rgba(201,168,76,0.3);background:transparent;color:var(--gold);padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-family:'Cairo',sans-serif;transition:all .2s;display:flex;align-items:center;gap:4px}
-    .card-btn:hover{background:rgba(201,168,76,0.12)}
-    
+    .card-btn{border:1px solid rgba(201,168,76,0.3);background:transparent;color:var(--gold);padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-family:'Cairo',sans-serif;}
     .empty-search {grid-column: 1 / -1; text-align: center; padding: 4rem; background: rgba(255,255,255,0.02); border-radius: 14px; border: 1px dashed rgba(201,168,76,0.3); color: var(--text-muted);}
-
-    /* MODAL AND INPUTS */
     .input-field-modal{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:12px 16px;color:var(--text-on-dark);font-family:'Cairo';font-size:14px;outline:none;margin-bottom:15px;}
-    .input-field-modal:focus{border-color:var(--gold);background:rgba(255,255,255,0.08);}
-    .btn-close-danger-modal{width:100%;background:transparent;color:var(--danger);border:1px solid var(--danger);border-radius:8px;padding:12px;font-size:14px;font-weight:700;font-family:'Cairo';cursor:pointer;margin-top:10px;transition:0.2s;}
-    .btn-close-danger-modal:hover{background:var(--danger);color:white;}
-    .modal-close-top-btn {position:absolute;top:15px;left:15px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text-muted);width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:0.2s;z-index: 10;}
-    .modal-close-top-btn:hover {color:var(--danger);background:rgba(255,77,77,0.1);border-color:var(--danger);}
-
-    @media(max-width:700px){
-      .nav-links{display:none}
-      .search-filters { flex-direction: column; width: 100%; border-left: none; }
-      .filter-select { border-left: none; border-bottom: 1px solid rgba(201,168,76,0.15); width: 100%; }
-      .search-btn { width: 100%; }
-    }
+    .btn-close-danger-modal{width:100%;background:transparent;color:var(--danger);border:1px solid var(--danger);border-radius:8px;padding:12px;font-size:14px;font-weight:700;font-family:'Cairo';cursor:pointer;margin-top:10px;}
+    .modal-close-top-btn {position:absolute;top:15px;left:15px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text-muted);width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+    @media(max-width:700px){ .nav-links{display:none} .search-filters { flex-direction: column; width: 100%; border-left: none; } .filter-select { border-left: none; border-bottom: 1px solid rgba(201,168,76,0.15); width: 100%; } .search-btn { width: 100%; } }
   </style>
 </head>
 <body>
-
 <nav class="nav">
   <div class="nav-logo">
     <div class="nav-logo-icon">ب</div>
     <div class="nav-logo-text">دليل البصرة العقاري<span>أكبر منصة عقارية في البصرة</span></div>
   </div>
-  <div class="nav-links">
-    <a href="#">العقارات</a>
-    <a href="#">المكاتب</a>
-    <a href="#search">البحث الذكي</a>
-    <button class="btn-add-prop" onclick="openAddPropertyModal()">➕ أضف عقارك كزائر</button>
-  </div>
+  <div class="nav-links"><a href="#">العقارات</a><a href="#">المكاتب</a><a href="#search">البحث الذكي</a><button class="btn-add-prop" onclick="openAddPropertyModal()">➕ أضف عقارك كزائر</button></div>
   <button class="nav-cta" onclick="window.location.href='admin.html'">تسجيل الدخول للمكاتب</button>
 </nav>
 
 <section class="hero">
-  <div class="hero-grid"></div>
-  <div class="hero-glow"></div>
+  <div class="hero-grid"></div><div class="hero-glow"></div>
   <div style="position:relative;z-index:2;text-align:center;width:100%">
     <div class="hero-badge">🏆 منصة الرقابة والتحكم المتكاملة لمحافظة البصرة</div>
     <h1 class="hero-title">ابحث عن عقارك في <span class="accent">البصرة</span><br>بذكاء وسهولة</h1>
     <p class="hero-subtitle">المنصة الأولى المربوطة بنظام رقابة إداري متكامل لمتابعة الاشتراكات والمكاتب العقارية المعتمدة.</p>
-    <div class="hero-actions">
-      <button class="btn-primary" onclick="scrollToSearch()">🔍 ابحث عن عقار الآن</button>
-      <button class="btn-secondary" onclick="openAddPropertyModal()">➕ انشر عقار كزائر سريع</button>
-    </div>
-    <div class="hero-stats">
-      <div class="stat"><div class="stat-num" id="count-offices">147</div><div class="stat-label">مكتب مسجّل</div></div>
-      <div class="stat"><div class="stat-num" id="count-props">1,842</div><div class="stat-label">عقار نشط</div></div>
-      <div class="stat"><div class="stat-num">24</div><div class="stat-label">منطقة مدعومة</div></div>
-    </div>
+    <div class="hero-actions"><button class="btn-primary" onclick="scrollToSearch()">🔍 ابحث عن عقار الآن</button><button class="btn-secondary" onclick="openAddPropertyModal()">➕ انشر عقار كزائر سريع</button></div>
   </div>
 </section>
 
 <section class="search-section" id="search">
   <div class="search-container">
     <div class="search-label">البحث المتقدم في عروض البصرة</div>
-    
     <div class="search-box">
       <div class="search-filters">
-        <select class="filter-select" id="filterAction">
-          <option value="">الكل (بيع/إيجار)</option>
-          <option value="بيع">للبيع</option>
-          <option value="إيجار">للإيجار</option>
-        </select>
-        <select class="filter-select" id="filterType">
-          <option value="">نوع العقار</option>
-          <option value="بيت">بيت سكني</option>
-          <option value="شقة">شقة فاخرة</option>
-          <option value="أرض">أرض</option>
-          <option value="محل">محل تجاري</option>
-        </select>
+        <select class="filter-select" id="filterAction"><option value="">الكل (بيع/إيجار)</option><option value="بيع">للبيع</option><option value="إيجار">للإيجار</option></select>
+        <select class="filter-select" id="filterType"><option value="">نوع العقار</option><option value="بيت">بيت سكني</option><option value="شقة">شقة فاخرة</option><option value="أرض">أرض</option><option value="محل">محل تجاري</option></select>
       </div>
-      <div class="search-input-wrap">
-        <i class="ti ti-search"></i>
-        <input class="search-input" type="text" placeholder="ابحث بالمنطقة، مثل العشار، الطويسة..." id="searchInput" onkeyup="if(event.key === 'Enter') executeSearch();" />
-      </div>
+      <div class="search-input-wrap"><i class="ti ti-search"></i><input class="search-input" type="text" placeholder="ابحث بالمنطقة، مثل العشار..." id="searchInput" onkeyup="if(event.key === 'Enter') executeSearch();" /></div>
       <button class="search-btn" onclick="executeSearch()">بحث سريّع</button>
     </div>
-    
     <div class="search-tags">
       <div class="search-tag" onclick="document.getElementById('searchInput').value='العشار'; executeSearch();">عقارات العشار</div>
       <div class="search-tag" onclick="document.getElementById('filterType').value='شقة'; document.getElementById('filterAction').value='إيجار'; executeSearch();">شقق للإيجار</div>
       <div class="search-tag" onclick="document.getElementById('filterType').value='أرض'; executeSearch();">أراضي استثمارية</div>
       <div class="search-tag" onclick="document.getElementById('searchInput').value=''; document.getElementById('filterAction').value=''; document.getElementById('filterType').value=''; executeSearch();">إلغاء الفلاتر 🔄</div>
     </div>
-    
   </div>
 </section>
 
-<section class="listings-section">
-  <div class="section-header">
-    <div class="section-title">المعرض <span>العام</span> للعقارات</div>
-  </div>
-  <div class="listing-grid" id="listingGrid"></div>
-</section>
-
-<footer class="footer" style="background: #050c16; padding: 2rem; border-top: 1px solid rgba(201,168,76,0.15); margin-top: 4rem;">
-  <div style="max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-    <div>© 2026 دليل البصرة العقاري — جميع الحقوق محفوظة للرقابة والتطوير.</div>
-    <div>
-      <button onclick="window.location.href='admin.html'" style="background: transparent; color: var(--gold); border: 1px dashed var(--gold); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-family: 'Cairo'; font-size: 13px;">
-        🔐 بوابة تسجيل الدخول (المشرفين / المكاتب)
-      </button>
-    </div>
-  </div>
-</footer>
+<section class="listings-section"><div class="section-header"><div class="section-title">المعرض <span>العام</span> للعقارات</div></div><div class="listing-grid" id="listingGrid"></div></section>
 
 <div id="addPropModal" style="display:none; position:fixed; inset:0; background:rgba(5,12,22,0.92); z-index:999; align-items:center; justify-content:center; padding:1rem">
   <div style="background:var(--navy-mid); border:2px solid var(--gold); border-radius:20px; padding:2.5rem; max-width:480px; width:100%; position:relative;">
     <button onclick="closeAddPropertyModal()" class="modal-close-top-btn">✕</button>
-    <div style="margin-bottom: 1.2rem;">
-      <h3 style="color: var(--gold); font-weight: 700;"><i class="ti ti-circle-plus"></i> إضافة عقار سريع (زائر)</h3>
-      <p style="font-size: 12px; color: var(--text-muted);">انشر عقارك مجاناً ليظهر للجمهور البصري فوراً</p>
-    </div>
+    <div style="margin-bottom: 1.2rem;"><h3 style="color: var(--gold); font-weight: 700;"><i class="ti ti-circle-plus"></i> إضافة عقار سريع (زائر)</h3></div>
     <div>
       <label style="font-size: 11px; color: var(--gold);">نوع العقار</label>
-      <select id="modalPropType" class="input-field-modal">
-        <option value="بيت">بيت سكني</option>
-        <option value="شقة">شقة فاخرة</option>
-        <option value="أرض">أرض استثمارية</option>
-      </select>
+      <select id="modalPropType" class="input-field-modal"><option value="بيت">بيت سكني</option><option value="شقة">شقة فاخرة</option><option value="أرض">أرض استثمارية</option></select>
       <label style="font-size: 11px; color: var(--gold);">المنطقة</label>
       <input type="text" id="modalPropArea" class="input-field-modal" placeholder="مثال: العشار، الجنينة...">
       <label style="font-size: 11px; color: var(--gold);">السعر</label>
       <input type="text" id="modalPropPrice" class="input-field-modal" placeholder="مثال: 140 مليون">
       <button onclick="submitNewPropertyFromModal()" class="search-btn" style="width:100%; border-radius:8px; height:44px;">🚀 انشر الإعلان الآن</button>
-      <button onclick="closeAddPropertyModal()" class="btn-close-danger-modal">❌ إلغاء وإغلاق النافذة</button>
+      <button onclick="closeAddPropertyModal()" class="btn-close-danger-modal">❌ إلغاء</button>
     </div>
   </div>
 </div>
 
 <script>
 const STORAGE_KEY = 'basra_data_v3';
-
-// المصفوفة الافتراضية للعقارات
 const defaultListings = [
   {type:'بيت', action:'للبيع', price:'145 مليون', area:'200 م²', district:'العشار', office:'مكتب الأمانة العقاري', officeId:'1', vip:true, icon:'🏠'},
   {type:'شقة', action:'للإيجار', price:'450 ألف/شهر', area:'120 م²', district:'الجمهورية', office:'عقارات الخليج بالبصرة', officeId:'2', vip:false, icon:'🏢'},
   {type:'أرض', action:'للبيع', price:'300 مليون', area:'600 م²', district:'المعقل', office:'مكتب الرافدين', officeId:'3', vip:true, icon:'🏞️'},
 ];
 
-// جلب العقارات الحية من الذاكرة ودمجها مع الافتراضية
+// دالة ذكية تقرأ التفاصيل الحقيقية من المكاتب!
 function getAllListings() {
   let offices = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
   let dynamicListings = [...defaultListings];
 
   offices.forEach(office => {
-    if(office.id === '1' && office.publishedProps > 1) {
-      for(let i = 1; i < office.publishedProps; i++) {
+    // إذا كان المكتب لديه مصفوفة عقارات منشورة
+    if(office.listings && office.listings.length > 0) {
+      office.listings.forEach(prop => {
         dynamicListings.unshift({
-          type: 'بيت', // افتراضياً للمكتب
-          action: 'للبيع', 
-          price: 'يرجى الاتصال بالمكتب', 
-          area: 'مساحة ممتازة', 
-          district: office.area || 'البصرة', 
-          office: office.name, 
-          officeId: office.id, 
-          vip: false, 
-          icon: '🏗️'
+          type: prop.type,
+          action: prop.action,
+          price: prop.price,
+          area: prop.area,
+          district: prop.district,
+          office: office.name,
+          officeId: office.id,
+          vip: false,
+          icon: prop.icon
         });
-      }
+      });
     }
   });
-
   return dynamicListings;
 }
 
-// دالة محرك البحث الدقيقة 
 function executeSearch() {
   const actionFilter = document.getElementById('filterAction').value;
   const typeFilter = document.getElementById('filterType').value;
   const textSearch = document.getElementById('searchInput').value.trim().toLowerCase();
-
   const allListings = getAllListings();
 
-  // فلترة العقارات بناءً على القيم المدخلة
   const filteredListings = allListings.filter(item => {
     const matchAction = actionFilter === "" || item.action.includes(actionFilter);
     const matchType = typeFilter === "" || item.type.includes(typeFilter);
-    
-    // البحث النصي يبحث في (المنطقة، نوع العقار، واسم المكتب)
-    const matchText = textSearch === "" || 
-                      item.district.includes(textSearch) || 
-                      item.type.includes(textSearch) || 
-                      item.office.includes(textSearch);
-
+    const matchText = textSearch === "" || item.district.includes(textSearch) || item.type.includes(textSearch) || item.office.includes(textSearch);
     return matchAction && matchType && matchText;
   });
 
-  // إعادة رسم العقارات بناءً على النتيجة
   renderListings(filteredListings);
-  
-  // النزول التلقائي السلس لقسم النتائج
   document.getElementById('listingGrid').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
-// دالة رسم العقارات (تستقبل بيانات مفلترة أو تعرض الكل)
 function renderListings(dataToRender = null){
   const g = document.getElementById('listingGrid');
   if(!g) return;
-  
   const currentListings = dataToRender || getAllListings();
   
-  // إذا لم يجد نتائج للبحث
   if(currentListings.length === 0) {
-    g.innerHTML = `
-      <div class="empty-search">
-        <i class="ti ti-mood-empty" style="font-size: 48px; color: var(--gold); margin-bottom: 15px; display: block;"></i>
-        <h3>عذراً، لم نجد أي عقارات تطابق بحثك الحالي!</h3>
-        <p style="margin-top: 10px; font-size: 14px;">جرب تغيير الفلاتر أو الكلمات المفتاحية، أو قم بالضغط على "إلغاء الفلاتر".</p>
-      </div>`;
+    g.innerHTML = `<div class="empty-search"><h3>عذراً، لم نجد أي عقارات تطابق بحثك الحالي!</h3></div>`;
     return;
   }
 
   g.innerHTML = currentListings.map(l => `
     <div class="listing-card">
-      <div class="card-img">
-        <div class="card-img-placeholder">${l.icon}</div>
-        <div class="card-badge badge-sale">${l.action}</div>
-        ${l.vip ? '<div class="badge-vip">👑 VIP</div>' : ''}
-      </div>
+      <div class="card-img"><div class="card-img-placeholder">${l.icon}</div><div class="card-badge badge-sale">${l.action}</div>${l.vip ? '<div class="badge-vip">👑 VIP</div>' : ''}</div>
       <div class="card-body">
         <div class="card-price">${l.price} <span>${l.area}</span></div>
         <div class="card-title">${l.type} في ${l.district}</div>
         <div class="card-footer">
-          <div class="card-office">
-            <div class="office-avatar">م</div>
-            <a href="office-profile.html?id=${l.officeId}" style="color:var(--text-on-dark); text-decoration:none; font-weight:700; transition:0.2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-on-dark)'">${l.office}</a>
-          </div>
+          <div class="card-office"><div class="office-avatar">م</div><a href="office-profile.html?id=${l.officeId}" style="color:var(--text-on-dark); text-decoration:none; font-weight:700;">${l.office}</a></div>
           <button class="card-btn" onclick="window.location.href='office-profile.html?id=${l.officeId}'">اتصال 📞</button>
         </div>
       </div>
@@ -330,26 +210,14 @@ function renderListings(dataToRender = null){
 
 function openAddPropertyModal() { document.getElementById('addPropModal').style.display = 'flex'; }
 function closeAddPropertyModal() { document.getElementById('addPropModal').style.display = 'none'; }
-
 function submitNewPropertyFromModal() {
-  const area = document.getElementById('modalPropArea').value.trim();
-  const price = document.getElementById('modalPropPrice').value.trim();
-  const type = document.getElementById('modalPropType').value;
+  const area = document.getElementById('modalPropArea').value.trim(); const price = document.getElementById('modalPropPrice').value.trim(); const type = document.getElementById('modalPropType').value;
   if(!area || !price) { alert("يرجى ملء كافة التفاصيل!"); return; }
-  
   defaultListings.unshift({type:type, action:'للبيع', price:price, area:'150 م²', district:area, office:'زائر', officeId:'guest', vip:false, icon:'🏠'});
-  alert("🎉 تم نشر العقار بنجاح في المعرض العام للدليل!");
-  closeAddPropertyModal();
-  renderListings(); // سيقوم بعرض العقارات المحدثة
+  alert("🎉 تم النشر بنجاح!"); closeAddPropertyModal(); renderListings();
 }
-
-function scrollToSearch() {
-  document.getElementById('search').scrollIntoView({behavior:'smooth'});
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  renderListings();
-});
+function scrollToSearch() { document.getElementById('search').scrollIntoView({behavior:'smooth'}); }
+document.addEventListener('DOMContentLoaded', () => { renderListings(); });
 </script>
 </body>
 </html>
