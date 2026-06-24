@@ -3,7 +3,7 @@
    المستشار العقاري الذكي لدليل البصرة العقاري
 
    ما الجديد في هذه النسخة؟
-   ✅ ذكاء اصطناعي حقيقي عبر Claude API (claude-sonnet-4-6)
+   ✅ ذكاء اصطناعي حقيقي عبر Gemini API (gemini-2.0-flash)
    ✅ System Prompt متخصص 100% بعقارات البصرة (أحياء، أسعار، مناطق)
    ✅ كشف تلقائي لنوع الطلب (بيع / إيجار / استثمار)
    ✅ مقارنة أسعار وتقدير عقاري ذكي
@@ -25,9 +25,12 @@
      ⚙️ الإعدادات — عدّل هنا فقط عند الحاجة
      ============================================================ */
   const CONFIG = {
-    // 🔑 مفتاح Claude API — ضع مفتاحك هنا
-    // للحصول على مفتاح: https://console.anthropic.com
-    API_KEY: 'YOUR_CLAUDE_API_KEY_HERE',
+    // 🔑 مفتاح Gemini API — ضع مفتاحك هنا (مجاني)
+    // للحصول على مفتاح: https://aistudio.google.com/apikey
+    API_KEY: 'AQ.Ab8RN6Jqx7NUvSBbSUB3HjrK98N1-tLyfXL_FIhtdwDWj-jaZg',
+
+    // نموذج Gemini — gemini-2.0-flash مجاني وسريع
+    GEMINI_MODEL: 'gemini-2.0-flash',
 
     // اسم الموقع — يُستخدم في ترويج الباقات
     SITE_NAME: 'دليل البصرة العقاري',
@@ -490,9 +493,9 @@
     if (!txt) return;
 
     // تحقق من وجود مفتاح API
-    if (CONFIG.API_KEY === 'YOUR_CLAUDE_API_KEY_HERE') {
+    if (CONFIG.API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
       appendMessage(
-        '⚠️ تنبيه: لم يتم إعداد مفتاح Claude API بعد. يرجى وضع مفتاحك في CONFIG.API_KEY داخل ملف ai-advisor.js',
+        '⚠️ تنبيه: لم يتم إعداد مفتاح Gemini API بعد. يرجى وضع مفتاحك في CONFIG.API_KEY داخل ملف ai-advisor.js — احصل عليه مجاناً من: aistudio.google.com/apikey',
         'bot'
       );
       return;
@@ -521,19 +524,24 @@
     showTyping();
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      // بناء سجل المحادثة بصيغة Gemini
+      const geminiHistory = conversationHistory.slice(0, -1).map(m => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content }],
+      }));
+
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=${CONFIG.API_KEY}`;
+
+      const response = await fetch(geminiUrl, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': CONFIG.API_KEY,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-calls': 'true',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 600,
-          system: SYSTEM_PROMPT,
-          messages: conversationHistory,
+          system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+          contents: [
+            ...geminiHistory,
+            { role: 'user', parts: [{ text: txt }] },
+          ],
+          generationConfig: { maxOutputTokens: 700, temperature: 0.7 },
         }),
       });
 
@@ -545,7 +553,7 @@
       }
 
       const data  = await response.json();
-      const reply = data?.content?.[0]?.text || 'عذراً، لم أستطع الرد الآن. حاول مجدداً.';
+      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'عذراً، لم أستطع الرد الآن. حاول مجدداً.';
 
       // أضف الرد لسجل المحادثة
       conversationHistory.push({ role: 'assistant', content: reply });
