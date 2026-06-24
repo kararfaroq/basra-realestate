@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بوابة التحكم والإدارة المتقدمة - دليل البصرة العقاري</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --gold:#C9A84C; --gold-light:#E8C96A;
+      --navy:#0A1628; --navy-mid:#1A3A5C; --navy-light:#2A5080;
+      --text-on-dark:#F5F0E8; --text-muted:#8BA0B8;
+      --success:#4CAF7D; --danger:#ff4d4d; --warning:#ff9800;
+    }
+    body{font-family:'Cairo',sans-serif;background:var(--navy);color:var(--text-on-dark);direction:rtl;padding:2rem 1rem;}
+    .container{max-width:1250px; margin:0 auto;}
+    
+    /* LOGIN BOX */
+    .login-card {
+      background:var(--navy-mid); border:1px solid rgba(201,168,76,0.3);
+      border-radius:20px; padding:2.5rem; max-width:450px; margin:5rem auto 0;
+      box-shadow:0 10px 30px rgba(0,0,0,0.3);
+    }
+    .input-field{
+      width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(201,168,76,0.2);
+      border-radius:8px; padding:12px 16px; color:var(--text-on-dark); font-family:'Cairo';
+      font-size:14px; outline:none; margin-bottom:15px;
+    }
+    .input-field:focus{ border-color:var(--gold); background:rgba(255,255,255,0.08); }
+    
+    .btn-action{
+      width:100%; background:var(--gold); color:var(--navy); border:none; border-radius:8px;
+      padding:14px; font-size:16px; font-weight:700; font-family:'Cairo'; cursor:pointer; transition: 0.2s;
+    }
+    .btn-action:hover { background: var(--gold-light); }
+    
+    /* DASHBOARD */
+    .dashboard-section { display:none; }
+    .dash-header {
+      display:flex; justify-content:space-between; align-items:center;
+      background:var(--navy-mid); padding:1.5rem 2rem; border-radius:14px;
+      border:1px solid rgba(201,168,76,0.2); margin-bottom:2rem; flex-wrap:wrap; gap:15px;
+    }
+    .badge-role { background:rgba(201,168,76,0.15); color:var(--gold); padding:6px 14px; border-radius:8px; font-weight:700; font-size:13px; }
+    .panel-card { background:var(--navy-mid); border:1px solid rgba(255,255,255,0.06); border-radius:14px; padding:1.5rem; margin-bottom:1.5rem; }
+    .panel-title { font-size:1.2rem; font-weight:700; color:var(--gold); margin-bottom:1.2rem; display:flex; align-items:center; gap:8px; }
+    
+    /* TABLE */
+    table { width:100%; border-collapse:collapse; text-align:right; font-size:13px; }
+    th { padding:12px; border-bottom:2px solid var(--gold); color:var(--text-muted); font-weight:600; }
+    td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); vertical-align: middle; }
+    
+    .badge-status { padding:4px 8px; border-radius:6px; font-size:11px; font-weight:600; display:inline-block; }
+    .status-active { background:rgba(76,175,125,0.15); color:var(--success); border:1px solid rgba(76,175,125,0.3); }
+    .status-expired { background:rgba(255,77,77,0.15); color:var(--danger); border:1px solid rgba(255,77,77,0.3); }
+    .status-suspended { background:rgba(255,152,0,0.15); color:var(--warning); border:1px solid rgba(255,152,0,0.3); }
+
+    .btn-renew { background:var(--success); color:white; border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-family:'Cairo'; font-size:11px; font-weight:600; }
+    .btn-renew:disabled { background: rgba(255,255,255,0.1); color: var(--text-muted); cursor: not-allowed; }
+    .btn-suspend { background:var(--warning); color:var(--navy); border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-family:'Cairo'; font-size:11px; font-weight:700; }
+    .btn-danger { background:var(--danger); color:white; border:none; padding:5px 12px; border-radius:6px; cursor:pointer; font-family:'Cairo'; font-size:12px; }
+    .btn-outline-back { background:transparent; color:var(--text-muted); border:1px solid rgba(255,255,255,0.2); padding:6px 14px; border-radius:6px; text-decoration:none; font-size:13px; }
+
+    /* MODAL STYLES */
+    .modal-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(10, 22, 40, 0.85); backdrop-filter: blur(5px);
+      z-index: 1000; justify-content: center; align-items: center; padding: 1rem;
+    }
+    .modal-content {
+      background: var(--navy-mid); border: 2px solid var(--gold);
+      border-radius: 16px; padding: 2rem; width: 100%; max-width: 550px;
+      position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .btn-close-danger {
+      width: 100%; background: transparent; color: var(--danger);
+      border: 1px solid var(--danger); border-radius: 8px; padding: 10px;
+      font-size: 14px; font-weight: 700; font-family: 'Cairo'; cursor: pointer;
+      margin-top: 10px; transition: 0.2s; text-align: center;
+    }
+    .btn-close-danger:hover { background: var(--danger); color: white; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <div id="loginFormSection" class="login-card">
+    <div style="text-align:center; margin-bottom:1.5rem">
+      <div style="width:56px; height:56px; background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3); border-radius:14px; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; font-size:24px">🔐</div>
+      <h2 style="font-size:1.3rem; font-weight:900; margin-bottom:.3rem">بوابة الدخول الموحدة للوحة التحكم</h2>
+      <p style="font-size:12px; color:var(--text-muted);">سجل دخولك كمشرف أو مكتب لمتابعة الصلاحيات والاشتراكات</p>
+    </div>
+    
+    <div>
+      <input type="text" id="usernameInput" class="input-field" placeholder="اسم المستخدم">
+      <input type="password" id="passwordInput" class="input-field" placeholder="كلمة المرور">
+      <button onclick="handleLogin()" class="btn-action">🚀 تسجيل الدخول والتحقق الآمن</button>
+      
+      <div style="margin: 15px 0; text-align: center; color: var(--text-muted); font-size: 12px; position: relative;">
+        <span style="background: var(--navy-mid); padding: 0 10px; z-index: 2; position: relative;">أو انشر كزائر سريع</span>
+        <hr style="position: absolute; top: 50%; left: 0; width: 100%; border: 0; border-top: 1px solid rgba(255,255,255,0.08); z-index: 1;">
+      </div>
+
+      <button onclick="loginAsGuest()" class="btn-action" style="background: transparent; color: var(--gold); border: 1px solid var(--gold);">
+        ➕ دخول سريع ونشر عقار واحد كزائر
+      </button>
+    </div>
+    
+    <div style="text-align:center; margin-top:20px;">
+       <a href="index.html" class="btn-outline-back">← العودة للرئيسية</a>
+    </div>
+  </div>
+
+  <div id="dashboardSection" class="dashboard-section">
+    
+    <div class="dash-header">
+      <div>
+        <h1 style="font-size:1.4rem; font-weight:900;">🛡️ نظام الرقابة والتحكم في مكاتب البصرة</h1>
+        <p style="font-size:12px; color:var(--text-muted); margin-top:3px;">المستخدم الحالي: <span id="displayUsername" style="color:#fff; font-weight:600;">-</span></p>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span id="roleBadge" class="badge-role">-</span>
+        <button onclick="handleLogout()" class="btn-danger" style="padding:7px 15px; font-size:13px;">خروج 🚪</button>
+      </div>
+    </div>
+
+    <div id="adminAndSuperView" class="panel-card" style="display:none;">
+      <div class="panel-title"><i class="ti ti-receipt"></i> لوحة التحكم بالاشتراكات الشهرية وحظر النشر</div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>المكتب العقاري</th>
+              <th>المنطقة</th>
+              <th>نوع الباقة وسقف النشر</th>
+              <th>حالة الاشتراك</th>
+              <th>حالة النشر الحالية</th>
+              <th>تاريخ انتهاء الصلاحية</th>
+              <th>تغيير الباقة</th>
+              <th>تجديد شهري (30 يوم)</th>
+              <th>التحكم بالنشر (إيقاف/تفعيل)</th>
+              <th>حذف المكتب</th>
+            </tr>
+          </thead>
+          <tbody id="officesTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="officeOnlyView" class="panel-card" style="display:none;">
+      <div class="panel-title"><i class="ti ti-building-estate"></i> حالة صلاحيات مكتبك الإعلانية</div>
+      <div id="officeStatusBanner" style="padding:1.2rem; border-radius:10px; margin-bottom:1.5rem; font-size:14px; line-height:1.6;"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <span style="font-weight:700; font-size:14px;">إحصائيات الإعلانات الحالية للمكتب:</span>
+        <button class="btn-action" style="width:auto; padding:6px 15px; font-size:12px;" onclick="openAddPropertyModal()">➕ إضافة عقار جديد</button>
+      </div>
+      <div style="background:rgba(255,255,255,0.02); padding:1rem; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
+         <p>📊 العقارات المنشورة حالياً: <strong id="currentOfficePropsCount" style="color:var(--gold);">0</strong> عقارات</p>
+         <p id="packageLimitInfo" style="font-size:12px; color:var(--text-muted); margin-top:5px;"></p>
+      </div>
+    </div>
+
+    <div style="text-align:center; margin-top:1.5rem;">
+      <a href="index.html" class="btn-outline-back" style="background:rgba(255,255,255,0.04)">← الانتقال للواجهة الرئيسية</a>
+    </div>
+
+  </div>
+
+</div>
+
+<div id="addPropertyModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event)">
+  <div class="modal-content">
+    <div style="margin-bottom: 1.5rem;">
+      <h3 style="color: var(--gold); font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+        <i class="ti ti-circle-plus"></i> إضافة عقار جديد للدليل
+      </h3>
+    </div>
+    <div>
+      <label style="font-size: 12px; color: var(--gold); display: block; margin-bottom: 5px;">نوع العقار</label>
+      <select id="propType" class="input-field" style="background: var(--navy); color:#fff;">
+        <option value="بيت">بيت سكني</option>
+        <option value="شقة">شقة فاخرة</option>
+        <option value="أرض">أرض استثمارية</option>
+        <option value="محل">محل تجاري</option>
+      </select>
+      <label style="font-size: 12px; color: var(--gold); display: block; margin-bottom: 5px;">المنطقة في البصرة</label>
+      <input type="text" id="propArea" class="input-field" placeholder="مثال: العشار، الطويسة...">
+      <label style="font-size: 12px; color: var(--gold); display: block; margin-bottom: 5px;">السعر المطلوب</label>
+      <input type="text" id="propPrice" class="input-field" placeholder="مثال: 140 مليون دينار">
+      
+      <button onclick="submitNewProperty()" class="btn-action">🚀 نشر الإعلان فوراً</button>
+      <button onclick="closeAddPropertyModal()" class="btn-close-danger">❌ إلغاء وإغلاق</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // تهيئة البيانات الافتراضية وحفظها بالـ LocalStorage لضمان الحفظ الدائم
+  const defaultOffices = [
+    {id: "1", name:'مكتب الأمانة العقاري', area:'العشار', publishedProps: 1, pkg:'free', status:'active', allowPublish: true, expiry:'مفتوح الصلاحية دائم'},
+    {id: "2", name:'عقارات الخليج بالبصرة', area:'الجمهورية', publishedProps: 4, pkg:'eco', status:'active', allowPublish: true, expiry:'2026-07-24'},
+    {id: "3", name:'مكتب الرافدين للاستثمار', area:'المعقل', publishedProps: 12, pkg:'gold', status:'expired', allowPublish: true, expiry:'2026-06-01'}
+  ];
+
+  if (!localStorage.getItem('mockOfficesData')) {
+     localStorage.setItem('mockOfficesData', JSON.stringify(defaultOffices));
+  }
+
+  function getOffices() { return JSON.parse(localStorage.getItem('mockOfficesData')); }
+  function saveOffices(data) { localStorage.setItem('mockOfficesData', JSON.stringify(data)); }
+
+  let guestUser = { publishedProps: 0, maxLimit: 1, allowPublish: true };
+  let session = JSON.parse(localStorage.getItem('basra_admin_session')) || null;
+
+  document.addEventListener('DOMContentLoaded', () => { evaluateSessionUI(); });
+
+  function evaluateSessionUI() {
+    const loginForm = document.getElementById('loginFormSection');
+    const dashboard = document.getElementById('dashboardSection');
+    
+    if (!session) {
+      loginForm.style.display = 'block';
+      dashboard.style.display = 'none';
+    } else {
+      loginForm.style.display = 'none';
+      dashboard.style.display = 'block';
+      document.getElementById('displayUsername').textContent = session.username;
+      
+      const badge = document.getElementById('roleBadge');
+      const adminSuperZone = document.getElementById('adminAndSuperView');
+      const officeZone = document.getElementById('officeOnlyView');
+      
+      adminSuperZone.style.display = 'none';
+      officeZone.style.display = 'none';
+      
+      if (session.role === 'admin' || session.role === 'supervisor') {
+        badge.textContent = session.role === 'admin' ? '👑 مدير النظام' : '🛡️ مشرف معتمد';
+        adminSuperZone.style.display = 'block';
+        renderOfficesTable();
+      } else if (session.role === 'office' || session.role === 'guest') {
+        badge.textContent = session.role === 'office' ? '🏢 مكتب عقاري شريك' : '👤 زائر عادي لدليل';
+        officeZone.style.display = 'block';
+        setupOfficeViewUI();
+      }
+    }
+  }
+
+  function renderOfficesTable() {
+    const tbody = document.getElementById('officesTableBody');
+    if (!tbody) return;
+
+    let offices = getOffices();
+    tbody.innerHTML = offices.map(o => {
+      const isFree = o.pkg === 'free';
+      const isExpired = o.status === 'expired' && !isFree;
+      let limitText = o.pkg === 'gold' ? '∞ مفتوح' : o.pkg === 'eco' ? 'اقصى 5' : 'اقصى 2';
+      
+      return `
+        <tr>
+          <td><strong>${o.name}</strong></td>
+          <td>${o.area}</td>
+          <td><span style="color:${o.pkg=='gold'?'var(--gold)':'#4A9FD4'}">${o.pkg=='gold'?'🥇 ذهبي VIP': o.pkg=='eco'?'💎 اقتصادي':'⭐ مجاني'} (${limitText})</span></td>
+          <td><span class="badge-status ${isFree ? 'status-active' : (isExpired ? 'status-expired' : 'status-active')}">${isFree ? '🟢 نشط دائم' : (isExpired ? '🔴 منتهي' : '🟢 نشط')}</span></td>
+          <td><span class="badge-status ${o.allowPublish ? 'status-active' : 'status-suspended'}">${o.allowPublish ? '🟢 مسموح بالنشر' : '🔴 حظر إداري'}</span></td>
+          <td style="font-family:monospace; font-size:12px;">${o.expiry}</td>
+          <td>
+            <select style="background:var(--navy); color:#fff; border:1px solid rgba(201,168,76,0.3); padding:4px; border-radius:6px; font-family:'Cairo'; font-size:11px;" onchange="changePackage('${o.id}', this.value)">
+              <option value="free" ${o.pkg == 'free' ? 'selected' : ''}>مجاني</option>
+              <option value="eco" ${o.pkg == 'eco' ? 'selected' : ''}>اقتصادي</option>
+              <option value="gold" ${o.pkg == 'gold' ? 'selected' : ''}>ذهبي VIP</option>
+            </select>
+          </td>
+          <td><button onclick="renewSubscriptionMonthly('${o.id}')" class="btn-renew" ${isFree ? 'disabled' : ''}>${isFree ? '🚫 لا يتطلب' : '🔄 تجديد 30 يوم'}</button></td>
+          <td><button onclick="togglePublishStatus('${o.id}')" class="btn-suspend" style="background:${o.allowPublish?'var(--warning)':'var(--success)'}; color:${o.allowPublish?'var(--navy)':'#fff'}">${o.allowPublish ? '🛑 إيقاف النشر' : '🟢 إلغاء الإيقاف'}</button></td>
+          <td><button onclick="deleteOffice('${o.id}')" class="btn-danger" style="background:var(--danger); padding:5px 10px;">🗑️ حذف</button></td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // الدالة الجديدة لحذف المكتب بالكامل
+  function deleteOffice(id) {
+    if(confirm('⚠️ تحذير: هل أنت متأكد من رغبتك في حذف هذا المكتب نهائياً من السيستم؟ لا يمكن التراجع عن هذا الإجراء!')) {
+      let offices = getOffices();
+      offices = offices.filter(o => o.id !== id);
+      saveOffices(offices);
+      renderOfficesTable();
+    }
+  }
+
+  function renewSubscriptionMonthly(id) {
+    let offices = getOffices();
+    const idx = offices.findIndex(o => o.id === id);
+    if (idx !== -1 && offices[idx].pkg !== 'free') {
+      const today = new Date(); today.setDate(today.getDate() + 30);
+      offices[idx].status = 'active'; offices[idx].expiry = today.toISOString().split('T')[0];
+      saveOffices(offices); alert(`✅ تم تجديد الاشتراك لـ (${offices[idx].name}).`); renderOfficesTable();
+    }
+  }
+
+  function togglePublishStatus(id) {
+    let offices = getOffices();
+    const idx = offices.findIndex(o => o.id === id);
+    if (idx !== -1) { 
+      offices[idx].allowPublish = !offices[idx].allowPublish; 
+      saveOffices(offices); 
+      renderOfficesTable(); 
+    }
+  }
+
+  function changePackage(id, newPkg) {
+    let offices = getOffices();
+    const idx = offices.findIndex(o => o.id === id);
+    if (idx !== -1) {
+      offices[idx].pkg = newPkg;
+      offices[idx].expiry = newPkg === 'free' ? 'مفتوح الصلاحية دائم' : new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0];
+      offices[idx].status = 'active'; 
+      saveOffices(offices); renderOfficesTable();
+    }
+  }
+
+  function setupOfficeViewUI() {
+    const banner = document.getElementById('officeStatusBanner');
+    
+    if (session.role === 'guest') {
+      document.getElementById('currentOfficePropsCount').textContent = guestUser.publishedProps;
+      document.getElementById('packageLimitInfo').textContent = `ℹ️ باقة الزائر: مسموح بنشر عقار واحد مجاناً.`;
+      banner.className = "status-active";
+      banner.innerHTML = `🟢 دخول سريع كزائر عادي.`;
+    } else {
+      let offices = getOffices();
+      const myOffice = offices[0]; 
+      document.getElementById('currentOfficePropsCount').textContent = myOffice.publishedProps;
+      let maxLimit = myOffice.pkg === 'gold' ? Infinity : myOffice.pkg === 'eco' ? 5 : 2;
+      document.getElementById('packageLimitInfo').textContent = myOffice.pkg === 'gold' ? "🥇 باقتك ذهبية: نشر غير محدود." : `ℹ️ سقف الباقة الحالية: ${maxLimit} عقارات.`;
+      
+      if (!myOffice.allowPublish) {
+        banner.className = "status-suspended"; banner.innerHTML = `🛑 <strong>تم إيقاف مكتبك عن النشر من قبل الإدارة!</strong>`;
+      } else {
+        banner.className = "status-active"; banner.innerHTML = `🟢 <strong>حسابك نشط وطبيعي ومصرح له بالعمل.</strong>`;
+      }
+    }
+  }
+
+  function openAddPropertyModal() {
+    if (session.role === 'guest') {
+      if (guestUser.publishedProps >= guestUser.maxLimit) {
+        alert("❌ تجاوز الحد المسموح للزوار!"); return;
+      }
+    } else {
+      let offices = getOffices();
+      const myOffice = offices[0]; 
+      if (!myOffice.allowPublish) { alert("❌ حسابك موقف عن النشر حالياً!"); return; }
+    }
+    document.getElementById('addPropertyModal').style.display = 'flex';
+  }
+
+  function closeAddPropertyModal() {
+    document.getElementById('addPropertyModal').style.display = 'none';
+  }
+
+  // دالة تسجيل الدخول الموحدة
+  function handleLogin() {
+    const u = document.getElementById('usernameInput').value.trim();
+    const p = document.getElementById('passwordInput').value.trim();
+    
+    if (u === 'admin' && p === 'admin123') {
+      session = { role: 'admin', username: 'المدير العام للنظام' };
+    } else if (u === 'super' && p === 'super123') { 
+      session = { role: 'supervisor', username: 'المشرف المعتمد (Super)' };
+    } else if (u === 'office' && p === 'office123') {
+      session = { role: 'office', username: 'مكتب الأمانة العقاري' };
+    } else { 
+      alert('⚠️ اسم المستخدم أو كلمة المرور غير صحيحة!'); 
+      return; 
+    }
+    
+    localStorage.setItem('basra_admin_session', JSON.stringify(session));
+    evaluateSessionUI();
+  }
+
+  function handleLogout() {
+    session = null; localStorage.removeItem('basra_admin_session'); evaluateSessionUI();
+  }
+
+  function loginAsGuest() {
+    session = { role: 'guest', username: 'زائر سريع للدليل' };
+    localStorage.setItem('basra_admin_session', JSON.stringify(session));
+    evaluateSessionUI();
+  }
+
+  function closeModalOnOutsideClick(event) {
+    if (event.target.id === 'addPropertyModal') { closeAddPropertyModal(); }
+  }
+
+  function submitNewProperty() {
+    const area = document.getElementById('propArea').value.trim();
+    const price = document.getElementById('propPrice').value.trim();
+    if(!area || !price) { alert("الرجاء إدخال البيانات!"); return; }
+
+    if (session.role === 'guest') {
+      guestUser.publishedProps++;
+    } else {
+      let offices = getOffices();
+      offices[0].publishedProps++;
+      saveOffices(offices);
+    }
+    alert("🎉 تم نشر العقار بنجاح!");
+    closeAddPropertyModal();
+    setupOfficeViewUI();
+  }
+</script>
+</body>
+</html>
