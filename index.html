@@ -91,6 +91,8 @@
     .office-avatar{width:22px;height:22px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--navy)}
     .card-btn{border:1px solid rgba(201,168,76,0.3);background:transparent;color:var(--gold);padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-family:'Cairo',sans-serif;transition:all .2s;display:flex;align-items:center;gap:4px}
     .card-btn:hover{background:rgba(201,168,76,0.12)}
+    
+    .empty-search {grid-column: 1 / -1; text-align: center; padding: 4rem; background: rgba(255,255,255,0.02); border-radius: 14px; border: 1px dashed rgba(201,168,76,0.3); color: var(--text-muted);}
 
     /* MODAL AND INPUTS */
     .input-field-modal{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:12px 16px;color:var(--text-on-dark);font-family:'Cairo';font-size:14px;outline:none;margin-bottom:15px;}
@@ -164,16 +166,16 @@
       </div>
       <div class="search-input-wrap">
         <i class="ti ti-search"></i>
-        <input class="search-input" type="text" placeholder="ابحث بالمنطقة، مثل العشار، الطويسة..." id="searchInput" />
+        <input class="search-input" type="text" placeholder="ابحث بالمنطقة، مثل العشار، الطويسة..." id="searchInput" onkeyup="if(event.key === 'Enter') executeSearch();" />
       </div>
-      <button class="search-btn" onclick="alert('جاري البحث في السيستم...')">بحث سريّع</button>
+      <button class="search-btn" onclick="executeSearch()">بحث سريّع</button>
     </div>
     
     <div class="search-tags">
-      <div class="search-tag" onclick="document.getElementById('searchInput').value='بيوت العشار'">بيوت العشار</div>
-      <div class="search-tag" onclick="document.getElementById('searchInput').value='شقق للإيجار'">شقق للإيجار</div>
-      <div class="search-tag" onclick="document.getElementById('searchInput').value='أراضي استثمارية'">أراضي استثمارية</div>
-      <div class="search-tag" onclick="document.getElementById('searchInput').value='محلات تجارية'">محلات تجارية</div>
+      <div class="search-tag" onclick="document.getElementById('searchInput').value='العشار'; executeSearch();">عقارات العشار</div>
+      <div class="search-tag" onclick="document.getElementById('filterType').value='شقة'; document.getElementById('filterAction').value='إيجار'; executeSearch();">شقق للإيجار</div>
+      <div class="search-tag" onclick="document.getElementById('filterType').value='أرض'; executeSearch();">أراضي استثمارية</div>
+      <div class="search-tag" onclick="document.getElementById('searchInput').value=''; document.getElementById('filterAction').value=''; document.getElementById('filterType').value=''; executeSearch();">إلغاء الفلاتر 🔄</div>
     </div>
     
   </div>
@@ -181,7 +183,7 @@
 
 <section class="listings-section">
   <div class="section-header">
-    <div class="section-title">أحدث <span>العقارات</span> في المعرض العام</div>
+    <div class="section-title">المعرض <span>العام</span> للعقارات</div>
   </div>
   <div class="listing-grid" id="listingGrid"></div>
 </section>
@@ -224,11 +226,14 @@
 <script>
 const STORAGE_KEY = 'basra_data_v3';
 
+// المصفوفة الافتراضية للعقارات
 const defaultListings = [
   {type:'بيت', action:'للبيع', price:'145 مليون', area:'200 م²', district:'العشار', office:'مكتب الأمانة العقاري', officeId:'1', vip:true, icon:'🏠'},
   {type:'شقة', action:'للإيجار', price:'450 ألف/شهر', area:'120 م²', district:'الجمهورية', office:'عقارات الخليج بالبصرة', officeId:'2', vip:false, icon:'🏢'},
+  {type:'أرض', action:'للبيع', price:'300 مليون', area:'600 م²', district:'المعقل', office:'مكتب الرافدين', officeId:'3', vip:true, icon:'🏞️'},
 ];
 
+// جلب العقارات الحية من الذاكرة ودمجها مع الافتراضية
 function getAllListings() {
   let offices = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
   let dynamicListings = [...defaultListings];
@@ -237,8 +242,8 @@ function getAllListings() {
     if(office.id === '1' && office.publishedProps > 1) {
       for(let i = 1; i < office.publishedProps; i++) {
         dynamicListings.unshift({
-          type: 'عقار مضاف حديثاً', 
-          action: 'للبيع / للإيجار', 
+          type: 'بيت', // افتراضياً للمكتب
+          action: 'للبيع', 
           price: 'يرجى الاتصال بالمكتب', 
           area: 'مساحة ممتازة', 
           district: office.area || 'البصرة', 
@@ -254,12 +259,53 @@ function getAllListings() {
   return dynamicListings;
 }
 
-function renderListings(){
+// دالة محرك البحث الدقيقة 
+function executeSearch() {
+  const actionFilter = document.getElementById('filterAction').value;
+  const typeFilter = document.getElementById('filterType').value;
+  const textSearch = document.getElementById('searchInput').value.trim().toLowerCase();
+
+  const allListings = getAllListings();
+
+  // فلترة العقارات بناءً على القيم المدخلة
+  const filteredListings = allListings.filter(item => {
+    const matchAction = actionFilter === "" || item.action.includes(actionFilter);
+    const matchType = typeFilter === "" || item.type.includes(typeFilter);
+    
+    // البحث النصي يبحث في (المنطقة، نوع العقار، واسم المكتب)
+    const matchText = textSearch === "" || 
+                      item.district.includes(textSearch) || 
+                      item.type.includes(textSearch) || 
+                      item.office.includes(textSearch);
+
+    return matchAction && matchType && matchText;
+  });
+
+  // إعادة رسم العقارات بناءً على النتيجة
+  renderListings(filteredListings);
+  
+  // النزول التلقائي السلس لقسم النتائج
+  document.getElementById('listingGrid').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// دالة رسم العقارات (تستقبل بيانات مفلترة أو تعرض الكل)
+function renderListings(dataToRender = null){
   const g = document.getElementById('listingGrid');
   if(!g) return;
   
-  const currentListings = getAllListings();
+  const currentListings = dataToRender || getAllListings();
   
+  // إذا لم يجد نتائج للبحث
+  if(currentListings.length === 0) {
+    g.innerHTML = `
+      <div class="empty-search">
+        <i class="ti ti-mood-empty" style="font-size: 48px; color: var(--gold); margin-bottom: 15px; display: block;"></i>
+        <h3>عذراً، لم نجد أي عقارات تطابق بحثك الحالي!</h3>
+        <p style="margin-top: 10px; font-size: 14px;">جرب تغيير الفلاتر أو الكلمات المفتاحية، أو قم بالضغط على "إلغاء الفلاتر".</p>
+      </div>`;
+    return;
+  }
+
   g.innerHTML = currentListings.map(l => `
     <div class="listing-card">
       <div class="card-img">
@@ -294,7 +340,7 @@ function submitNewPropertyFromModal() {
   defaultListings.unshift({type:type, action:'للبيع', price:price, area:'150 م²', district:area, office:'زائر', officeId:'guest', vip:false, icon:'🏠'});
   alert("🎉 تم نشر العقار بنجاح في المعرض العام للدليل!");
   closeAddPropertyModal();
-  renderListings();
+  renderListings(); // سيقوم بعرض العقارات المحدثة
 }
 
 function scrollToSearch() {
