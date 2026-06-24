@@ -10,6 +10,10 @@
     *{margin:0;padding:0;box-sizing:border-box}
     :root{ --gold:#C9A84C;--gold-light:#E8C96A;--gold-dark:#A07830; --navy:#0A1628;--navy-mid:#1A3A5C;--navy-light:#2A5080; --text-on-dark:#F5F0E8;--text-muted:#8BA0B8; --success:#4CAF7D;--danger:#ff4d4d;--warning:#ff9800;}
     body{font-family:'Cairo',sans-serif;background:var(--navy);color:var(--text-on-dark);direction:rtl;overflow-x:hidden}
+    
+    /* حل مشكلة القوائم المنسدلة */
+    select option { background-color: var(--navy-mid); color: #fff; }
+
     .nav{background:rgba(10,22,40,0.95);border-bottom:1px solid rgba(201,168,76,0.2);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
     .nav-logo{display:flex;align-items:center;gap:10px}
     .nav-logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--navy)}
@@ -48,7 +52,6 @@
     .search-box:focus-within{border-color:var(--gold)}
     .search-filters{display:flex;border-left:1px solid rgba(201,168,76,0.2);flex-wrap:nowrap}
     .filter-select{background:transparent;border:none;color:var(--text-on-dark);padding:0 16px;height:54px;font-size:14px;font-family:'Cairo',sans-serif;cursor:pointer;border-left:1px solid rgba(201,168,76,0.15);outline:none;min-width:130px}
-    .filter-select option{background:var(--navy-mid);color:var(--text-on-dark)}
     .search-input-wrap{flex:1;display:flex;align-items:center;padding:0 1rem;gap:8px;min-width:200px;}
     .search-input-wrap i{color:var(--text-muted);font-size:18px}
     .search-input{background:transparent;border:none;color:var(--text-on-dark);font-size:15px;font-family:'Cairo',sans-serif;outline:none;width:100%;padding:0 4px}
@@ -76,8 +79,9 @@
     .card-desc { font-size:12px; color:var(--text-muted); line-height:1.6; margin-bottom:12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .card-footer{border-top:1px solid rgba(255,255,255,0.06);padding-top:10px;display:flex;align-items:center;justify-content:space-between}
     .card-office{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted)}
-    .office-avatar{width:22px;height:22px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--navy)}
-    .card-btn{border:1px solid rgba(201,168,76,0.3);background:transparent;color:var(--gold);padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-family:'Cairo',sans-serif;}
+    .office-avatar{width:24px;height:24px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--navy);overflow:hidden;}
+    .card-btn{border:1px solid rgba(201,168,76,0.3);background:transparent;color:var(--gold);padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-family:'Cairo',sans-serif;transition:0.2s;}
+    .card-btn:hover{background:rgba(201,168,76,0.12)}
     .empty-search {grid-column: 1 / -1; text-align: center; padding: 4rem; background: rgba(255,255,255,0.02); border-radius: 14px; border: 1px dashed rgba(201,168,76,0.3); color: var(--text-muted);}
 
     /* PRICING SECTION */
@@ -98,10 +102,18 @@
     .modal-overlay {display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 22, 40, 0.9); backdrop-filter: blur(5px); z-index: 1000; justify-content: center; align-items: center; padding: 1rem; overflow-y:auto;}
     .modal-content {background: var(--navy-mid); border: 2px solid var(--gold); border-radius: 16px; padding: 2rem; width: 100%; max-width: 550px; position: relative; margin:auto;}
     .input-field-modal{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:12px 16px;color:var(--text-on-dark);font-family:'Cairo';font-size:14px;outline:none;margin-bottom:15px;}
-    .btn-close-danger-modal{width:100%;background:transparent;color:var(--danger);border:1px solid var(--danger);border-radius:8px;padding:12px;font-size:14px;font-weight:700;font-family:'Cairo';cursor:pointer;margin-top:10px;}
-    .modal-close-top-btn {position:absolute;top:15px;left:15px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text-muted);width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+    .input-field-modal:focus{border-color:var(--gold);background:rgba(255,255,255,0.08);}
+    .btn-close-danger-modal{width:100%;background:transparent;color:var(--danger);border:1px solid var(--danger);border-radius:8px;padding:12px;font-size:14px;font-weight:700;font-family:'Cairo';cursor:pointer;margin-top:10px;transition:0.2s;}
+    .btn-close-danger-modal:hover{background:var(--danger);color:#fff;}
+    .modal-close-top-btn {position:absolute;top:15px;left:15px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text-muted);width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:0.2s;}
+    .modal-close-top-btn:hover{color:var(--danger);background:rgba(255,77,77,0.1);border-color:var(--danger);}
+
+    /* تنسيقات رفع اللوكو للمكاتب ومعاينته الدائرية */
+    .logo-upload-container { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px; }
+    .logo-preview-circle { width: 85px; height: 85px; border-radius: 50%; border: 2px dashed var(--gold); background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--text-muted); font-size: 26px; transition: 0.2s; }
+    .logo-preview-circle img { width: 100%; height: 100%; object-fit: cover; }
     
-    /* تنسيقات نافذة الـ VIP ورفع الصورة */
+    /* تنسيقات نافذة الـ VIP ورفع الصورة للزوار */
     .vip-upgrade-box { background: rgba(201,168,76,0.08); border: 1px dashed var(--gold); border-radius: 10px; padding: 15px; margin-bottom: 15px; text-align: right; transition: 0.3s; }
     .vip-checkbox-wrap { display: flex; align-items: center; gap: 10px; cursor: pointer; margin-bottom: 5px; }
     .vip-checkbox-wrap input { width: 18px; height: 18px; accent-color: var(--gold); }
@@ -129,7 +141,7 @@
     <button class="btn-add-prop" onclick="openAddPropertyModal()">➕ أضف عقارك كزائر</button>
   </div>
   <div style="display:flex; gap:10px;">
-    <button class="btn-secondary" style="padding:8px 16px; font-size:13px;" onclick="window.location.href='register.html'">تسجيل مكتبك</button>
+    <button class="btn-secondary" style="padding:8px 16px; font-size:13px;" onclick="openRegisterModal('free')">تسجيل مكتبك</button>
     <button class="nav-cta" onclick="window.location.href='admin.html'">دخول</button>
   </div>
 </nav>
@@ -142,7 +154,12 @@
     <p class="hero-subtitle">المنصة الأولى المربوطة بنظام رقابة إداري متكامل لمتابعة الاشتراكات والمكاتب العقارية المعتمدة.</p>
     <div class="hero-actions">
       <button class="btn-primary" onclick="scrollToSearch()">🔍 ابحث عن عقار الآن</button>
-      <button class="btn-secondary" onclick="window.location.href='register.html'">💼 سجل مكتبك العقاري الآن</button>
+      <button class="btn-secondary" onclick="openRegisterModal('free')">💼 سجل مكتبك العقاري الآن</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num" id="count-offices">147</div><div class="stat-label">مكتب مسجّل</div></div>
+      <div class="stat"><div class="stat-num" id="count-props">1,842</div><div class="stat-label">عقار نشط</div></div>
+      <div class="stat"><div class="stat-num">24</div><div class="stat-label">منطقة مدعومة</div></div>
     </div>
   </div>
 </section>
@@ -183,7 +200,7 @@
         <li><i class="ti ti-check"></i> صفحة بروفايل خاصة للمكتب</li>
         <li><i class="ti ti-check"></i> ظهور في البحث العام</li>
       </ul>
-      <button class="btn-secondary" style="width: 100%;" onclick="window.location.href='register.html?pkg=free'">سجل مجاناً الآن</button>
+      <button class="btn-secondary" style="width: 100%;" onclick="openRegisterModal('free')">سجل مجاناً الآن</button>
     </div>
     <div class="pricing-card popular">
       <div class="pkg-name">الباقة الاقتصادية</div>
@@ -193,7 +210,7 @@
         <li><i class="ti ti-check"></i> إضافة الشعار ومعلومات الاتصال</li>
         <li><i class="ti ti-check"></i> أولوية في نتائج البحث</li>
       </ul>
-      <button class="btn-primary" style="width: 100%;" onclick="window.location.href='register.html?pkg=eco'">اشترك بالباقة الاقتصادية</button>
+      <button class="btn-primary" style="width: 100%;" onclick="openRegisterModal('eco')">اشترك بالباقة الاقتصادية</button>
     </div>
     <div class="pricing-card">
       <div class="pkg-name">الباقة الذهبية VIP</div>
@@ -203,7 +220,7 @@
         <li><i class="ti ti-check"></i> تمييز العقارات كـ VIP</li>
         <li><i class="ti ti-check"></i> لوحة تحكم إحصائية متقدمة</li>
       </ul>
-      <button class="btn-secondary" style="width: 100%;" onclick="window.location.href='register.html?pkg=gold'">اشترك بالباقة الذهبية</button>
+      <button class="btn-secondary" style="width: 100%;" onclick="openRegisterModal('gold')">اشترك بالباقة الذهبية</button>
     </div>
   </div>
 </section>
@@ -248,12 +265,56 @@
   </div>
 </div>
 
+<div id="registerOfficeModal" class="modal-overlay" onclick="if(event.target.id === 'registerOfficeModal') closeRegisterModal()">
+  <div class="modal-content">
+    <button onclick="closeRegisterModal()" class="modal-close-top-btn">✕</button>
+    <div style="margin-bottom: 1.2rem; text-align: center;">
+      <h3 style="color: var(--gold); font-weight: 700;"><i class="ti ti-briefcase"></i> تسجيل مكتب عقاري جديد</h3>
+      <p style="font-size: 12px; color: var(--text-muted);">انضم كشريك رسمي ومعتمد ودع النظام يدير عروضك</p>
+    </div>
+    
+    <div class="logo-upload-container">
+      <div class="logo-preview-circle" id="logoPreviewCircle">
+        <i class="ti ti-building-store"></i>
+      </div>
+      <label for="officeLogoInput" class="card-btn" style="cursor: pointer; font-size: 11px; padding: 4px 10px;">
+        <i class="ti ti-upload"></i> ارفع لوجو المكتب
+      </label>
+      <input type="file" id="officeLogoInput" accept="image/*" style="display: none;" onchange="handleLogoUpload(event)">
+    </div>
+
+    <div>
+      <label style="font-size: 11px; color: var(--gold);">اسم المكتب التجاري</label>
+      <input type="text" id="regOfficeName" class="input-field-modal" placeholder="مثال: مكتب الأمانة العقاري">
+
+      <label style="font-size: 11px; color: var(--gold);">رقم هاتف التواصل (للدخول)</label>
+      <input type="text" id="regOfficePhone" class="input-field-modal" placeholder="مثال: 077XXXXXXXX">
+
+      <label style="font-size: 11px; color: var(--gold);">منطقة العمل والتخصص في البصرة</label>
+      <input type="text" id="regOfficeDistrict" class="input-field-modal" placeholder="مثال: العشار، الجنينة...">
+
+      <label style="font-size: 11px; color: var(--gold);">باقة الاشتراك المختارة</label>
+      <select id="regOfficePkg" class="input-field-modal">
+        <option value="free">الباقة المجانية (ظهور محدود)</option>
+        <option value="eco">الباقة الاقتصادية (25,000 د.ع)</option>
+        <option value="gold">الباقة الذهبية VIP (50,000 د.ع)</option>
+      </select>
+
+      <label style="font-size: 11px; color: var(--gold);">كلمة المرور للحساب</label>
+      <input type="password" id="regOfficePass" class="input-field-modal" placeholder="••••••••">
+
+      <button onclick="submitNewOffice()" class="search-btn" style="width:100%; border-radius:8px; height:44px; margin-top: 5px;">💎 تفعيل الحساب وحفظ البيانات</button>
+      <button onclick="closeRegisterModal()" class="btn-close-danger-modal">❌ إلغاء التقديم</button>
+    </div>
+  </div>
+</div>
+
 <div id="paymentModal" class="modal-overlay" onclick="if(event.target.id === 'paymentModal') closePaymentModal()">
   <div class="modal-content" style="max-width: 400px; text-align: center;">
     <button onclick="closePaymentModal()" class="modal-close-top-btn">✕</button>
     <div style="margin-bottom: 1.5rem;">
       <i class="ti ti-credit-card-pay" style="font-size: 50px; color: var(--gold);"></i>
-      <h3 style="color: var(--gold); font-weight: 700; margin-top: 10px;">بوابة الدفع الإلكتروني الآمنة</h3>
+      <h3 style="color: var(--gold); font-weight: 700; margin-top: 10px;">بوابة الدفع الإلكتروني</h3>
       <p style="font-size: 13px; color: var(--text-muted); margin-top: 5px;">دفع رسوم تمييز الإعلان (VIP) - 5,000 د.ع</p>
     </div>
     
@@ -269,16 +330,22 @@
         <div style="width: 30px; height: 30px; background: #1a1f71; border-radius: 6px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:10px;">Asia</div>
         <span style="font-size: 14px; font-weight: 600; color: #fff;">حوالة رصيد آسيا سيل / زين</span>
       </div>
-      
-      <div class="payment-method" onclick="selectPayment(this)">
-        <div style="width: 30px; height: 30px; background: #222; border-radius: 6px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:18px;"><i class="ti ti-brand-mastercard"></i></div>
-        <span style="font-size: 14px; font-weight: 600; color: #fff;">بطاقة ماستر كارد / كي كارد</span>
-      </div>
     </div>
 
     <button onclick="confirmPaymentAndPublish()" class="search-btn" style="width:100%; border-radius:8px; height:44px; background: var(--success); color: #fff;">💳 تأكيد الدفع ونشر الإعلان VIP</button>
   </div>
 </div>
+
+<footer class="footer" style="background: #050c16; padding: 2rem; border-top: 1px solid rgba(201,168,76,0.15); margin-top: 4rem;">
+  <div style="max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+    <div>© 2026 دليل البصرة العقاري — جميع الحقوق محفوظة للرقابة والتطوير.</div>
+    <div>
+      <button onclick="window.location.href='admin.html'" style="background: transparent; color: var(--gold); border: 1px dashed var(--gold); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-family: 'Cairo'; font-size: 13px;">
+        🔐 بوابة تسجيل الدخول (المشرفين / المكاتب)
+      </button>
+    </div>
+  </div>
+</footer>
 
 <script>
 const STORAGE_KEY = 'basra_data_v3';
@@ -288,8 +355,9 @@ let defaultListings = [
   {type:'أرض', action:'للبيع', price:'300 مليون', area:'600', district:'المعقل', deedType:'طابو زراعي (إقرار)', rooms:'-', desc:'قطعة أرض مسيجة في موقع مميز جداً ومناسبة للاستثمار.', office:'مكتب الرافدين', officeId:'3', vip:true, icon:'🏞️', image:''},
 ];
 
-let pendingListing = null;
-let visitorImageBase64 = ''; // لتخزين صورة الزائر المرفوعة
+let uploadedLogoBase64 = ''; // الشعار المرفوع للمكتب الجديد
+let visitorImageBase64 = ''; // الصورة المرفوعة للزائر الـ VIP
+let pendingListing = null; // إعلان الزائر المعلق قبل الدفع
 
 function getAllListings() {
   let offices = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
@@ -301,7 +369,8 @@ function getAllListings() {
         dynamicListings.unshift({
           type: prop.type, action: prop.action, price: prop.price, area: prop.area, district: prop.district,
           deedType: prop.deedType, rooms: prop.rooms, desc: prop.desc, image: prop.image,
-          office: office.name, officeId: office.id, vip: false, icon: prop.icon
+          office: office.name, officeId: office.id, vip: false, icon: prop.icon,
+          officeLogo: office.logo // لتظهر صورة المكتب في الكارت
         });
       });
     }
@@ -331,7 +400,7 @@ function renderListings(dataToRender = null){
   if(!g) return;
   const currentListings = dataToRender || getAllListings();
   
-  // ترتيب العقارات بحيث تظهر الـ VIP في المقدمة دائماً
+  // الـ VIP يظهر أولاً
   currentListings.sort((a, b) => (b.vip === true) - (a.vip === true));
 
   if(currentListings.length === 0) {
@@ -341,6 +410,9 @@ function renderListings(dataToRender = null){
 
   g.innerHTML = currentListings.map(l => {
     const imageStyle = l.image ? `background-image:url(${l.image}); background-size:cover; background-position:center;` : '';
+    // الأيقونة أو الشعار أسفل الكارت
+    const avatarContent = l.officeLogo ? `<img src="${l.officeLogo}" style="width:100%; height:100%; object-fit:cover;">` : 'م';
+    
     return `
     <div class="listing-card">
       <div class="card-img" style="${imageStyle}">
@@ -358,7 +430,10 @@ function renderListings(dataToRender = null){
         </div>
         ${l.desc ? `<div class="card-desc">${l.desc}</div>` : ''}
         <div class="card-footer">
-          <div class="card-office"><div class="office-avatar">م</div><a href="office-profile.html?id=${l.officeId}" style="color:var(--text-on-dark); text-decoration:none; font-weight:700;">${l.office}</a></div>
+          <div class="card-office">
+            <div class="office-avatar">${avatarContent}</div>
+            <a href="office-profile.html?id=${l.officeId}" style="color:var(--text-on-dark); text-decoration:none; font-weight:700;">${l.office}</a>
+          </div>
           <button class="card-btn" onclick="window.location.href='office-profile.html?id=${l.officeId}'">تفاصيل 📞</button>
         </div>
       </div>
@@ -366,21 +441,76 @@ function renderListings(dataToRender = null){
   `}).join('');
 }
 
-// ---------------- وظائف إضافة عقار للزائر مع دعم הـ VIP والصور ----------------
+// ----------------- دوال تسجيل المكتب واللوجو -----------------
+function openRegisterModal(pkgType) {
+  if(pkgType) document.getElementById('regOfficePkg').value = pkgType;
+  document.getElementById('registerOfficeModal').style.display = 'flex';
+}
+function closeRegisterModal() {
+  document.getElementById('registerOfficeModal').style.display = 'none';
+  document.getElementById('regOfficeName').value = '';
+  document.getElementById('regOfficePhone').value = '';
+  document.getElementById('regOfficeDistrict').value = '';
+  document.getElementById('regOfficePass').value = '';
+  document.getElementById('logoPreviewCircle').innerHTML = '<i class="ti ti-building-store"></i>';
+  uploadedLogoBase64 = '';
+}
+function handleLogoUpload(event) {
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    uploadedLogoBase64 = e.target.result;
+    document.getElementById('logoPreviewCircle').innerHTML = `<img src="${uploadedLogoBase64}" />`;
+  }
+  reader.readAsDataURL(file);
+}
+function submitNewOffice() {
+  const name = document.getElementById('regOfficeName').value.trim();
+  const phone = document.getElementById('regOfficePhone').value.trim();
+  const district = document.getElementById('regOfficeDistrict').value.trim();
+  const pkg = document.getElementById('regOfficePkg').value;
+  const pass = document.getElementById('regOfficePass').value.trim();
 
+  if(!name || !phone || !district || !pass) { alert("يرجى إدخال كافة البيانات (الاسم، الرقم، التخصص، كلمة المرور)!"); return; }
+
+  let offices = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  if(offices.find(o => o.phone === phone)){ alert("رقم الهاتف مستخدم مسبقاً لمكتب آخر!"); return; }
+
+  const newId = (offices.length + 4).toString();
+  
+  let expiryDate = "مفتوح دائم";
+  if(pkg !== 'free') {
+      let d = new Date(); d.setDate(d.getDate() + 30);
+      expiryDate = d.toISOString().split('T')[0];
+  }
+
+  const newOffice = {
+    id: newId, name: name, phone: phone, password: pass, district: district, area: district, pkg: pkg,
+    logo: uploadedLogoBase64, status: 'active', expiry: expiryDate, listings: []
+  };
+
+  offices.push(newOffice);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(offices));
+
+  alert(`🎉 تم تسجيل وتفعيل مكتب "${name}" بنجاح!\nيمكنك الآن تسجيل الدخول برقمك وكلمة مرورك.`);
+  closeRegisterModal();
+  updateStatsCounters();
+}
+
+function updateStatsCounters() {
+  let offices = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  document.getElementById('count-offices').innerText = 147 + offices.length;
+}
+
+// ----------------- دوال إضافة الزائر والـ VIP -----------------
 function openAddPropertyModal() { 
   document.getElementById('modalVipCheck').checked = false;
-  toggleVipFeatures(); // لإخفاء قسم الصورة
+  toggleVipFeatures(); // إخفاء حقل الصورة
   document.getElementById('addPropModal').style.display = 'flex'; 
 }
-
 function closeAddPropertyModal() { document.getElementById('addPropModal').style.display = 'none'; }
 function closePaymentModal() { document.getElementById('paymentModal').style.display = 'none'; pendingListing = null; }
-
-function selectPayment(el) {
-  document.querySelectorAll('.payment-method').forEach(div => div.classList.remove('active'));
-  el.classList.add('active');
-}
 
 function toggleVipFeatures() {
   const isChecked = document.getElementById('modalVipCheck').checked;
@@ -390,12 +520,12 @@ function toggleVipFeatures() {
   if (isChecked) {
     box.style.borderColor = "var(--success)";
     box.style.background = "rgba(76,175,125,0.05)";
-    imgSection.style.display = "block"; // إظهار زر الرفع
+    imgSection.style.display = "block"; 
   } else {
     box.style.borderColor = "var(--gold)";
     box.style.background = "rgba(201,168,76,0.08)";
-    imgSection.style.display = "none";  // إخفاء زر الرفع
-    visitorImageBase64 = "";            // تصفير الصورة
+    imgSection.style.display = "none";  
+    visitorImageBase64 = "";            
     document.getElementById('visitorImgPreview').style.display = 'none';
     document.getElementById('visitorImgUpload').value = "";
   }
@@ -414,6 +544,11 @@ function previewVisitorImage(event) {
   }
 }
 
+function selectPayment(el) {
+  document.querySelectorAll('.payment-method').forEach(div => div.classList.remove('active'));
+  el.classList.add('active');
+}
+
 function submitNewPropertyFromModal() {
   const area = document.getElementById('modalPropArea').value.trim(); 
   const price = document.getElementById('modalPropPrice').value.trim(); 
@@ -422,25 +557,19 @@ function submitNewPropertyFromModal() {
 
   if(!area || !price) { alert("يرجى ملء كافة التفاصيل!"); return; }
 
-  // اختيار الأيقونة
-  let icon = '🏠';
-  if(type === 'شقة') icon = '🏢';
-  if(type === 'أرض') icon = '🏞️';
+  let icon = '🏠'; if(type === 'شقة') icon = '🏢'; if(type === 'أرض') icon = '🏞️';
 
-  // حفظ تفاصيل الإعلان مؤقتاً
   pendingListing = {
     type: type, action: 'للبيع', price: price, area: '150', district: area, 
     deedType: 'غير محدد', rooms: '-', desc: isVip ? 'إعلان مميز (VIP). تم إرفاق صورة حقيقية للعقار.' : 'تم النشر عبر الدخول السريع للزوار.', 
     office: isVip ? 'مالك العقار (VIP)' : 'زائر', officeId: 'guest', vip: isVip, icon: icon, 
-    image: isVip ? visitorImageBase64 : '' // أخذ الصورة فقط إذا كان VIP
+    image: isVip ? visitorImageBase64 : '', officeLogo: ''
   };
 
   if(isVip) {
-    // إخفاء نافذة الإضافة وإظهار نافذة الدفع
     closeAddPropertyModal();
     document.getElementById('paymentModal').style.display = 'flex';
   } else {
-    // نشر عادي مجاني
     publishFinalListing();
   }
 }
@@ -455,7 +584,7 @@ function publishFinalListing() {
   if(pendingListing) {
     defaultListings.unshift(pendingListing);
     if(!pendingListing.vip) {
-      alert("🎉 تم النشر بنجاح!");
+      alert("🎉 تم النشر المجاني بنجاح!");
       closeAddPropertyModal();
     }
     pendingListing = null;
@@ -464,7 +593,7 @@ function publishFinalListing() {
 }
 
 function scrollToSearch() { document.getElementById('search').scrollIntoView({behavior:'smooth'}); }
-document.addEventListener('DOMContentLoaded', () => { renderListings(); });
+document.addEventListener('DOMContentLoaded', () => { renderListings(); updateStatsCounters(); });
 </script>
 </body>
 </html>
