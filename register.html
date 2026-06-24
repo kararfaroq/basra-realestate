@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تسجيل مكتب عقاري جديد - دليل البصرة العقاري</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{ --gold:#C9A84C; --gold-light:#E8C96A; --navy:#0A1628; --navy-mid:#1A3A5C; --navy-light:#2A5080; --text-on-dark:#F5F0E8; --text-muted:#8BA0B8; --success:#4CAF7D;}
+    body{font-family:'Cairo',sans-serif;background:var(--navy);color:var(--text-on-dark);direction:rtl;padding:2rem 1rem;}
+    .container{max-width:550px; margin:2rem auto;}
+    .register-card {background:var(--navy-mid); border:2px solid var(--gold); border-radius:20px; padding:2.5rem; box-shadow:0 10px 40px rgba(0,0,0,0.5);}
+    .input-field{width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(201,168,76,0.2); border-radius:8px; padding:14px 16px; color:var(--text-on-dark); font-family:'Cairo'; font-size:14px; outline:none; margin-bottom:15px;}
+    .input-field:focus{ border-color:var(--gold); background:rgba(255,255,255,0.08); }
+    .btn-action{width:100%; background:var(--gold); color:var(--navy); border:none; border-radius:8px; padding:15px; font-size:16px; font-weight:700; font-family:'Cairo'; cursor:pointer; transition: 0.2s; margin-top: 10px;}
+    .btn-action:hover { background: var(--gold-light); }
+    .btn-outline-back { display:block; text-align:center; background:transparent; color:var(--text-muted); padding:10px; text-decoration:none; font-size:14px; margin-top: 15px; }
+    .btn-outline-back:hover { color: var(--gold); }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="register-card">
+    <div style="text-align:center; margin-bottom:2rem;">
+      <i class="ti ti-building-estate" style="font-size: 50px; color: var(--gold);"></i>
+      <h2 style="font-size:1.5rem; font-weight:900; margin-top: 10px;">إنشاء حساب مكتب عقاري</h2>
+      <p style="font-size:13px; color:var(--text-muted); margin-top:5px;">سجل مكتبك الآن وانضم لأكبر شبكة عقارية في البصرة</p>
+    </div>
+
+    <form onsubmit="registerNewOffice(event)">
+      <label style="font-size: 12px; color: var(--gold); margin-bottom: 5px; display:block;">اسم المكتب العقاري (الرسمي)</label>
+      <input type="text" id="regName" class="input-field" placeholder="مثال: مكتب النور العقاري" required>
+
+      <label style="font-size: 12px; color: var(--gold); margin-bottom: 5px; display:block;">رقم هاتف الإدارة (سيكون هو اسم المستخدم للدخول)</label>
+      <input type="tel" id="regPhone" class="input-field" placeholder="مثال: 07700000000" required>
+
+      <label style="font-size: 12px; color: var(--gold); margin-bottom: 5px; display:block;">كلمة المرور لحسابك</label>
+      <input type="password" id="regPass" class="input-field" placeholder="اختر كلمة مرور قوية" required>
+
+      <label style="font-size: 12px; color: var(--gold); margin-bottom: 5px; display:block;">المنطقة الرئيسية لعمل المكتب</label>
+      <input type="text" id="regArea" class="input-field" placeholder="مثال: الطويسة، الجنينة..." required>
+
+      <label style="font-size: 12px; color: var(--gold); margin-bottom: 5px; display:block;">اختر باقة الاشتراك</label>
+      <select id="regPkg" class="input-field" style="color:#fff; background:var(--navy);">
+        <option value="free">الباقة المجانية (إعلانين فقط)</option>
+        <option value="eco">الباقة الاقتصادية (10 إعلانات) - 25 ألف شهرياً</option>
+        <option value="gold">الباقة الذهبية VIP (نشر مفتوح) - 50 ألف شهرياً</option>
+      </select>
+
+      <button type="submit" class="btn-action">✅ تسجيل المكتب الآن</button>
+    </form>
+    <a href="index.html" class="btn-outline-back">← العودة للصفحة الرئيسية</a>
+  </div>
+</div>
+
+<script>
+  // قراءة الباقة المختارة من الرابط إذا جاء الزائر عبر الضغط على الباقات في الرئيسية
+  const urlParams = new URLSearchParams(window.location.search);
+  const pkgParam = urlParams.get('pkg');
+  if(pkgParam && (pkgParam === 'free' || pkgParam === 'eco' || pkgParam === 'gold')) {
+      document.getElementById('regPkg').value = pkgParam;
+  }
+
+  function registerNewOffice(e) {
+    e.preventDefault();
+    const name = document.getElementById('regName').value.trim();
+    const phone = document.getElementById('regPhone').value.trim();
+    const pass = document.getElementById('regPass').value.trim();
+    const area = document.getElementById('regArea').value.trim();
+    const pkg = document.getElementById('regPkg').value;
+    
+    let offices = JSON.parse(localStorage.getItem('basra_data_v3')) || [];
+    
+    // التحقق من عدم تكرار رقم الهاتف
+    if(offices.find(o => o.phone === phone)) {
+        alert("❌ رقم الهاتف مسجل مسبقاً! يرجى تسجيل الدخول أو استخدام رقم آخر."); return;
+    }
+    
+    const newOffice = {
+      id: Date.now().toString(),
+      name: name,
+      area: area,
+      publishedProps: 0,
+      pkg: pkg,
+      status: 'active', // يتم تفعيل الحساب فوراً للتجربة
+      allowPublish: true,
+      expiry: pkg === 'free' ? 'مفتوح دائم' : new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0],
+      phone: phone,
+      password: pass, // حفظ كلمة المرور
+      description: '',
+      logo: '',
+      listings: []
+    };
+    
+    offices.push(newOffice);
+    localStorage.setItem('basra_data_v3', JSON.stringify(offices));
+    
+    alert("🎉 تم إنشاء حساب مكتبك بنجاح!\n\nيمكنك الآن تسجيل الدخول باستخدام:\nاسم المستخدم: " + phone + "\nكلمة المرور: التي اخترتها");
+    window.location.href = "admin.html";
+  }
+</script>
+</body>
+</html>
