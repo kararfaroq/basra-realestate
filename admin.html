@@ -29,6 +29,7 @@
       font-size:14px; outline:none; margin-bottom:15px;
     }
     .input-field:focus{ border-color:var(--gold); background:rgba(255,255,255,0.08); }
+    textarea.input-field { resize: vertical; min-height: 80px; }
     
     .btn-action{
       width:100%; background:var(--gold); color:var(--navy); border:none; border-radius:8px;
@@ -83,6 +84,12 @@
       margin-top: 10px; transition: 0.2s; text-align: center;
     }
     .btn-close-danger:hover { background: var(--danger); color: white; }
+
+    /* UPLOAD STYLES */
+    .file-upload-wrapper { position: relative; width: 100%; margin-bottom: 15px; }
+    .file-upload-input { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+    .file-upload-btn { background: rgba(255,255,255,0.05); border: 1px dashed var(--gold); border-radius: 8px; padding: 15px; text-align: center; color: var(--gold); font-size: 14px; }
+    .img-preview { max-width: 100px; max-height: 100px; border-radius: 50%; border: 2px solid var(--gold); margin: 10px auto; display: none; object-fit: cover; }
 
     @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
   </style>
@@ -157,10 +164,15 @@
     <div id="officeOnlyView" class="panel-card" style="display:none;">
       <div class="panel-title"><i class="ti ti-building-estate"></i> حالة صلاحيات مكتبك الإعلانية</div>
       <div id="officeStatusBanner" style="padding:1.2rem; border-radius:10px; margin-bottom:1.5rem; font-size:14px; line-height:1.6;"></div>
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+      
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap: wrap; gap: 10px;">
         <span style="font-weight:700; font-size:14px;">إحصائيات الإعلانات الحالية للمكتب:</span>
-        <button class="btn-action" style="width:auto; padding:6px 15px; font-size:12px;" onclick="openAddPropertyModal()">➕ إضافة عقار جديد</button>
+        <div style="display:flex; gap: 10px;">
+           <button id="editProfileBtn" class="btn-action" style="width:auto; padding:6px 15px; font-size:12px; background: transparent; border: 1px solid var(--gold); color: var(--gold);" onclick="openProfileSettingsModal()">⚙️ إعدادات البروفايل</button>
+           <button class="btn-action" style="width:auto; padding:6px 15px; font-size:12px;" onclick="openAddPropertyModal()">➕ إضافة عقار جديد</button>
+        </div>
       </div>
+
       <div style="background:rgba(255,255,255,0.02); padding:1rem; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
          <p>📊 العقارات المنشورة حالياً: <strong id="currentOfficePropsCount" style="color:var(--gold);">0</strong> عقارات</p>
          <p id="packageLimitInfo" style="font-size:12px; color:var(--text-muted); margin-top:5px;"></p>
@@ -175,7 +187,7 @@
 
 </div>
 
-<div id="addPropertyModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event)">
+<div id="addPropertyModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'addPropertyModal')">
   <div class="modal-content">
     <div style="margin-bottom: 1.5rem;">
       <h3 style="color: var(--gold); font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
@@ -196,28 +208,62 @@
       <input type="text" id="propPrice" class="input-field" placeholder="مثال: 140 مليون دينار">
       
       <button onclick="submitNewProperty()" class="btn-action">🚀 نشر الإعلان فوراً</button>
-      <button onclick="closeAddPropertyModal()" class="btn-close-danger">❌ إلغاء وإغلاق</button>
+      <button onclick="closeModal('addPropertyModal')" class="btn-close-danger">❌ إلغاء وإغلاق</button>
+    </div>
+  </div>
+</div>
+
+<div id="profileSettingsModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'profileSettingsModal')">
+  <div class="modal-content">
+    <div style="margin-bottom: 1.5rem;">
+      <h3 style="color: var(--gold); font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+        <i class="ti ti-settings"></i> إعدادات بروفايل المكتب
+      </h3>
+    </div>
+    <div>
+      <label style="font-size: 12px; color: var(--gold); display: block; margin-bottom: 5px;">شعار المكتب (اختياري)</label>
+      <div class="file-upload-wrapper">
+        <div class="file-upload-btn"><i class="ti ti-upload"></i> اضغط هنا لرفع صورة الشعار من جهازك</div>
+        <input type="file" id="logoUploadInput" class="file-upload-input" accept="image/*" onchange="handleLogoUpload(event)">
+      </div>
+      <div style="text-align: center;">
+         <img id="logoPreview" class="img-preview" src="" alt="شعار المكتب">
+      </div>
+
+      <label style="font-size: 12px; color: var(--gold); display: block; margin-bottom: 5px;">رقم هاتف التواصل للزبائن</label>
+      <input type="text" id="officePhoneInput" class="input-field" placeholder="مثال: 07701234567">
+      
+      <label style="font-size: 12px; color: var(--gold); display: block; margin-bottom: 5px;">نبذة سريعة عن المكتب (الوصف)</label>
+      <textarea id="officeDescInput" class="input-field" placeholder="اكتب نبذة عن تخصص مكتبك وخبرتك في عقارات البصرة..."></textarea>
+      
+      <button onclick="saveProfileSettings()" class="btn-action">💾 حفظ التحديثات</button>
+      <button onclick="closeModal('profileSettingsModal')" class="btn-close-danger">❌ إلغاء وإغلاق</button>
     </div>
   </div>
 </div>
 
 <script>
-  // تهيئة البيانات الافتراضية وحفظها بالـ LocalStorage لضمان الحفظ الدائم
+  // تحديث المفاتيح لحل مشكلة قراءة البيانات القديمة
+  const STORAGE_KEY = 'basra_data_v3';
+  const SESSION_KEY = 'basra_session_v3';
+
+  // البيانات الافتراضية المحدثة
   const defaultOffices = [
-    {id: "1", name:'مكتب الأمانة العقاري', area:'العشار', publishedProps: 1, pkg:'free', status:'active', allowPublish: true, expiry:'مفتوح الصلاحية دائم'},
-    {id: "2", name:'عقارات الخليج بالبصرة', area:'الجمهورية', publishedProps: 4, pkg:'eco', status:'active', allowPublish: true, expiry:'2026-07-24'},
-    {id: "3", name:'مكتب الرافدين للاستثمار', area:'المعقل', publishedProps: 12, pkg:'gold', status:'expired', allowPublish: true, expiry:'2026-06-01'}
+    {id: "1", name:'مكتب الأمانة العقاري', area:'العشار', publishedProps: 1, pkg:'free', status:'active', allowPublish: true, expiry:'مفتوح الصلاحية دائم', phone: '', description: '', logo: ''},
+    {id: "2", name:'عقارات الخليج بالبصرة', area:'الجمهورية', publishedProps: 4, pkg:'eco', status:'active', allowPublish: true, expiry:'2026-07-24', phone: '', description: '', logo: ''},
+    {id: "3", name:'مكتب الرافدين للاستثمار', area:'المعقل', publishedProps: 12, pkg:'gold', status:'expired', allowPublish: true, expiry:'2026-06-01', phone: '', description: '', logo: ''}
   ];
 
-  if (!localStorage.getItem('mockOfficesData')) {
-     localStorage.setItem('mockOfficesData', JSON.stringify(defaultOffices));
+  if (!localStorage.getItem(STORAGE_KEY)) {
+     localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultOffices));
   }
 
-  function getOffices() { return JSON.parse(localStorage.getItem('mockOfficesData')); }
-  function saveOffices(data) { localStorage.setItem('mockOfficesData', JSON.stringify(data)); }
+  function getOffices() { return JSON.parse(localStorage.getItem(STORAGE_KEY)); }
+  function saveOffices(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 
   let guestUser = { publishedProps: 0, maxLimit: 1, allowPublish: true };
-  let session = JSON.parse(localStorage.getItem('basra_admin_session')) || null;
+  let session = JSON.parse(localStorage.getItem(SESSION_KEY)) || null;
+  let tempLogoBase64 = "";
 
   document.addEventListener('DOMContentLoaded', () => { evaluateSessionUI(); });
 
@@ -285,7 +331,6 @@
     }).join('');
   }
 
-  // الدالة الجديدة لحذف المكتب بالكامل
   function deleteOffice(id) {
     if(confirm('⚠️ تحذير: هل أنت متأكد من رغبتك في حذف هذا المكتب نهائياً من السيستم؟ لا يمكن التراجع عن هذا الإجراء!')) {
       let offices = getOffices();
@@ -328,18 +373,21 @@
 
   function setupOfficeViewUI() {
     const banner = document.getElementById('officeStatusBanner');
+    const editBtn = document.getElementById('editProfileBtn');
     
     if (session.role === 'guest') {
       document.getElementById('currentOfficePropsCount').textContent = guestUser.publishedProps;
       document.getElementById('packageLimitInfo').textContent = `ℹ️ باقة الزائر: مسموح بنشر عقار واحد مجاناً.`;
       banner.className = "status-active";
       banner.innerHTML = `🟢 دخول سريع كزائر عادي.`;
+      editBtn.style.display = 'none'; // إخفاء زر الإعدادات للزائر
     } else {
       let offices = getOffices();
       const myOffice = offices[0]; 
       document.getElementById('currentOfficePropsCount').textContent = myOffice.publishedProps;
       let maxLimit = myOffice.pkg === 'gold' ? Infinity : myOffice.pkg === 'eco' ? 5 : 2;
       document.getElementById('packageLimitInfo').textContent = myOffice.pkg === 'gold' ? "🥇 باقتك ذهبية: نشر غير محدود." : `ℹ️ سقف الباقة الحالية: ${maxLimit} عقارات.`;
+      editBtn.style.display = 'block'; // إظهار الزر للمكتب
       
       if (!myOffice.allowPublish) {
         banner.className = "status-suspended"; banner.innerHTML = `🛑 <strong>تم إيقاف مكتبك عن النشر من قبل الإدارة!</strong>`;
@@ -362,11 +410,63 @@
     document.getElementById('addPropertyModal').style.display = 'flex';
   }
 
-  function closeAddPropertyModal() {
-    document.getElementById('addPropertyModal').style.display = 'none';
+  /* وظائف نافذة إعدادات البروفايل */
+  function openProfileSettingsModal() {
+    let offices = getOffices();
+    const myOffice = offices[0]; 
+    
+    document.getElementById('officePhoneInput').value = myOffice.phone || '';
+    document.getElementById('officeDescInput').value = myOffice.description || '';
+    
+    const preview = document.getElementById('logoPreview');
+    if (myOffice.logo) {
+      preview.src = myOffice.logo;
+      preview.style.display = 'block';
+      tempLogoBase64 = myOffice.logo;
+    } else {
+      preview.style.display = 'none';
+      tempLogoBase64 = "";
+    }
+    
+    document.getElementById('profileSettingsModal').style.display = 'flex';
   }
 
-  // دالة تسجيل الدخول الموحدة
+  function handleLogoUpload(event) {
+    const file = event.target.files[0];
+    if(file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        tempLogoBase64 = e.target.result;
+        const preview = document.getElementById('logoPreview');
+        preview.src = tempLogoBase64;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function saveProfileSettings() {
+    const phone = document.getElementById('officePhoneInput').value.trim();
+    const desc = document.getElementById('officeDescInput').value.trim();
+    
+    let offices = getOffices();
+    offices[0].phone = phone;
+    offices[0].description = desc;
+    offices[0].logo = tempLogoBase64;
+    
+    saveOffices(offices);
+    alert("✅ تم حفظ إعدادات البروفايل والشعار بنجاح!");
+    closeModal('profileSettingsModal');
+  }
+
+  function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+  }
+
+  function closeModalOnOutsideClick(event, modalId) {
+    if (event.target.id === modalId) { closeModal(modalId); }
+  }
+
   function handleLogin() {
     const u = document.getElementById('usernameInput').value.trim();
     const p = document.getElementById('passwordInput').value.trim();
@@ -382,22 +482,18 @@
       return; 
     }
     
-    localStorage.setItem('basra_admin_session', JSON.stringify(session));
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
     evaluateSessionUI();
   }
 
   function handleLogout() {
-    session = null; localStorage.removeItem('basra_admin_session'); evaluateSessionUI();
+    session = null; localStorage.removeItem(SESSION_KEY); evaluateSessionUI();
   }
 
   function loginAsGuest() {
     session = { role: 'guest', username: 'زائر سريع للدليل' };
-    localStorage.setItem('basra_admin_session', JSON.stringify(session));
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
     evaluateSessionUI();
-  }
-
-  function closeModalOnOutsideClick(event) {
-    if (event.target.id === 'addPropertyModal') { closeAddPropertyModal(); }
   }
 
   function submitNewProperty() {
@@ -413,7 +509,7 @@
       saveOffices(offices);
     }
     alert("🎉 تم نشر العقار بنجاح!");
-    closeAddPropertyModal();
+    closeModal('addPropertyModal');
     setupOfficeViewUI();
   }
 </script>
