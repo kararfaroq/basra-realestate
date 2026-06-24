@@ -101,13 +101,18 @@
     .btn-close-danger-modal{width:100%;background:transparent;color:var(--danger);border:1px solid var(--danger);border-radius:8px;padding:12px;font-size:14px;font-weight:700;font-family:'Cairo';cursor:pointer;margin-top:10px;}
     .modal-close-top-btn {position:absolute;top:15px;left:15px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text-muted);width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
     
-    /* تنسيقات نافذة الدفع للـ VIP */
-    .vip-upgrade-box { background: rgba(201,168,76,0.08); border: 1px dashed var(--gold); border-radius: 10px; padding: 15px; margin-bottom: 15px; text-align: right; }
+    /* تنسيقات نافذة الـ VIP ورفع الصورة */
+    .vip-upgrade-box { background: rgba(201,168,76,0.08); border: 1px dashed var(--gold); border-radius: 10px; padding: 15px; margin-bottom: 15px; text-align: right; transition: 0.3s; }
     .vip-checkbox-wrap { display: flex; align-items: center; gap: 10px; cursor: pointer; margin-bottom: 5px; }
     .vip-checkbox-wrap input { width: 18px; height: 18px; accent-color: var(--gold); }
+    .vip-features-list { list-style: none; margin: 10px 0 0 0; padding: 0 28px 0 0; font-size: 12px; color: var(--text-muted); }
+    .vip-features-list li { margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .vip-features-list li i { color: var(--gold); }
+    .file-upload-btn { background: rgba(201,168,76,0.1); border: 1px dashed var(--gold); border-radius: 8px; padding: 12px; text-align: center; color: var(--gold); font-size: 13px; cursor: pointer; transition: 0.2s; display: block; font-weight: 600; }
+    .file-upload-btn:hover { background: rgba(201,168,76,0.2); }
+    
     .payment-method { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
     .payment-method:hover, .payment-method.active { border-color: var(--gold); background: rgba(201,168,76,0.1); }
-    .payment-method img { width: 30px; height: 30px; border-radius: 6px; object-fit: contain; }
 
     @media(max-width:700px){ .nav-links{display:none} .search-filters { flex-direction: column; width: 100%; border-left: none; } .filter-select { border-left: none; border-bottom: 1px solid rgba(201,168,76,0.15); width: 100%; } .search-btn { width: 100%; } }
   </style>
@@ -215,14 +220,26 @@
       <label style="font-size: 11px; color: var(--gold);">السعر</label>
       <input type="text" id="modalPropPrice" class="input-field-modal" placeholder="مثال: 140 مليون">
       
-      <div class="vip-upgrade-box">
+      <div class="vip-upgrade-box" id="vipBoxContainer">
         <label class="vip-checkbox-wrap">
-          <input type="checkbox" id="modalVipCheck">
-          <span style="font-size: 14px; font-weight: 700; color: var(--gold);">👑 تمييز الإعلان كـ (VIP) - 5,000 د.ع</span>
+          <input type="checkbox" id="modalVipCheck" onchange="toggleVipFeatures()">
+          <span style="font-size: 14px; font-weight: 700; color: var(--gold);">👑 ترقية الإعلان لـ (VIP) - 5,000 د.ع فقط</span>
         </label>
-        <p style="font-size: 11px; color: var(--text-muted); margin-top: 5px; padding-right: 28px;">
-          سيظهر إعلانك بشارة ملكية ذهبية وفي أعلى القائمة لضمان سرعة البيع والتأجير.
-        </p>
+        
+        <ul class="vip-features-list">
+          <li><i class="ti ti-arrow-up-circle"></i> ظهور دائم في أعلى القائمة وتصدر نتائج البحث</li>
+          <li><i class="ti ti-eye"></i> شارة ذهبية تجذب المشترين وتضاعف المشاهدات</li>
+          <li><i class="ti ti-camera"></i> <b>حصرياً:</b> فتح ميزة إرفاق صورة حقيقية لعقارك!</li>
+        </ul>
+
+        <div id="vipImageSection" style="display:none; margin-top: 15px; border-top: 1px dashed rgba(201,168,76,0.3); padding-top: 15px;">
+           <label style="font-size: 11px; color: var(--gold); margin-bottom:5px; display:block;">صورة العقار (ميزة الـ VIP مفعلة 🔓)</label>
+           <div class="file-upload-btn" onclick="document.getElementById('visitorImgUpload').click()">
+             <i class="ti ti-upload"></i> اضغط هنا لرفع صورة العقار من جهازك
+           </div>
+           <input type="file" id="visitorImgUpload" accept="image/*" style="display:none;" onchange="previewVisitorImage(event)">
+           <img id="visitorImgPreview" src="" style="display:none; width:100%; height:140px; object-fit:cover; border-radius:8px; margin-top:10px; border:1px solid var(--gold);">
+        </div>
       </div>
 
       <button onclick="submitNewPropertyFromModal()" class="search-btn" style="width:100%; border-radius:8px; height:44px;">🚀 انشر الإعلان الآن</button>
@@ -236,7 +253,7 @@
     <button onclick="closePaymentModal()" class="modal-close-top-btn">✕</button>
     <div style="margin-bottom: 1.5rem;">
       <i class="ti ti-credit-card-pay" style="font-size: 50px; color: var(--gold);"></i>
-      <h3 style="color: var(--gold); font-weight: 700; margin-top: 10px;">بوابة الدفع الإلكتروني</h3>
+      <h3 style="color: var(--gold); font-weight: 700; margin-top: 10px;">بوابة الدفع الإلكتروني الآمنة</h3>
       <p style="font-size: 13px; color: var(--text-muted); margin-top: 5px;">دفع رسوم تمييز الإعلان (VIP) - 5,000 د.ع</p>
     </div>
     
@@ -271,8 +288,8 @@ let defaultListings = [
   {type:'أرض', action:'للبيع', price:'300 مليون', area:'600', district:'المعقل', deedType:'طابو زراعي (إقرار)', rooms:'-', desc:'قطعة أرض مسيجة في موقع مميز جداً ومناسبة للاستثمار.', office:'مكتب الرافدين', officeId:'3', vip:true, icon:'🏞️', image:''},
 ];
 
-// متغيرات لحفظ بيانات الإعلان مؤقتاً قبل الدفع
 let pendingListing = null;
+let visitorImageBase64 = ''; // لتخزين صورة الزائر المرفوعة
 
 function getAllListings() {
   let offices = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
@@ -314,7 +331,7 @@ function renderListings(dataToRender = null){
   if(!g) return;
   const currentListings = dataToRender || getAllListings();
   
-  // ترتيب العقارات بحيث تظهر الـ VIP أولاً
+  // ترتيب العقارات بحيث تظهر الـ VIP في المقدمة دائماً
   currentListings.sort((a, b) => (b.vip === true) - (a.vip === true));
 
   if(currentListings.length === 0) {
@@ -349,9 +366,11 @@ function renderListings(dataToRender = null){
   `}).join('');
 }
 
-// دوال إضافة العقار والدفع
+// ---------------- وظائف إضافة عقار للزائر مع دعم הـ VIP والصور ----------------
+
 function openAddPropertyModal() { 
-  document.getElementById('modalVipCheck').checked = false; // تصفير الصح
+  document.getElementById('modalVipCheck').checked = false;
+  toggleVipFeatures(); // لإخفاء قسم الصورة
   document.getElementById('addPropModal').style.display = 'flex'; 
 }
 
@@ -363,6 +382,38 @@ function selectPayment(el) {
   el.classList.add('active');
 }
 
+function toggleVipFeatures() {
+  const isChecked = document.getElementById('modalVipCheck').checked;
+  const box = document.getElementById('vipBoxContainer');
+  const imgSection = document.getElementById('vipImageSection');
+  
+  if (isChecked) {
+    box.style.borderColor = "var(--success)";
+    box.style.background = "rgba(76,175,125,0.05)";
+    imgSection.style.display = "block"; // إظهار زر الرفع
+  } else {
+    box.style.borderColor = "var(--gold)";
+    box.style.background = "rgba(201,168,76,0.08)";
+    imgSection.style.display = "none";  // إخفاء زر الرفع
+    visitorImageBase64 = "";            // تصفير الصورة
+    document.getElementById('visitorImgPreview').style.display = 'none';
+    document.getElementById('visitorImgUpload').value = "";
+  }
+}
+
+function previewVisitorImage(event) {
+  const file = event.target.files[0];
+  if(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      visitorImageBase64 = e.target.result;
+      document.getElementById('visitorImgPreview').src = visitorImageBase64;
+      document.getElementById('visitorImgPreview').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
 function submitNewPropertyFromModal() {
   const area = document.getElementById('modalPropArea').value.trim(); 
   const price = document.getElementById('modalPropPrice').value.trim(); 
@@ -371,11 +422,17 @@ function submitNewPropertyFromModal() {
 
   if(!area || !price) { alert("يرجى ملء كافة التفاصيل!"); return; }
 
+  // اختيار الأيقونة
+  let icon = '🏠';
+  if(type === 'شقة') icon = '🏢';
+  if(type === 'أرض') icon = '🏞️';
+
   // حفظ تفاصيل الإعلان مؤقتاً
   pendingListing = {
     type: type, action: 'للبيع', price: price, area: '150', district: area, 
-    deedType: 'غير محدد', rooms: '-', desc: 'تم النشر عبر الدخول السريع للزوار.', 
-    office: 'زائر', officeId: 'guest', vip: isVip, icon: '🏠', image: ''
+    deedType: 'غير محدد', rooms: '-', desc: isVip ? 'إعلان مميز (VIP). تم إرفاق صورة حقيقية للعقار.' : 'تم النشر عبر الدخول السريع للزوار.', 
+    office: isVip ? 'مالك العقار (VIP)' : 'زائر', officeId: 'guest', vip: isVip, icon: icon, 
+    image: isVip ? visitorImageBase64 : '' // أخذ الصورة فقط إذا كان VIP
   };
 
   if(isVip) {
@@ -389,8 +446,7 @@ function submitNewPropertyFromModal() {
 }
 
 function confirmPaymentAndPublish() {
-  // هنا تتم محاكاة نجاح عملية الدفع
-  alert("✅ تمت عملية الدفع بنجاح (محاكاة)! شكراً لك.\nسيتم الآن نشر إعلانك متوجاً بشارة الـ VIP.");
+  alert("✅ تمت عملية الدفع بنجاح (محاكاة)! شكراً لك.\nسيتم الآن نشر إعلانك متوجاً بشارة الـ VIP وبالصورة المرفقة.");
   closePaymentModal();
   publishFinalListing();
 }
