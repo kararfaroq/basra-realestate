@@ -603,26 +603,31 @@
 // ===== Supabase Config =====
 const SUPABASE_URL = 'https://blayfetxmufisvtigugt.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_zCJnnFxjHQ-X7BkkQCuVqA_U_UyaI6y';
+const SUPABASE_REST = `${SUPABASE_URL}/rest/v1`;
 const STORAGE_KEY  = 'basra_data_v3'; // للتوافق مع admin.html
 let uploadedVisitorImgBase64 = "";
 
 // دالة مساعدة لاستدعاء Supabase REST API
 async function sbFetch(table, method = 'GET', body = null, filter = '') {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}${filter}`, {
+  const res = await fetch(`${SUPABASE_REST}/${table}${filter}`, {
     method,
     headers: {
       'apikey': SUPABASE_KEY,
       'Authorization': `Bearer ${SUPABASE_KEY}`,
       'Content-Type': 'application/json',
-      'Prefer': method === 'POST' ? 'return=representation' : ''
+      'Accept': 'application/json',
+      'Prefer': method === 'POST' ? 'return=representation' : 'return=minimal'
     },
     body: body ? JSON.stringify(body) : null
   });
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(err);
+    console.error('Supabase error:', res.status, err);
+    throw new Error(`${res.status}: ${err}`);
   }
-  return method === 'DELETE' ? null : res.json();
+  if (method === 'DELETE' || res.status === 204) return null;
+  const text = await res.text();
+  return text ? JSON.parse(text) : [];
 }
 
 // إنشاء الجداول إذا ما كانت موجودة (عبر SQL Editor في Supabase)
@@ -630,9 +635,9 @@ async function sbFetch(table, method = 'GET', body = null, filter = '') {
 // جدول listings: id, office_id, office_name, type, action, price, area, district, deed_type, rooms, desc, phone, vip, icon, image, created_at
 
 let defaultListings = [
-  {type:'بيت', action:'للبيع', price:'145 مليون', area:'200', district:'العشار', deedType:'طابو صرف (ملك)', rooms:'4', desc:'بيت بناء حديث درجة أولى قرب الشارع التجاري، جاهز للسكن.', office:'مكتب الأمانة العقاري', officeId:'default', vip:true, icon:'🏠', image:'', phone:''},
-  {type:'شقة', action:'للإيجار', price:'450 ألف/شهر', area:'120', district:'الجمهورية', deedType:'طابو صرف', rooms:'2', desc:'شقة مؤثثة بالكامل ضمن مجمع آمن مع موقف للسيارات.', office:'عقارات الخليج بالبصرة', officeId:'default', vip:false, icon:'🏢', image:'', phone:''},
-  {type:'أرض', action:'للبيع', price:'300 مليون', area:'600', district:'المعقل', deedType:'طابو زراعي (إقرار)', rooms:'-', desc:'قطعة أرض مسيجة في موقع مميز جداً ومناسبة للاستثمار.', office:'مكتب الرافدين', officeId:'default', vip:true, icon:'🏞️', image:'', phone:''}
+  {type:'بيت', action:'للبيع', price:'145 مليون', area:'200', district:'العشار', deedType:'طابو صرف (ملك)', rooms:'4', notes:'بيت بناء حديث درجة أولى قرب الشارع التجاري، جاهز للسكن.', office:'مكتب الأمانة العقاري', officeId:'default', vip:true, icon:'🏠', image:'', phone:''},
+  {type:'شقة', action:'للإيجار', price:'450 ألف/شهر', area:'120', district:'الجمهورية', deedType:'طابو صرف', rooms:'2', notes:'شقة مؤثثة بالكامل ضمن مجمع آمن مع موقف للسيارات.', office:'عقارات الخليج بالبصرة', officeId:'default', vip:false, icon:'🏢', image:'', phone:''},
+  {type:'أرض', action:'للبيع', price:'300 مليون', area:'600', district:'المعقل', deedType:'طابو زراعي (إقرار)', rooms:'-', notes:'قطعة أرض مسيجة في موقع مميز جداً ومناسبة للاستثمار.', office:'مكتب الرافدين', officeId:'default', vip:true, icon:'🏞️', image:'', phone:''}
 ];
 
 // تحويل صف Supabase إلى كائن listing
@@ -646,7 +651,7 @@ function rowToListing(row) {
     district: row.district || '',
     deedType: row.deed_type || 'طابو صرف',
     rooms: row.rooms || '-',
-    desc: row.desc || '',
+    notes: row.notes || '',
     office: row.office_name || '',
     officeId: row.office_id || '',
     vip: !!row.vip,
@@ -674,7 +679,7 @@ async function getAllListings() {
           dynamicListings.unshift({
             type: prop.type, action: prop.action, price: prop.price, area: prop.area,
             district: prop.district, deedType: prop.deedType || 'طابو صرف',
-            rooms: prop.rooms || '-', desc: prop.desc, image: prop.image || '',
+            rooms: prop.rooms || '-', notes: prop.notes, image: prop.image || '',
             office: office.name, officeId: office.id, vip: !!prop.vip,
             icon: prop.icon || '🏠', phone: prop.phone || ''
           });
@@ -707,7 +712,7 @@ async function renderListings(dataToRender = null){
     const action = l.action || 'للبيع';
     const vipBadge = l.vip ? '<div class="badge-vip">&#x1F451; VIP</div>' : '';
     const imgPlaceholder = !l.image ? `<div class="card-img-placeholder">${icon}</div>` : '';
-    const desc = l.desc ? `<div class="card-desc">${l.desc}</div>` : '';
+    const desc = l.notes ? `<div class="card-desc">${l.notes}</div>` : '';
     return `
     <div class="listing-card" onclick="openPropModal(${idx})">
       <div class="card-img" style="${imageStyle}">
@@ -752,7 +757,7 @@ async function executeSearch() {
       (item.district || '').includes(textSearch) ||
       (item.type     || '').includes(textSearch) ||
       (item.office   || '').includes(textSearch) ||
-      (item.desc     || '').includes(textSearch);
+      (item.notes     || '').includes(textSearch);
     return matchAction && matchType && matchText;
   });
   renderListings(filteredListings);
@@ -867,7 +872,7 @@ async function publishVisitorProperty(type, area, price, phone, isVip, img) {
     type, action: 'للبيع', price,
     area: '150', district: area,
     deed_type: 'طابو صرف', rooms: '-',
-    desc: 'إعلان نُشر بواسطة زائر للمنصة.',
+    notes: 'إعلان نُشر بواسطة زائر للمنصة.',
     phone, vip: isVip,
     icon: iconMap[type] || '🏠',
     image: img || ''
@@ -881,7 +886,7 @@ async function publishVisitorProperty(type, area, price, phone, isVip, img) {
     defaultListings.unshift({
       type, action: 'للبيع', price, area: '150', district: area,
       deedType: 'طابو صرف', rooms: '-', phone,
-      desc: 'إعلان نُشر بواسطة زائر للمنصة.',
+      notes: 'إعلان نُشر بواسطة زائر للمنصة.',
       office: 'إعلان زائر' + (isVip ? ' ⭐' : ''),
       officeId: 'guest', vip: isVip,
       icon: iconMap[type] || '🏠', image: img || ''
@@ -1011,7 +1016,7 @@ function openPropModal(idx) {
   `;
 
   // الوصف
-  document.getElementById('propModalDesc').textContent = l.desc || 'لا يوجد وصف إضافي لهذا العقار.';
+  document.getElementById('propModalDesc').textContent = l.notes || 'لا يوجد وصف إضافي لهذا العقار.';
 
   // معلومات المكتب — ابحث عن رقم هاتفه من localStorage
   document.getElementById('propModalOfficeName').textContent = l.office || 'مكتب عقاري';
