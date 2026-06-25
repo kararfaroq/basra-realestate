@@ -126,7 +126,6 @@
         <div class="stat-card"><div class="stat-icon" style="color:var(--warning);"><i class="ti ti-home-stats"></i></div><div><div style="font-size:13px; color:var(--text-muted);">العقارات</div><h3 id="statTotalProps" style="font-size:22px; font-weight:900; color:var(--warning);">0</h3></div></div>
       </div>
 
-      <!-- ===== قسم النسخ الاحتياطي — للمدير فقط ===== -->
       <div id="backupPanel" style="display:none; background:var(--navy-mid); border:1.5px solid rgba(201,168,76,0.35); border-radius:16px; padding:1.8rem; margin-bottom:2rem;">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.3rem; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:10px;">
           <div style="display:flex; align-items:center; gap:10px;">
@@ -139,7 +138,6 @@
 
         <div class="backup-grid">
 
-          <!-- === إنشاء نسخة احتياطية === -->
           <div class="backup-card">
             <div class="backup-card-title"><i class="ti ti-database-export"></i> إنشاء نسخة احتياطية</div>
             <div class="backup-card-desc">
@@ -152,7 +150,6 @@
             <div id="backupCreateStatus" class="backup-status"></div>
           </div>
 
-          <!-- === استعادة نسخة احتياطية === -->
           <div class="backup-card">
             <div class="backup-card-title"><i class="ti ti-database-import"></i> استعادة نسخة احتياطية</div>
             <div class="backup-card-desc">
@@ -168,7 +165,6 @@
           </div>
         </div>
 
-        <!-- === قائمة النسخ المحفوظة === -->
         <div>
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
             <div style="font-size:14px; font-weight:700; color:var(--gold); display:flex; align-items:center; gap:7px;">
@@ -295,7 +291,7 @@ async function sbFetch(table, method = 'GET', body = null, filter = '') {
       'Authorization': `Bearer ${SUPABASE_KEY}`,
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Prefer': method === 'POST' ? 'return=representation' : 'return=minimal'
+      'Prefer': method === 'POST' ? 'return=representation' : (method === 'GET' ? '' : 'return=minimal')
     },
     body: body ? JSON.stringify(body) : null
   });
@@ -388,7 +384,7 @@ function formatExpiry(expiry, pkg) {
   if (!pkg || pkg === 'free') return '<span style="color:var(--text-muted);">مفتوح دائم</span>';
   if (!expiry || expiry === 'مفتوح دائم' || expiry === 'مفتوح') return '<span style="color:var(--text-muted);">—</span>';
   const d = new Date(expiry);
-  if (isNaN(d)) return `<span style="color:var(--text-muted);">${expiry}</span>`;
+  if (isNaN(d.getTime())) return `<span style="color:var(--text-muted);">${expiry}</span>`;
   const today = new Date();
   const diffDays = Math.ceil((d - today) / (1000*60*60*24));
   const dateStr = d.toLocaleDateString('ar-IQ');
@@ -408,7 +404,7 @@ async function renderAdminDashboard() {
 
   // إحصائيات
   document.getElementById('statTotalOffices').textContent = offices.length;
-  document.getElementById('statActiveOffices').textContent = offices.filter(o => o.status === 'active' || o.pkg).length;
+  document.getElementById('statActiveOffices').textContent = offices.filter(o => o.status === 'active' || !o.status).length;
   document.getElementById('statTotalProps').textContent = dbListings.length;
 
   // جدول المكاتب
@@ -545,7 +541,7 @@ async function changePackageByAdmin(id, newPkg) {
     await sbFetch('offices', 'PATCH', { pkg: newPkg, status: 'active', expiry }, `?id=eq.${id}`);
   } catch(e) {
     // fallback localStorage
-    let offices = getOffices(); let idx = offices.findIndex(x => x.id === id);
+    let offices = getOffices(); let idx = offices.findIndex(x => String(x.id) === String(id));
     if(idx !== -1) { offices[idx].pkg = newPkg; offices[idx].status = 'active'; offices[idx].expiry = expiry || 'مفتوح دائم'; saveOffices(offices); }
   }
   renderAdminDashboard();
@@ -559,21 +555,21 @@ async function renewSubscriptionByAdmin(id) {
     office = res && res[0];
   } catch(e) {
     const offices = getOffices();
-    office = offices.find(x => x.id === id);
+    office = offices.find(x => String(x.id) === String(id));
   }
 
   if (!office || office.pkg === 'free') return;
 
   let currentExpiry = new Date(office.expiry);
   let today = new Date();
-  let baseDate = (currentExpiry < today || isNaN(currentExpiry)) ? today : currentExpiry;
+  let baseDate = (currentExpiry < today || isNaN(currentExpiry.getTime())) ? today : currentExpiry;
   baseDate.setDate(baseDate.getDate() + 30);
   const newExpiry = baseDate.toISOString().split('T')[0];
 
   try {
     await sbFetch('offices', 'PATCH', { expiry: newExpiry, status: 'active' }, `?id=eq.${id}`);
   } catch(e) {
-    let offices = getOffices(); let idx = offices.findIndex(x => x.id === id);
+    let offices = getOffices(); let idx = offices.findIndex(x => String(x.id) === String(id));
     if(idx !== -1) { offices[idx].expiry = newExpiry; offices[idx].status = 'active'; saveOffices(offices); }
   }
   alert(`✅ تم تجديد الاشتراك 30 يوم!\nتاريخ الانتهاء الجديد: ${newExpiry}`);
@@ -589,7 +585,7 @@ async function toggleOfficeStatus(id) {
     currentStatus = (!raw || raw === 'active') ? 'active' : raw;
   } catch(e) {
     const offices = getOffices();
-    const o = offices.find(x => x.id === id);
+    const o = offices.find(x => String(x.id) === String(id));
     currentStatus = (o && o.status && o.status !== 'active') ? o.status : 'active';
   }
 
@@ -598,10 +594,10 @@ async function toggleOfficeStatus(id) {
   try {
     await sbFetch('offices', 'PATCH', { status: newStatus }, `?id=eq.${id}`);
     // مزامنة localStorage
-    let offices = getOffices(); let o = offices.find(x => x.id === id);
+    let offices = getOffices(); let o = offices.find(x => String(x.id) === String(id));
     if(o) { o.status = newStatus; saveOffices(offices); }
   } catch(e) {
-    let offices = getOffices(); let o = offices.find(x => x.id === id);
+    let offices = getOffices(); let o = offices.find(x => String(x.id) === String(id));
     if(o) { o.status = newStatus; saveOffices(offices); }
   }
   await renderAdminDashboard();
@@ -647,17 +643,17 @@ async function deleteOfficeAdmin(id) {
   // حذف من Supabase
   await deleteDbOffice(id);
   // حذف من localStorage كذلك
-  saveOffices(getOffices().filter(o => o.id !== id));
+  saveOffices(getOffices().filter(o => String(o.id) !== String(id)));
   alert('✅ تم حذف المكتب');
   renderAdminDashboard();
 }
 
-function deleteOffice(id){ if(confirm('تأكيد حذف المكتب؟')) { saveOffices(getOffices().filter(o=>o.id!==id)); renderAdminDashboard(); } }
+function deleteOffice(id){ if(confirm('تأكيد حذف المكتب؟')) { saveOffices(getOffices().filter(o=>String(o.id)!==String(id))); renderAdminDashboard(); } }
 
 function getCurrentOffice() {
   const session = JSON.parse(localStorage.getItem(SESSION_KEY));
   if (!session || session.role !== 'office') return null;
-  return getOffices().find(o => o.id === session.officeId);
+  return getOffices().find(o => String(o.id) === String(session.officeId));
 }
 
 async function renderOfficeDashboard() {
@@ -667,7 +663,7 @@ async function renderOfficeDashboard() {
   let currentOffice = null;
   try {
     const offices = await getDbOffices();
-    currentOffice = offices.find(o => o.id === session.officeId || o.phone === session.username);
+    currentOffice = offices.find(o => String(o.id) === String(session.officeId) || o.phone === session.username);
     // fallback localStorage
     if (!currentOffice) currentOffice = getCurrentOffice();
   } catch(e) {
@@ -724,7 +720,7 @@ function fillOfficeSettingsForm(){
 }
 function handleLogoUpload(e){ const f=e.target.files[0]; if(f){ const r=new FileReader(); r.onload=e=>{ tempLogoBase64=e.target.result; document.getElementById('logoPreview').src=tempLogoBase64; document.getElementById('logoPreview').style.display='inline-block'; }; r.readAsDataURL(f); } }
 function saveOfficeAccountSettings(e){
-  e.preventDefault(); let o=getOffices(); let i=o.findIndex(x=>x.id===JSON.parse(localStorage.getItem(SESSION_KEY)).officeId);
+  e.preventDefault(); let o=getOffices(); let i=o.findIndex(x=>String(x.id)===String(JSON.parse(localStorage.getItem(SESSION_KEY)).officeId));
   o[i].name=document.getElementById('setOfficeName').value; o[i].phone=document.getElementById('setOfficePhone').value; o[i].password=document.getElementById('setOfficePass').value; o[i].description=document.getElementById('setOfficeDesc').value; o[i].logo=tempLogoBase64;
   saveOffices(o); alert('✅ تم الحفظ');
 }
@@ -754,7 +750,7 @@ async function submitNewPropFromOffice(e) {
   let officeId = session ? session.officeId : 'guest';
   try {
     const offices = await getDbOffices();
-    const found = offices.find(o => o.id === officeId || o.phone === (session && session.username));
+    const found = offices.find(o => String(o.id) === String(officeId) || o.phone === (session && session.username));
     if (found) { officeName = found.name; officeId = found.id; }
   } catch(e) {
     const lo = getCurrentOffice();
@@ -794,7 +790,7 @@ async function submitNewPropFromOffice(e) {
   } catch(err) {
     // fallback localStorage
     let o = getOffices();
-    let i = o.findIndex(x => x.id === officeId);
+    let i = o.findIndex(x => String(x.id) === String(officeId));
     if (i === -1) { alert('❌ فشل النشر: ' + err.message); return; }
     if (!o[i].listings) o[i].listings = [];
     o[i].listings.unshift({ type, action: newListing.action, district: newListing.district, price: newListing.price, area: newListing.area, deedType: newListing.deed_type, rooms: newListing.rooms, desc: newListing.notes, image: tempPropImageBase64, icon: newListing.icon });
@@ -997,7 +993,7 @@ async function applyRestore(backup) {
 
 function deleteLocalBackup(id) {
   if (!confirm('هل تريد حذف هذه النسخة الاحتياطية نهائياً؟')) return;
-  let backups = getBackupList().filter(b => b.id !== id);
+  let backups = getBackupList().filter(b => String(b.id) !== String(id));
   localStorage.setItem(BACKUP_KEY, JSON.stringify(backups));
   localStorage.removeItem('basra_backup_' + id);
   renderBackupList();
