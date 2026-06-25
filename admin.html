@@ -89,7 +89,7 @@
     </div>
     <div class="form-group"><input type="text" id="usernameInput" class="input-control" placeholder="اسم المستخدم أو الهاتف"></div>
     <div class="form-group"><input type="password" id="passwordInput" class="input-control" placeholder="كلمة المرور"></div>
-    <button onclick="handleLogin()" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 14px;">🚪 تسجيل الدخول</button>
+    <button onclick="handleLogin()" id="loginBtn" class="btn btn-gold" style="width: 100%; justify-content: center; padding: 14px;">🚪 تسجيل الدخول</button>
     
     <button onclick="window.location.href='index.html'" style="display:block; width:100%; background:transparent; border:none; text-align:center; margin-top:15px; color:var(--text-muted); text-decoration:none; font-size:13px; font-family:'Cairo'; cursor:pointer;">
       ← العودة للموقع الرئيسي
@@ -295,7 +295,7 @@ async function sbFetch(table, method = 'GET', body = null, filter = '') {
       'Authorization': `Bearer ${SUPABASE_KEY}`,
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Prefer': method === 'POST' ? 'return=representation' : 'return=minimal'
+      'Prefer': (method === 'POST' || method === 'PATCH') ? 'return=representation' : 'return=minimal'
     },
     body: body ? JSON.stringify(body) : null
   });
@@ -358,29 +358,58 @@ function checkSession() {
   }
 }
 
-function handleLogin() {
+async function handleLogin() {
   const u = document.getElementById('usernameInput').value.trim();
   const p = document.getElementById('passwordInput').value.trim();
+  const btn = document.getElementById('loginBtn');
 
   if (!u || !p) { alert('❌ يرجى إدخال رقم الهاتف وكلمة المرور'); return; }
+
+  // مؤشر تحميل
+  btn.disabled = true;
+  btn.innerHTML = '⏳ جاري التحقق...';
 
   // دخول المدير العام
   if (u === 'admin' && p === 'admin123') {
     localStorage.setItem(SESSION_KEY, JSON.stringify({ role: 'admin', username: 'المدير' }));
+    btn.disabled = false; btn.innerHTML = '🚪 تسجيل الدخول';
     checkSession(); return;
   }
 
-  // دخول المكاتب — يقبل كلمة المرور بالحقلين password أو pass (توافق مع index.html)
-  let offices = getOffices();
-  let office = offices.find(o => o.phone === u && (o.password === p || o.pass === p));
+  // دخول المكاتب — يبحث في Supabase أولاً ثم localStorage
+  let office = null;
+
+  // 1) جرب Supabase
+  try {
+    const res = await sbFetch('offices', 'GET', null, `?phone=eq.${encodeURIComponent(u)}`);
+    if (res && res.length > 0) {
+      const found = res.find(o => o.password === p || o.pass === p);
+      if (found) office = found;
+    }
+  } catch(e) { console.warn('Supabase login check failed:', e); }
+
+  // 2) fallback localStorage
+  if (!office) {
+    const offices = getOffices();
+    office = offices.find(o => o.phone === u && (o.password === p || o.pass === p));
+  }
+
+  btn.disabled = false; btn.innerHTML = '🚪 تسجيل الدخول';
 
   if (office) {
     localStorage.setItem(SESSION_KEY, JSON.stringify({ role: 'office', officeId: office.id, username: office.name }));
     checkSession();
   } else {
-    alert('❌ البيانات غير صحيحة!\n\nتأكد من:\n• رقم الهاتف المسجّل في index.html\n• كلمة المرور');
+    alert('❌ البيانات غير صحيحة!\n\nتأكد من:\n• رقم الهاتف المسجّل\n• كلمة المرور');
   }
 }
+
+// الدخول بضغط Enter
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('loginZone').style.display !== 'none') {
+    handleLogin();
+  }
+});
 function handleLogout() { localStorage.removeItem(SESSION_KEY); checkSession(); }
 
 // دالة مساعدة لعرض تاريخ الانتهاء بشكل واضح
@@ -581,29 +610,35 @@ async function renewSubscriptionByAdmin(id) {
 }
 
 async function toggleOfficeStatus(id) {
-  // جلب الحالة الحالية من Supabase
+  // نجلب المكتب كاملاً ونقرأ حالته
   let currentStatus = 'active';
   try {
-    const res = await sbFetch('offices', 'GET', null, `?id=eq.${id}&select=status`);
-    const raw = res && res[0] && res[0].status;
-    currentStatus = (!raw || raw === 'active') ? 'active' : raw;
+    const res = await sbFetch('offices', 'GET', null, `?id=eq.${id}`);
+    if (res && res[0]) {
+      currentStatus = res[0].status || 'active';
+    }
   } catch(e) {
-    const offices = getOffices();
-    const o = offices.find(x => x.id === id);
-    currentStatus = (o && o.status && o.status !== 'active') ? o.status : 'active';
+    const o = getOffices().find(x => x.id === id);
+    currentStatus = (o && o.status) ? o.status : 'active';
   }
 
-  const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
+  const newStatus = currentStatus === 'suspended' ? 'active' : 'suspended';
+  const label = newStatus === 'active' ? 'تم تفعيل المكتب ✅' : 'تم إيقاف المكتب ⏸';
 
   try {
     await sbFetch('offices', 'PATCH', { status: newStatus }, `?id=eq.${id}`);
-    // مزامنة localStorage
-    let offices = getOffices(); let o = offices.find(x => x.id === id);
-    if(o) { o.status = newStatus; saveOffices(offices); }
   } catch(e) {
-    let offices = getOffices(); let o = offices.find(x => x.id === id);
-    if(o) { o.status = newStatus; saveOffices(offices); }
+    console.error('toggle status error:', e);
+    alert('❌ فشل تغيير الحالة: ' + e.message);
+    return;
   }
+
+  // مزامنة localStorage
+  let offices = getOffices();
+  const o = offices.find(x => x.id === id);
+  if (o) { o.status = newStatus; saveOffices(offices); }
+
+  alert(label);
   await renderAdminDashboard();
 }
 // موافقة على طلب VIP
