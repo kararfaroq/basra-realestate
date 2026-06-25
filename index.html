@@ -801,25 +801,34 @@ let uploadedVisitorImgBase64 = "";
 
 // دالة مساعدة لاستدعاء Supabase REST API
 async function sbFetch(table, method = 'GET', body = null, filter = '') {
-  const res = await fetch(`${SUPABASE_REST}/${table}${filter}`, {
-    method,
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Prefer': method === 'POST' ? 'return=representation' : 'return=minimal'
-    },
-    body: body ? JSON.stringify(body) : null
-  });
-  if (!res.ok) {
-    const err = await res.text();
-    console.error('Supabase error:', res.status, err);
-    throw new Error(`${res.status}: ${err}`);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+  try {
+    const res = await fetch(`${SUPABASE_REST}/${table}${filter}`, {
+      method,
+      signal: controller.signal,
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Prefer': (method === 'POST' || method === 'PATCH') ? 'return=representation' : 'return=minimal'
+      },
+      body: body ? JSON.stringify(body) : null
+    });
+    clearTimeout(timeout);
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('Supabase error:', res.status, err);
+      throw new Error(`${res.status}: ${err}`);
+    }
+    if (method === 'DELETE' || res.status === 204) return null;
+    const text = await res.text();
+    return text ? JSON.parse(text) : [];
+  } catch(e) {
+    clearTimeout(timeout);
+    throw e;
   }
-  if (method === 'DELETE' || res.status === 204) return null;
-  const text = await res.text();
-  return text ? JSON.parse(text) : [];
 }
 
 // إنشاء الجداول إذا ما كانت موجودة (عبر SQL Editor في Supabase)
@@ -855,36 +864,14 @@ function rowToListing(row) {
 
 async function getAllListings() {
   try {
-    // نجلب كل العقارات ما عدا المعلقة (pending)
-    const rows = await sbFetch('listings', 'GET', null, '?status=neq.pending&order=created_at.desc');
-    const dbListings = rows.map(rowToListing);
+    const rows = await sbFetch('listings', 'GET', null, '?order=created_at.desc');
+    const dbListings = rows
+      .filter(r => r.status !== 'pending')
+      .map(rowToListing);
     return [...dbListings, ...defaultListings];
   } catch(e) {
-    // fallback: نجلب الكل ونستثني pending يدوياً
-    try {
-      const rows = await sbFetch('listings', 'GET', null, '?order=created_at.desc');
-      const dbListings = rows.filter(r => r.status !== 'pending').map(rowToListing);
-      return [...dbListings, ...defaultListings];
-    } catch(e2) {
-      console.warn('Supabase error, using defaults:', e2.message);
-      let offices = [];
-      try { offices = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e3) { offices = []; }
-    let dynamicListings = [...defaultListings];
-      offices.forEach(office => {
-        if (office.listings && office.listings.length > 0) {
-          office.listings.forEach(prop => {
-            dynamicListings.unshift({
-              type: prop.type, action: prop.action, price: prop.price, area: prop.area,
-              district: prop.district, deedType: prop.deedType || 'طابو صرف',
-              rooms: prop.rooms || '-', notes: prop.notes, image: prop.image || '',
-              office: office.name, officeId: office.id, vip: !!prop.vip,
-              icon: prop.icon || '🏠', phone: prop.phone || ''
-            });
-          });
-        }
-      });
-      return dynamicListings;
-    }
+    console.warn('Supabase listings error:', e.message);
+    return [...defaultListings];
   }
 }
 
@@ -1443,32 +1430,17 @@ if('serviceWorker' in navigator) {
 // ===== تحميل الإحصائيات الحقيقية من Supabase =====
 async function loadHeroStats() {
   try {
-    // عدد المكاتب
-    const officesRes = await fetch(`${SUPABASE_REST}/offices?select=id`, {
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'count=exact', 'Accept': 'application/json' }
-    });
-    const officesCount = officesRes.headers.get('content-range')?.split('/')[1] || '0';
-
-    // عدد العقارات النشطة
-    const propsRes = await fetch(`${SUPABASE_REST}/listings?select=id&status=neq.pending`, {
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'count=exact', 'Accept': 'application/json' }
-    });
-    const propsCount = propsRes.headers.get('content-range')?.split('/')[1] || '0';
-
-    // تحديث العداد مع تأثير animation
-    animateCount('count-offices', parseInt(officesCount) || 0);
-    animateCount('count-props',   parseInt(propsCount)   || 0);
+    const [officesData, listingsData] = await Promise.all([
+      sbFetch('offices', 'GET', null, '?select=id'),
+      sbFetch('listings', 'GET', null, '?select=id,status')
+    ]);
+    const officesCount = officesData.length;
+    const propsCount   = listingsData.filter(l => l.status !== 'pending').length;
+    animateCount('count-offices', officesCount);
+    animateCount('count-props',   propsCount);
   } catch(e) {
-    // fallback من localStorage
-    try {
-      const offices = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      const props   = offices.reduce((acc, o) => acc + (o.listings?.length || 0), 0);
-      animateCount('count-offices', offices.length);
-      animateCount('count-props',   props + defaultListings.length);
-    } catch(e2) {
-      document.getElementById('count-offices').textContent = '—';
-      document.getElementById('count-props').textContent   = '—';
-    }
+    document.getElementById('count-offices').textContent = '—';
+    document.getElementById('count-props').textContent   = '—';
   }
 }
 
