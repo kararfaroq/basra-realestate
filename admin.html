@@ -386,7 +386,6 @@ async function handleLogin() {
 
   if (!u || !p) { alert('❌ يرجى إدخال رقم الهاتف وكلمة المرور'); return; }
 
-  // مؤشر تحميل
   btn.disabled = true;
   btn.innerHTML = '⏳ جاري التحقق...';
 
@@ -397,31 +396,36 @@ async function handleLogin() {
     checkSession(); return;
   }
 
-  // دخول المكاتب — يبحث في Supabase أولاً ثم localStorage
+  // دخول المكاتب — Supabase فقط
   let office = null;
-
-  // 1) جرب Supabase
   try {
     const res = await sbFetch('offices', 'GET', null, `?phone=eq.${encodeURIComponent(u)}`);
     if (res && res.length > 0) {
-      const found = res.find(o => o.password === p || o.pass === p);
-      if (found) office = found;
+      office = res.find(o => o.password === p || o.pass === p) || null;
+      // إذا وجد الرقم لكن كلمة المرور خاطئة
+      if (!office && res.length > 0) {
+        btn.disabled = false; btn.innerHTML = '🚪 تسجيل الدخول';
+        alert('❌ كلمة المرور غير صحيحة.\nتواصل مع الإدارة إذا نسيتها.');
+        return;
+      }
     }
-  } catch(e) { console.warn('Supabase login check failed:', e); }
-
-  // 2) fallback localStorage
-  if (!office) {
-    const offices = getOffices();
-    office = offices.find(o => o.phone === u && (o.password === p || o.pass === p));
+  } catch(e) {
+    btn.disabled = false; btn.innerHTML = '🚪 تسجيل الدخول';
+    alert('❌ تعذر الاتصال بالخادم.\nتحقق من اتصالك بالإنترنت وحاول مجدداً.');
+    return;
   }
 
   btn.disabled = false; btn.innerHTML = '🚪 تسجيل الدخول';
 
   if (office) {
-    localStorage.setItem(SESSION_KEY, JSON.stringify({ role: 'office', officeId: office.id, username: office.name }));
+    localStorage.setItem(SESSION_KEY, JSON.stringify({
+      role: 'office',
+      officeId: office.id,
+      username: office.name
+    }));
     checkSession();
   } else {
-    alert('❌ البيانات غير صحيحة!\n\nتأكد من:\n• رقم الهاتف المسجّل\n• كلمة المرور');
+    alert('❌ رقم الهاتف غير مسجّل.\nتأكد من الرقم أو سجّل مكتبك من الصفحة الرئيسية.');
   }
 }
 
