@@ -166,7 +166,20 @@
     <form onsubmit="submitNewPropFromOffice(event)">
       <div class="form-group"><label class="form-label">صورة العقار</label><div class="file-upload-btn" onclick="document.getElementById('pImgUpload').click()"><i class="ti ti-camera"></i> ارفع صورة العقار</div><input type="file" id="pImgUpload" accept="image/*" onchange="handlePropImageUpload(event)" style="display:none;"><img id="propImagePreview" src="" style="display:none; width:100%; height:160px; object-fit:cover; border-radius:8px; margin-top:10px; border:1px solid var(--gold);"></div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-        <div class="form-group"><label class="form-label">نوع العقار</label><select id="pType" class="input-control"><option value="بيت">بيت</option><option value="شقة">شقة</option><option value="أرض">أرض</option></select></div>
+        <div class="form-group"><label class="form-label">نوع العقار</label>
+          <select id="pType" class="input-control" onchange="toggleAdminCustomType(this)">
+            <option value="بيت">🏠 بيت سكني</option>
+            <option value="شقة">🏢 شقة فاخرة</option>
+            <option value="أرض">🏞️ أرض استثمارية</option>
+            <option value="مكتب">🏛️ مكتب تجاري</option>
+            <option value="محل">🏪 محل تجاري</option>
+            <option value="مستودع">🏭 مستودع / مخزن</option>
+            <option value="فيلا">🏡 فيلا</option>
+            <option value="عمارة">🏗️ عمارة سكنية</option>
+            <option value="أخرى">✏️ أخرى (اكتب النوع)</option>
+          </select>
+          <input type="text" id="pTypeCustom" class="input-control" placeholder="اكتب نوع العقار..." style="display:none; margin-top:8px;">
+        </div>
         <div class="form-group"><label class="form-label">الإجراء</label><select id="pAction" class="input-control"><option value="للبيع">للبيع</option><option value="للإيجار">للإيجار</option></select></div>
         <div class="form-group"><label class="form-label">المنطقة</label><input type="text" id="pDistrict" class="input-control" required></div>
         <div class="form-group"><label class="form-label">السعر</label><input type="text" id="pPrice" class="input-control" required></div>
@@ -462,12 +475,66 @@ function handlePropImageUpload(e){ const f=e.target.files[0]; if(f){ const r=new
 function openAddPropModal(){ tempPropImageBase64=""; document.getElementById('propImagePreview').style.display='none'; document.getElementById('addPropModal').style.display='flex'; }
 function closeAddPropModal(){ document.getElementById('addPropModal').style.display='none'; }
 
-function submitNewPropFromOffice(e){
-  e.preventDefault(); let o=getOffices(); let i=o.findIndex(x=>x.id===JSON.parse(localStorage.getItem(SESSION_KEY)).officeId);
-  if(!o[i].listings) o[i].listings=[];
-  if(o[i].pkg==='free' && o[i].listings.length>=2){ alert('تجاوزت الحد المجاني'); return; }
-  o[i].listings.unshift({type:document.getElementById('pType').value, action:document.getElementById('pAction').value, district:document.getElementById('pDistrict').value, price:document.getElementById('pPrice').value, area:document.getElementById('pArea').value, deedType:document.getElementById('pDeed').value, rooms:document.getElementById('pRooms').value, desc:document.getElementById('pDesc').value, image:tempPropImageBase64, icon:'🏠'});
-  saveOffices(o); alert('تم النشر'); closeAddPropModal(); renderOfficeDashboard();
+function toggleAdminCustomType(sel) {
+  const custom = document.getElementById('pTypeCustom');
+  custom.style.display = sel.value === 'أخرى' ? 'block' : 'none';
+  if (sel.value !== 'أخرى') custom.value = '';
+}
+
+async function submitNewPropFromOffice(e) {
+  e.preventDefault();
+  const session = JSON.parse(localStorage.getItem(SESSION_KEY));
+  
+  const selType = document.getElementById('pType').value;
+  const customType = document.getElementById('pTypeCustom') ? document.getElementById('pTypeCustom').value.trim() : '';
+  const type = selType === 'أخرى' ? (customType || 'أخرى') : selType;
+  
+  const iconMap = {'بيت':'🏠','شقة':'🏢','أرض':'🏞️','مكتب':'🏛️','محل':'🏪','مستودع':'🏭','فيلا':'🏡','عمارة':'🏗️'};
+
+  // جلب بيانات المكتب من Supabase أو localStorage
+  let officeName = 'مكتب';
+  let officeId = session ? session.officeId : 'guest';
+  try {
+    const offices = await getDbOffices();
+    const found = offices.find(o => o.id === officeId || o.phone === (session && session.username));
+    if (found) { officeName = found.name; officeId = found.id; }
+  } catch(e) {
+    const lo = getCurrentOffice();
+    if (lo) { officeName = lo.name; officeId = lo.id; }
+  }
+
+  const newListing = {
+    office_id:   officeId,
+    office_name: officeName,
+    type,
+    action:    document.getElementById('pAction').value,
+    district:  document.getElementById('pDistrict').value,
+    price:     document.getElementById('pPrice').value,
+    area:      document.getElementById('pArea').value || '',
+    deed_type: document.getElementById('pDeed').value || 'طابو صرف',
+    rooms:     document.getElementById('pRooms').value || '-',
+    notes:     document.getElementById('pDesc').value || '',
+    image:     tempPropImageBase64 || '',
+    icon:      iconMap[type] || '🏠',
+    vip:       false,
+    phone:     ''
+  };
+
+  try {
+    await sbFetch('listings', 'POST', newListing);
+    alert('✅ تم نشر العقار بنجاح في قاعدة البيانات!');
+  } catch(err) {
+    // fallback localStorage
+    let o = getOffices();
+    let i = o.findIndex(x => x.id === officeId);
+    if (i === -1) { alert('❌ فشل النشر: ' + err.message); return; }
+    if (!o[i].listings) o[i].listings = [];
+    o[i].listings.unshift({ type, action: newListing.action, district: newListing.district, price: newListing.price, area: newListing.area, deedType: newListing.deed_type, rooms: newListing.rooms, desc: newListing.notes, image: tempPropImageBase64, icon: newListing.icon });
+    saveOffices(o);
+    alert('✅ تم النشر (محلياً)');
+  }
+  closeAddPropModal();
+  renderOfficeDashboard();
 }
 
 function contactAdminForRenewal() {
