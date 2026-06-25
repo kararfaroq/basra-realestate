@@ -55,27 +55,6 @@
     .sub-nav { display: flex; gap: 10px; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; overflow-x:auto;}
     .tab-btn { background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid transparent; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; white-space:nowrap;}
     .tab-btn.active { background: var(--gold); color: var(--navy); font-weight: 700; }
-
-    /* ===== النسخ الاحتياطي ===== */
-    .backup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.5rem; }
-    @media(max-width:600px){ .backup-grid { grid-template-columns: 1fr; } }
-    .backup-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(201,168,76,0.2); border-radius: 12px; padding: 1.3rem; }
-    .backup-card-title { font-size: 14px; font-weight: 700; color: var(--gold); margin-bottom: 6px; display: flex; align-items: center; gap: 7px; }
-    .backup-card-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.7; }
-    .backup-list { list-style: none; max-height: 200px; overflow-y: auto; }
-    .backup-list li { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 6px; font-size: 12px; background: rgba(255,255,255,0.02); }
-    .backup-list li .bk-name { color: var(--text-on-dark); font-weight: 600; }
-    .backup-list li .bk-date { color: var(--text-muted); font-size: 11px; }
-    .backup-list li .bk-actions { display: flex; gap: 5px; }
-    .bk-restore-btn { background: rgba(76,175,125,0.15); color: var(--success); border: 1px solid var(--success); border-radius: 6px; padding: 3px 8px; font-size: 11px; font-family: 'Cairo'; cursor: pointer; transition: 0.2s; }
-    .bk-restore-btn:hover { background: var(--success); color: #fff; }
-    .bk-del-btn { background: rgba(255,77,77,0.1); color: var(--danger); border: 1px solid var(--danger); border-radius: 6px; padding: 3px 8px; font-size: 11px; font-family: 'Cairo'; cursor: pointer; transition: 0.2s; }
-    .bk-del-btn:hover { background: var(--danger); color: #fff; }
-    .backup-status { font-size: 13px; padding: 10px 14px; border-radius: 8px; margin-top: 10px; display: none; }
-    .backup-status.success { background: rgba(76,175,125,0.12); border: 1px solid var(--success); color: var(--success); display: block; }
-    .backup-status.error   { background: rgba(255,77,77,0.12);  border: 1px solid var(--danger);  color: var(--danger);  display: block; }
-    .restore-drop-zone { border: 2px dashed rgba(201,168,76,0.35); border-radius: 10px; padding: 20px; text-align: center; color: var(--text-muted); font-size: 13px; cursor: pointer; transition: 0.2s; }
-    .restore-drop-zone:hover { border-color: var(--gold); background: rgba(201,168,76,0.05); color: var(--gold); }
   </style>
 </head>
 <body>
@@ -108,9 +87,6 @@
       <button onclick="window.location.href='index.html'" class="btn" style="background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.15);">
         <i class="ti ti-home"></i> الرئيسية
       </button>
-      <button id="backupNavBtn" onclick="toggleBackupPanel()" class="btn" style="background: rgba(201,168,76,0.12); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); display:none;">
-        <i class="ti ti-database-export"></i> النسخ الاحتياطي
-      </button>
       <button onclick="handleLogout()" class="btn btn-danger">
         <i class="ti ti-logout"></i> خروج
       </button>
@@ -124,67 +100,6 @@
         <div class="stat-card"><div class="stat-icon"><i class="ti ti-building-community"></i></div><div><div style="font-size:13px; color:var(--text-muted);">المكاتب</div><h3 id="statTotalOffices" style="font-size:22px; font-weight:900;">0</h3></div></div>
         <div class="stat-card"><div class="stat-icon" style="color:var(--success);"><i class="ti ti-discount-check"></i></div><div><div style="font-size:13px; color:var(--text-muted);">نشط</div><h3 id="statActiveOffices" style="font-size:22px; font-weight:900; color:var(--success);">0</h3></div></div>
         <div class="stat-card"><div class="stat-icon" style="color:var(--warning);"><i class="ti ti-home-stats"></i></div><div><div style="font-size:13px; color:var(--text-muted);">العقارات</div><h3 id="statTotalProps" style="font-size:22px; font-weight:900; color:var(--warning);">0</h3></div></div>
-      </div>
-
-      <!-- ===== قسم النسخ الاحتياطي — للمدير فقط ===== -->
-      <div id="backupPanel" style="display:none; background:var(--navy-mid); border:1.5px solid rgba(201,168,76,0.35); border-radius:16px; padding:1.8rem; margin-bottom:2rem;">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.3rem; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:10px;">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <i class="ti ti-database" style="color:var(--gold); font-size:22px;"></i>
-            <span style="font-size:17px; font-weight:700; color:#fff;">إدارة النسخ الاحتياطية</span>
-            <span style="background:rgba(201,168,76,0.15); color:var(--gold); font-size:11px; font-weight:700; padding:3px 10px; border-radius:100px; border:1px solid rgba(201,168,76,0.3);">للمدير فقط</span>
-          </div>
-          <button onclick="toggleBackupPanel()" style="background:transparent; border:none; color:var(--text-muted); font-size:20px; cursor:pointer;">✕</button>
-        </div>
-
-        <div class="backup-grid">
-
-          <!-- === إنشاء نسخة احتياطية === -->
-          <div class="backup-card">
-            <div class="backup-card-title"><i class="ti ti-database-export"></i> إنشاء نسخة احتياطية</div>
-            <div class="backup-card-desc">
-              تحفظ النسخة كاملاً: المكاتب + العقارات + الإعدادات.<br>
-              تُخزَّن محلياً في المتصفح وتُحمَّل كملف JSON على جهازك.
-            </div>
-            <button onclick="createBackup()" class="btn btn-gold" style="width:100%; justify-content:center; padding:12px;">
-              <i class="ti ti-cloud-download"></i> إنشاء نسخة الآن
-            </button>
-            <div id="backupCreateStatus" class="backup-status"></div>
-          </div>
-
-          <!-- === استعادة نسخة احتياطية === -->
-          <div class="backup-card">
-            <div class="backup-card-title"><i class="ti ti-database-import"></i> استعادة نسخة احتياطية</div>
-            <div class="backup-card-desc">
-              ارفع ملف JSON لاستعادة البيانات.<br>
-              <strong style="color:var(--danger);">تحذير:</strong> ستُستبدل البيانات الحالية بالكامل.
-            </div>
-            <div class="restore-drop-zone" onclick="document.getElementById('restoreFileInput').click()">
-              <i class="ti ti-file-upload" style="font-size:24px; display:block; margin-bottom:6px;"></i>
-              اضغط لرفع ملف النسخة الاحتياطية (.json)
-            </div>
-            <input type="file" id="restoreFileInput" accept=".json" style="display:none;" onchange="restoreBackup(event)">
-            <div id="backupRestoreStatus" class="backup-status"></div>
-          </div>
-        </div>
-
-        <!-- === قائمة النسخ المحفوظة === -->
-        <div>
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
-            <div style="font-size:14px; font-weight:700; color:var(--gold); display:flex; align-items:center; gap:7px;">
-              <i class="ti ti-history"></i> النسخ المحفوظة في المتصفح
-            </div>
-            <button onclick="renderBackupList()" style="background:transparent; border:1px solid rgba(255,255,255,0.1); color:var(--text-muted); border-radius:6px; padding:4px 10px; font-size:11px; font-family:'Cairo'; cursor:pointer;">
-              <i class="ti ti-refresh"></i> تحديث
-            </button>
-          </div>
-          <ul class="backup-list" id="backupList">
-            <li style="justify-content:center; color:var(--text-muted);">جاري التحميل...</li>
-          </ul>
-          <div style="font-size:11px; color:var(--text-muted); margin-top:8px;">
-            💡 تُحفظ آخر 10 نسخ فقط تلقائياً — الأقدم تُحذف تلقائياً.
-          </div>
-        </div>
       </div>
       <div class="dash-section" style="display: block;">
         <div class="section-title"><i class="ti ti-shield-half"></i> إدارة المكاتب العقارية وتجديد الاشتراكات</div>
@@ -344,7 +259,6 @@ function checkSession() {
     if (session.role === 'admin') {
       document.getElementById('adminView').style.display = 'block';
       document.getElementById('officeView').style.display = 'none';
-      showBackupBtn();
       renderAdminDashboard();
     } else if (session.role === 'office') {
       document.getElementById('adminView').style.display = 'none';
@@ -383,20 +297,6 @@ function handleLogin() {
 }
 function handleLogout() { localStorage.removeItem(SESSION_KEY); checkSession(); }
 
-// دالة مساعدة لعرض تاريخ الانتهاء بشكل واضح
-function formatExpiry(expiry, pkg) {
-  if (!pkg || pkg === 'free') return '<span style="color:var(--text-muted);">مفتوح دائم</span>';
-  if (!expiry || expiry === 'مفتوح دائم' || expiry === 'مفتوح') return '<span style="color:var(--text-muted);">—</span>';
-  const d = new Date(expiry);
-  if (isNaN(d)) return `<span style="color:var(--text-muted);">${expiry}</span>`;
-  const today = new Date();
-  const diffDays = Math.ceil((d - today) / (1000*60*60*24));
-  const dateStr = d.toLocaleDateString('ar-IQ');
-  if (diffDays < 0)   return `<span style="color:var(--danger); font-weight:700;">منتهي (${dateStr})</span>`;
-  if (diffDays <= 7)  return `<span style="color:var(--warning); font-weight:700;">⚠️ ${dateStr} (${diffDays} أيام)</span>`;
-  return `<span style="color:var(--success);">${dateStr}</span>`;
-}
-
 async function renderAdminDashboard() {
   // المكاتب — من Supabase أولاً ثم localStorage كـ fallback
   let dbOffices = await getDbOffices();
@@ -414,38 +314,32 @@ async function renderAdminDashboard() {
   // جدول المكاتب
   document.getElementById('adminOfficesTable').innerHTML = offices.length === 0
     ? '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);">لا توجد مكاتب مسجلة بعد</td></tr>'
-    : offices.map(o => {
-      // تحديد الحالة بشكل صريح — null أو undefined = active
-      const isActive = !o.status || o.status === 'active';
-      const renewDisabled = (!o.pkg || o.pkg === 'free') ? 'disabled' : '';
-      const renewOpacity  = (!o.pkg || o.pkg === 'free') ? 'opacity:0.4;cursor:not-allowed;' : '';
-      return `
+    : offices.map(o => `
     <tr>
       <td style="font-weight:700;">${o.name}</td>
       <td>${o.phone}</td>
       <td><span class="badge" style="background:rgba(201,168,76,0.2); color:#fff;">${o.pkg || 'free'}</span></td>
-      <td><span class="badge ${isActive ? 'bg-success' : 'bg-danger'}">${isActive ? 'نشط' : 'موقوف'}</span></td>
-      <td>${formatExpiry(o.expiry, o.pkg)}</td>
+      <td><span class="badge ${o.status === 'active' ? 'bg-success' : 'bg-danger'}">${o.status || 'نشط'}</span></td>
+      <td style="font-family:monospace; font-size:12px;">${o.expiry || 'مفتوح'}</td>
       <td>
         <select class="input-control" style="padding:4px; font-size:11px; width:auto;" onchange="changePackageByAdmin('${o.id}', this.value)">
-          <option value="free" ${o.pkg === 'free' || !o.pkg ? 'selected' : ''}>مجانية</option>
+          <option value="free" ${o.pkg === 'free' ? 'selected' : ''}>مجانية</option>
           <option value="eco"  ${o.pkg === 'eco'  ? 'selected' : ''}>اقتصادية</option>
           <option value="gold" ${o.pkg === 'gold' ? 'selected' : ''}>ذهبية</option>
         </select>
       </td>
       <td>
-        <button class="btn btn-success" style="padding:4px 8px; font-size:11px; background:#4CAF7D; ${renewOpacity}" onclick="renewSubscriptionByAdmin('${o.id}')" ${renewDisabled}>تجديد 30 يوم</button>
+        <button class="btn btn-success" style="padding:4px 8px; font-size:11px; background:#4CAF7D;" onclick="renewSubscriptionByAdmin('${o.id}')" ${o.pkg === 'free' ? 'disabled' : ''}>تجديد 30 يوم</button>
       </td>
       <td>
         <div style="display:flex; gap:4px;">
-          <button class="btn" style="padding:4px 8px; font-size:11px; background:${isActive ? 'var(--danger)' : 'var(--success)'}; color:#fff; border:none;" onclick="toggleOfficeStatus('${o.id}')">
-            ${isActive ? '⏸ إيقاف' : '▶ تفعيل'}
+          <button class="btn" style="padding:4px 8px; font-size:11px; background:var(--navy-light); color:#fff;" onclick="toggleOfficeStatus('${o.id}')">
+            ${o.status === 'active' ? 'إيقاف' : 'تفعيل'}
           </button>
           <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="deleteOfficeAdmin('${o.id}')">🗑️ حذف</button>
         </div>
       </td>
-    </tr>`;
-    }).join('');
+    </tr>`).join('');
 
   // ===== طلبات VIP المعلقة =====
   let pendingSection = document.getElementById('adminPendingSection');
@@ -536,75 +430,29 @@ async function renderAdminDashboard() {
     }`;
 }
 
-async function changePackageByAdmin(id, newPkg) {
-  const expiry = newPkg === 'free'
-    ? null
-    : new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0];
-
-  try {
-    await sbFetch('offices', 'PATCH', { pkg: newPkg, status: 'active', expiry }, `?id=eq.${id}`);
-  } catch(e) {
-    // fallback localStorage
-    let offices = getOffices(); let idx = offices.findIndex(x => x.id === id);
-    if(idx !== -1) { offices[idx].pkg = newPkg; offices[idx].status = 'active'; offices[idx].expiry = expiry || 'مفتوح دائم'; saveOffices(offices); }
+function changePackageByAdmin(id, newPkg) {
+  let offices = getOffices(); let idx = offices.findIndex(x => x.id === id);
+  if(idx !== -1) {
+    offices[idx].pkg = newPkg; offices[idx].status = 'active';
+    offices[idx].expiry = newPkg === 'free' ? 'مفتوح دائم' : new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0];
+    saveOffices(offices); renderAdminDashboard();
   }
-  renderAdminDashboard();
 }
 
-async function renewSubscriptionByAdmin(id) {
-  // جلب بيانات المكتب من Supabase
-  let office = null;
-  try {
-    const res = await sbFetch('offices', 'GET', null, `?id=eq.${id}`);
-    office = res && res[0];
-  } catch(e) {
-    const offices = getOffices();
-    office = offices.find(x => x.id === id);
+function renewSubscriptionByAdmin(id) {
+  let offices = getOffices(); let idx = offices.findIndex(x => x.id === id);
+  if(idx !== -1 && offices[idx].pkg !== 'free') {
+    let currentExpiry = new Date(offices[idx].expiry); let today = new Date();
+    let baseDate = (currentExpiry < today || isNaN(currentExpiry)) ? today : currentExpiry;
+    baseDate.setDate(baseDate.getDate() + 30);
+    offices[idx].expiry = baseDate.toISOString().split('T')[0]; offices[idx].status = 'active';
+    saveOffices(offices); renderAdminDashboard(); alert("تم تجديد الاشتراك 30 يوم!");
   }
-
-  if (!office || office.pkg === 'free') return;
-
-  let currentExpiry = new Date(office.expiry);
-  let today = new Date();
-  let baseDate = (currentExpiry < today || isNaN(currentExpiry)) ? today : currentExpiry;
-  baseDate.setDate(baseDate.getDate() + 30);
-  const newExpiry = baseDate.toISOString().split('T')[0];
-
-  try {
-    await sbFetch('offices', 'PATCH', { expiry: newExpiry, status: 'active' }, `?id=eq.${id}`);
-  } catch(e) {
-    let offices = getOffices(); let idx = offices.findIndex(x => x.id === id);
-    if(idx !== -1) { offices[idx].expiry = newExpiry; offices[idx].status = 'active'; saveOffices(offices); }
-  }
-  alert(`✅ تم تجديد الاشتراك 30 يوم!\nتاريخ الانتهاء الجديد: ${newExpiry}`);
-  renderAdminDashboard();
 }
 
-async function toggleOfficeStatus(id) {
-  // جلب الحالة الحالية من Supabase
-  let currentStatus = 'active';
-  try {
-    const res = await sbFetch('offices', 'GET', null, `?id=eq.${id}&select=status`);
-    const raw = res && res[0] && res[0].status;
-    currentStatus = (!raw || raw === 'active') ? 'active' : raw;
-  } catch(e) {
-    const offices = getOffices();
-    const o = offices.find(x => x.id === id);
-    currentStatus = (o && o.status && o.status !== 'active') ? o.status : 'active';
-  }
-
-  const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
-
-  try {
-    await sbFetch('offices', 'PATCH', { status: newStatus }, `?id=eq.${id}`);
-    // مزامنة localStorage
-    let offices = getOffices(); let o = offices.find(x => x.id === id);
-    if(o) { o.status = newStatus; saveOffices(offices); }
-  } catch(e) {
-    let offices = getOffices(); let o = offices.find(x => x.id === id);
-    if(o) { o.status = newStatus; saveOffices(offices); }
-  }
-  await renderAdminDashboard();
+function toggleOfficeStatus(id) {
+  let offices = getOffices(); let o = offices.find(x => x.id === id);
+  if(o) { o.status = o.status === 'active' ? 'suspended' : 'active'; saveOffices(offices); renderAdminDashboard(); }
 }
 // موافقة على طلب VIP
 async function approveVip(id) {
@@ -811,196 +659,6 @@ function contactAdminForRenewal() {
   const adminWhatsAppNumber = "9647719994201"; // 🔴 ضع رقمك الحقيقي هنا
   const message = `مرحباً إدارة دليل البصرة العقاري،%0Aأود تجديد أو ترقية باقة اشتراك مكتبي.%0A%0A🏢 اسم المكتب: ${currentOffice.name}%0A📱 رقم الهاتف: ${currentOffice.phone}%0A📦 الباقة الحالية: ${currentOffice.pkg === 'gold' ? 'الذهبية' : currentOffice.pkg === 'eco' ? 'الاقتصادية' : 'المجانية'}%0A%0Aيرجى تزويدي بتفاصيل الدفع (زين كاش / حوالة).`;
   window.open(`https://wa.me/${adminWhatsAppNumber}?text=${message}`, '_blank');
-}
-
-// ===== النسخ الاحتياطي =====
-const BACKUP_KEY = 'basra_backups_v1';
-const MAX_BACKUPS = 10;
-
-function toggleBackupPanel() {
-  const panel = document.getElementById('backupPanel');
-  const isOpen = panel.style.display !== 'none';
-  panel.style.display = isOpen ? 'none' : 'block';
-  if (!isOpen) renderBackupList();
-}
-
-function showBackupBtn() {
-  const btn = document.getElementById('backupNavBtn');
-  if (btn) btn.style.display = 'inline-flex';
-}
-
-async function createBackup() {
-  const statusEl = document.getElementById('backupCreateStatus');
-  statusEl.className = 'backup-status';
-  statusEl.textContent = '';
-
-  try {
-    // جمع البيانات من Supabase
-    let offices = [], listings = [];
-    try {
-      offices  = await getDbOffices();
-      listings = await getDbListings();
-    } catch(e) {
-      offices  = getOffices();
-      listings = [];
-    }
-
-    const backup = {
-      version: '1.0',
-      createdAt: new Date().toISOString(),
-      label: `نسخة ${new Date().toLocaleString('ar-IQ')}`,
-      data: { offices, listings, localStorage: localStorage.getItem(STORAGE_KEY) }
-    };
-
-    // 1) حفظ في localStorage
-    const backups = getBackupList();
-    backups.unshift({ id: 'bk_' + Date.now(), label: backup.label, createdAt: backup.createdAt, size: JSON.stringify(backup).length });
-    if (backups.length > MAX_BACKUPS) backups.splice(MAX_BACKUPS);
-    localStorage.setItem(BACKUP_KEY, JSON.stringify(backups));
-    localStorage.setItem('basra_backup_' + backups[0].id, JSON.stringify(backup));
-
-    // 2) تحميل ملف JSON على الجهاز
-    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href     = url;
-    a.download = `basra-backup-${new Date().toISOString().slice(0,10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-
-    statusEl.className = 'backup-status success';
-    statusEl.innerHTML = '✅ تم إنشاء النسخة الاحتياطية وتحميلها بنجاح!';
-    renderBackupList();
-
-  } catch(e) {
-    statusEl.className = 'backup-status error';
-    statusEl.textContent = '❌ فشل الإنشاء: ' + e.message;
-  }
-}
-
-function getBackupList() {
-  try { return JSON.parse(localStorage.getItem(BACKUP_KEY)) || []; }
-  catch(e) { return []; }
-}
-
-function renderBackupList() {
-  const ul = document.getElementById('backupList');
-  const backups = getBackupList();
-
-  if (backups.length === 0) {
-    ul.innerHTML = '<li style="justify-content:center; color:var(--text-muted); border:none;">لا توجد نسخ احتياطية محفوظة بعد</li>';
-    return;
-  }
-
-  ul.innerHTML = backups.map(bk => {
-    const sizeKB = bk.size ? (bk.size / 1024).toFixed(1) + ' KB' : '—';
-    const date   = new Date(bk.createdAt).toLocaleString('ar-IQ');
-    return `<li>
-      <div>
-        <div class="bk-name">💾 ${bk.label}</div>
-        <div class="bk-date">${date} · ${sizeKB}</div>
-      </div>
-      <div class="bk-actions">
-        <button class="bk-restore-btn" onclick="restoreFromLocal('${bk.id}')">↩ استعادة</button>
-        <button class="bk-restore-btn" style="background:rgba(201,168,76,0.1);color:var(--gold);border-color:var(--gold);" onclick="downloadLocalBackup('${bk.id}')">⬇ تحميل</button>
-        <button class="bk-del-btn" onclick="deleteLocalBackup('${bk.id}')">🗑</button>
-      </div>
-    </li>`;
-  }).join('');
-}
-
-function downloadLocalBackup(id) {
-  const raw = localStorage.getItem('basra_backup_' + id);
-  if (!raw) { alert('❌ النسخة غير موجودة في المتصفح'); return; }
-  const blob = new Blob([raw], { type: 'application/json' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href     = url;
-  a.download = `basra-backup-${id}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-async function restoreFromLocal(id) {
-  const raw = localStorage.getItem('basra_backup_' + id);
-  if (!raw) { alert('❌ النسخة غير موجودة في المتصفح'); return; }
-  try {
-    const backup = JSON.parse(raw);
-    await applyRestore(backup);
-  } catch(e) {
-    alert('❌ فشل الاستعادة: ' + e.message);
-  }
-}
-
-function restoreBackup(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const statusEl = document.getElementById('backupRestoreStatus');
-  statusEl.className = 'backup-status';
-
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    try {
-      const backup = JSON.parse(e.target.result);
-      if (!backup.data) throw new Error('ملف غير صالح — تأكد أنه ملف نسخة احتياطية من هذا النظام');
-      await applyRestore(backup);
-      statusEl.className = 'backup-status success';
-      statusEl.innerHTML = '✅ تمت الاستعادة بنجاح! جاري إعادة التحميل...';
-      setTimeout(() => location.reload(), 1500);
-    } catch(err) {
-      statusEl.className = 'backup-status error';
-      statusEl.textContent = '❌ فشل: ' + err.message;
-    }
-  };
-  reader.readAsText(file);
-  event.target.value = '';
-}
-
-async function applyRestore(backup) {
-  if (!confirm(`⚠️ تحذير!\n\nستُستبدل جميع البيانات الحالية بنسخة:\n"${backup.label}"\n\nهل أنت متأكد؟`)) return;
-
-  const statusEl = document.getElementById('backupRestoreStatus') || document.getElementById('backupCreateStatus');
-
-  // استعادة localStorage
-  if (backup.data.localStorage) {
-    localStorage.setItem(STORAGE_KEY, backup.data.localStorage);
-  }
-
-  // استعادة Supabase — المكاتب
-  if (backup.data.offices && backup.data.offices.length > 0) {
-    try {
-      for (const office of backup.data.offices) {
-        const { id, created_at, ...officeData } = office;
-        try {
-          await sbFetch('offices', 'POST', officeData);
-        } catch(e) { /* قد يكون موجود مسبقاً */ }
-      }
-    } catch(e) { console.warn('offices restore:', e); }
-  }
-
-  // استعادة Supabase — العقارات
-  if (backup.data.listings && backup.data.listings.length > 0) {
-    try {
-      for (const listing of backup.data.listings) {
-        const { id, created_at, ...listingData } = listing;
-        try {
-          await sbFetch('listings', 'POST', listingData);
-        } catch(e) { /* قد يكون موجود مسبقاً */ }
-      }
-    } catch(e) { console.warn('listings restore:', e); }
-  }
-
-  alert('✅ تمت الاستعادة بنجاح!');
-  renderAdminDashboard();
-  renderBackupList();
-}
-
-function deleteLocalBackup(id) {
-  if (!confirm('هل تريد حذف هذه النسخة الاحتياطية نهائياً؟')) return;
-  let backups = getBackupList().filter(b => b.id !== id);
-  localStorage.setItem(BACKUP_KEY, JSON.stringify(backups));
-  localStorage.removeItem('basra_backup_' + id);
-  renderBackupList();
 }
 
 document.addEventListener('DOMContentLoaded', checkSession);
