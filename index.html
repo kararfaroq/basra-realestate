@@ -165,6 +165,38 @@
 
     /* تنسيقات المستشار العقاري الذكي مفصولة بالكامل في ملف ai-advisor.js لتسريع وتأمين ملف الواجهة */
 
+    /* ===== نافذة التواصل مع الإدارة ===== */
+    .contact-modal-overlay{display:none;position:fixed;inset:0;background:rgba(5,12,24,0.92);backdrop-filter:blur(6px);z-index:3000;justify-content:center;align-items:center;padding:1rem;overflow-y:auto;}
+    .contact-modal-overlay.open{display:flex;}
+    .contact-modal{background:var(--navy-mid);border:1.5px solid rgba(201,168,76,0.4);border-radius:20px;width:100%;max-width:520px;margin:auto;overflow:hidden;position:relative;animation:modalIn .3s ease;}
+    .contact-modal-header{background:linear-gradient(135deg,rgba(201,168,76,0.15),rgba(201,168,76,0.05));border-bottom:1px solid rgba(201,168,76,0.2);padding:1.4rem 1.5rem;display:flex;align-items:center;justify-content:space-between;}
+    .contact-modal-header h3{color:var(--gold);font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:8px;}
+    .contact-modal-body{padding:1.5rem;}
+    .contact-direct-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.3rem;}
+    .contact-direct-btns a{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border-radius:12px;font-family:'Cairo';font-size:14px;font-weight:700;text-decoration:none;transition:0.2s;}
+    .btn-contact-wa{background:#25D366;color:#fff;}
+    .btn-contact-wa:hover{background:#1db954;}
+    .btn-contact-call{background:transparent;color:var(--gold);border:1.5px solid var(--gold);}
+    .btn-contact-call:hover{background:rgba(201,168,76,0.1);}
+    .contact-divider{text-align:center;font-size:12px;color:var(--text-muted);margin:1rem 0;position:relative;}
+    .contact-divider::before,.contact-divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:rgba(255,255,255,0.1);}
+    .contact-divider::before{right:0;}.contact-divider::after{left:0;}
+    .contact-msg-form{display:flex;flex-direction:column;gap:10px;}
+    .contact-msg-form input,.contact-msg-form textarea{background:rgba(255,255,255,0.05);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:11px 14px;color:var(--text-on-dark);font-family:'Cairo';font-size:13px;outline:none;resize:none;transition:0.2s;}
+    .contact-msg-form input:focus,.contact-msg-form textarea:focus{border-color:var(--gold);background:rgba(255,255,255,0.08);}
+    .contact-msg-form textarea{min-height:100px;}
+    .btn-send-msg{background:var(--gold);color:var(--navy);border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;font-family:'Cairo';cursor:pointer;transition:0.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+    .btn-send-msg:hover{background:var(--gold-light);}
+    .btn-send-msg:disabled{opacity:0.6;cursor:not-allowed;}
+    .contact-success{display:none;text-align:center;padding:1.5rem;color:var(--success);}
+    .contact-success .check-icon{font-size:3rem;margin-bottom:10px;}
+
+    /* زر تواصل ثابت في الزاوية */
+    .contact-admin-fab{position:fixed;bottom:90px;left:20px;z-index:9990;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:var(--navy);border:none;border-radius:50px;padding:12px 18px;font-family:'Cairo';font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(201,168,76,0.4);display:flex;align-items:center;gap:7px;transition:0.25s;}
+    .contact-admin-fab:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(201,168,76,0.5);}
+    .contact-admin-fab .fab-pulse{width:8px;height:8px;background:#4CAF7D;border-radius:50%;animation:pulse 1.5s infinite;}
+    @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:0.7}}
+
     /* ===== بانر iOS ===== */
     .ios-install-banner{display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:linear-gradient(180deg,rgba(10,22,40,0) 0%,rgba(10,22,40,0.98) 12px);padding:0 16px 16px;}
     .ios-install-card{background:var(--navy-mid);border:1.5px solid rgba(201,168,76,0.4);border-radius:18px;padding:16px;box-shadow:0 -4px 30px rgba(0,0,0,0.5);animation:slideUp 0.4s ease;}
@@ -267,6 +299,7 @@
   <div class="nav-links">
     <a href="#search">البحث الذكي</a>
     <a href="#pricing">باقات المكاتب</a>
+    <a href="#" onclick="openContactModal(); return false;" style="color:var(--gold);">📨 تواصل معنا</a>
     <button class="btn-add-prop" onclick="openAddPropertyModal()">➕ أضف عقارك كزائر</button>
   </div>
   <div style="display:flex; gap:10px; align-items:center;">
@@ -282,6 +315,7 @@
 <div class="mobile-menu" id="mobileMenu">
   <a href="#search" onclick="closeMobileMenu()">🔍 البحث الذكي</a>
   <a href="#pricing" onclick="closeMobileMenu()">💼 باقات المكاتب</a>
+  <button onclick="closeMobileMenu(); openContactModal()">📨 تواصل مع الإدارة</button>
   <button onclick="closeMobileMenu(); openAddPropertyModal()">➕ أضف عقارك كزائر</button>
   <button onclick="closeMobileMenu(); openRegisterModal('free')">🏢 تسجيل مكتبك العقاري</button>
   <button class="mobile-menu-cta" onclick="window.location.href='admin.html'">🔐 دخول المشرفين / المكاتب</button>
@@ -541,6 +575,57 @@
         <div class="similar-title">📌 عقارات مشابهة قد تهمك</div>
         <div class="similar-grid" id="propModalSimilar"></div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- زر تواصل عائم -->
+<button class="contact-admin-fab" onclick="openContactModal()">
+  <div class="fab-pulse"></div>
+  📨 تواصل مع الإدارة
+</button>
+
+<!-- ===== نافذة التواصل مع الإدارة ===== -->
+<div class="contact-modal-overlay" id="contactAdminOverlay" onclick="if(event.target.id==='contactAdminOverlay') closeContactModal()">
+  <div class="contact-modal">
+    <div class="contact-modal-header">
+      <h3><i class="ti ti-messages"></i> التواصل مع إدارة المنصة</h3>
+      <button onclick="closeContactModal()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text-muted);width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:0.2s;" onmouseover="this.style.color='#ff4d4d'" onmouseout="this.style.color='var(--text-muted)'">✕</button>
+    </div>
+    <div class="contact-modal-body">
+
+      <!-- أزرار التواصل المباشر -->
+      <div class="contact-direct-btns">
+        <a href="https://wa.me/96407719994201" target="_blank" class="btn-contact-wa">
+          <i class="ti ti-brand-whatsapp"></i> واتساب مباشر
+        </a>
+        <a href="tel:07719994201" class="btn-contact-call">
+          <i class="ti ti-phone"></i> 07719994201
+        </a>
+      </div>
+
+      <div class="contact-divider">أو أرسل رسالة مباشرة من هنا</div>
+
+      <!-- نموذج الرسالة -->
+      <div id="contactFormWrap">
+        <div class="contact-msg-form">
+          <input type="text" id="contactName" placeholder="اسمك الكريم *" maxlength="60">
+          <input type="text" id="contactPhone" placeholder="رقم هاتفك (اختياري)">
+          <textarea id="contactMessage" placeholder="اكتب رسالتك للإدارة... *" maxlength="600"></textarea>
+          <button class="btn-send-msg" id="sendContactBtn" onclick="submitContactMessage()">
+            <i class="ti ti-send"></i> إرسال الرسالة
+          </button>
+        </div>
+      </div>
+
+      <!-- رسالة النجاح -->
+      <div class="contact-success" id="contactSuccess">
+        <div class="check-icon">✅</div>
+        <div style="font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:8px;">وصلت رسالتك!</div>
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.8;">تم إرسال رسالتك للإدارة بنجاح.<br>سنتواصل معك قريباً إن شاء الله.</div>
+        <button onclick="closeContactModal()" style="margin-top:18px;background:var(--gold);color:var(--navy);border:none;border-radius:8px;padding:10px 24px;font-family:'Cairo';font-weight:700;font-size:14px;cursor:pointer;">حسناً، شكراً</button>
+      </div>
+
     </div>
   </div>
 </div>
@@ -969,6 +1054,60 @@ async function submitNewOffice() {
 
 // دوال المستشار العقاري الذكي (toggleAiChat / sendAiMessage) أصبحت في ملف ai-advisor.js المستقل
 
+// ===== نافذة التواصل مع الإدارة =====
+function openContactModal() {
+  document.getElementById('contactAdminOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('contactFormWrap').style.display = 'block';
+  document.getElementById('contactSuccess').style.display = 'none';
+}
+function closeContactModal() {
+  document.getElementById('contactAdminOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  setTimeout(() => {
+    document.getElementById('contactName').value = '';
+    document.getElementById('contactPhone').value = '';
+    document.getElementById('contactMessage').value = '';
+    document.getElementById('contactFormWrap').style.display = 'block';
+    document.getElementById('contactSuccess').style.display = 'none';
+  }, 300);
+}
+async function submitContactMessage() {
+  const name    = document.getElementById('contactName').value.trim();
+  const phone   = document.getElementById('contactPhone').value.trim();
+  const message = document.getElementById('contactMessage').value.trim();
+  if (!name) { alert('يرجى كتابة اسمك.'); return; }
+  if (!message) { alert('يرجى كتابة رسالتك.'); return; }
+  const btn = document.getElementById('sendContactBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader"></i> جاري الإرسال...';
+  // حفظ في Supabase (جدول contact_messages)
+  try {
+    await sbFetch('contact_messages', 'POST', {
+      sender_name: name,
+      sender_phone: phone || null,
+      message: message,
+      is_read: false
+    });
+  } catch(e) {
+    // Fallback: localStorage
+    try {
+      const msgs = JSON.parse(localStorage.getItem('basra_contact_msgs') || '[]');
+      msgs.unshift({ id: 'msg_' + Date.now(), sender_name: name, sender_phone: phone || '', message, is_read: false, created_at: new Date().toISOString() });
+      localStorage.setItem('basra_contact_msgs', JSON.stringify(msgs));
+    } catch(e2) {}
+  }
+  // إشعار واتساب للإدارة
+  const waMsg = encodeURIComponent(
+    `📨 رسالة جديدة من زائر المنصة\n\n👤 الاسم: ${name}\n📞 الهاتف: ${phone||'لم يذكر'}\n\n✉️ الرسالة:\n${message}\n\n🕐 ${new Date().toLocaleString('ar-IQ')}`
+  );
+  window.open(`https://wa.me/96407719994201?text=${waMsg}`, '_blank');
+  btn.disabled = false;
+  btn.innerHTML = '<i class="ti ti-send"></i> إرسال الرسالة';
+  document.getElementById('contactFormWrap').style.display = 'none';
+  document.getElementById('contactSuccess').style.display = 'block';
+}
+
 function toggleMobileMenu() {
   const menu = document.getElementById('mobileMenu');
   const btn = document.getElementById('hamburgerBtn');
@@ -1120,7 +1259,7 @@ function closePropModal() {
 }
 
 // إغلاق بـ Escape
-document.addEventListener('keydown', e => { if(e.key === 'Escape') closePropModal(); });
+document.addEventListener('keydown', e => { if(e.key === 'Escape') { closePropModal(); closeContactModal(); } });
 
 // ===== iOS Install Guide =====
 function isIos() {
