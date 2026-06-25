@@ -288,20 +288,29 @@ const SUPABASE_URL = 'https://blayfetxmufisvtigugt.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_zCJnnFxjHQ-X7BkkQCuVqA_U_UyaI6y';
 
 async function sbFetch(table, method = 'GET', body = null, filter = '') {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}${filter}`, {
-    method,
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Prefer': (method === 'POST' || method === 'PATCH') ? 'return=representation' : 'return=minimal'
-    },
-    body: body ? JSON.stringify(body) : null
-  });
-  if (!res.ok) { const e = await res.text(); throw new Error(e); }
-  const text = await res.text();
-  return text ? JSON.parse(text) : [];
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}${filter}`, {
+      method,
+      signal: controller.signal,
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Prefer': (method === 'POST' || method === 'PATCH') ? 'return=representation' : 'return=minimal'
+      },
+      body: body ? JSON.stringify(body) : null
+    });
+    clearTimeout(timeout);
+    if (!res.ok) { const e = await res.text(); throw new Error(e); }
+    const text = await res.text();
+    return text ? JSON.parse(text) : [];
+  } catch(e) {
+    clearTimeout(timeout);
+    throw e;
+  }
 }
 
 // جلب العقارات النشطة من Supabase
@@ -439,15 +448,18 @@ function formatExpiry(expiry, pkg) {
 }
 
 async function renderAdminDashboard() {
-  // المكاتب — من Supabase أولاً ثم localStorage كـ fallback
-  let dbOffices = await getDbOffices();
-  const localOffices = getOffices();
-  const offices = dbOffices.length > 0 ? dbOffices : localOffices;
+  // جلب المكاتب
+  let offices = [];
+  try { offices = await getDbOffices(); }
+  catch(e) { offices = getOffices(); }
 
-  // العقارات — نجلب الكل ونقسمها
-  const allListings    = await getDbListings();
+  // جلب كل العقارات دفعة واحدة وتقسيمها في JS
+  let allListings = [];
+  try { allListings = await getDbListings(); }
+  catch(e) { allListings = []; }
+
   const pendingListings = allListings.filter(l => l.status === 'pending');
-  const activeListings  = allListings.filter(l => !l.status || l.status === 'active');
+  const activeListings  = allListings.filter(l => l.status !== 'pending');
 
   // إحصائيات
   document.getElementById('statTotalOffices').textContent = offices.length;
