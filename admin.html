@@ -385,9 +385,10 @@ function handleLogout() { localStorage.removeItem(SESSION_KEY); checkSession(); 
 
 // دالة مساعدة لعرض تاريخ الانتهاء بشكل واضح
 function formatExpiry(expiry, pkg) {
-  if (!expiry || pkg === 'free') return '<span style="color:var(--text-muted);">مفتوح دائم</span>';
+  if (!pkg || pkg === 'free') return '<span style="color:var(--text-muted);">مفتوح دائم</span>';
+  if (!expiry || expiry === 'مفتوح دائم' || expiry === 'مفتوح') return '<span style="color:var(--text-muted);">—</span>';
   const d = new Date(expiry);
-  if (isNaN(d)) return '<span style="color:var(--text-muted);">—</span>';
+  if (isNaN(d)) return `<span style="color:var(--text-muted);">${expiry}</span>`;
   const today = new Date();
   const diffDays = Math.ceil((d - today) / (1000*60*60*24));
   const dateStr = d.toLocaleDateString('ar-IQ');
@@ -413,32 +414,38 @@ async function renderAdminDashboard() {
   // جدول المكاتب
   document.getElementById('adminOfficesTable').innerHTML = offices.length === 0
     ? '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);">لا توجد مكاتب مسجلة بعد</td></tr>'
-    : offices.map(o => `
+    : offices.map(o => {
+      // تحديد الحالة بشكل صريح — null أو undefined = active
+      const isActive = !o.status || o.status === 'active';
+      const renewDisabled = (!o.pkg || o.pkg === 'free') ? 'disabled' : '';
+      const renewOpacity  = (!o.pkg || o.pkg === 'free') ? 'opacity:0.4;cursor:not-allowed;' : '';
+      return `
     <tr>
       <td style="font-weight:700;">${o.name}</td>
       <td>${o.phone}</td>
       <td><span class="badge" style="background:rgba(201,168,76,0.2); color:#fff;">${o.pkg || 'free'}</span></td>
-      <td><span class="badge ${(o.status === 'active' || !o.status) ? 'bg-success' : 'bg-danger'}">${(o.status === 'active' || !o.status) ? 'نشط' : 'موقوف'}</span></td>
+      <td><span class="badge ${isActive ? 'bg-success' : 'bg-danger'}">${isActive ? 'نشط' : 'موقوف'}</span></td>
       <td>${formatExpiry(o.expiry, o.pkg)}</td>
       <td>
         <select class="input-control" style="padding:4px; font-size:11px; width:auto;" onchange="changePackageByAdmin('${o.id}', this.value)">
-          <option value="free" ${o.pkg === 'free' ? 'selected' : ''}>مجانية</option>
+          <option value="free" ${o.pkg === 'free' || !o.pkg ? 'selected' : ''}>مجانية</option>
           <option value="eco"  ${o.pkg === 'eco'  ? 'selected' : ''}>اقتصادية</option>
           <option value="gold" ${o.pkg === 'gold' ? 'selected' : ''}>ذهبية</option>
         </select>
       </td>
       <td>
-        <button class="btn btn-success" style="padding:4px 8px; font-size:11px; background:#4CAF7D;" onclick="renewSubscriptionByAdmin('${o.id}')" ${o.pkg === 'free' ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : ''}>تجديد 30 يوم</button>
+        <button class="btn btn-success" style="padding:4px 8px; font-size:11px; background:#4CAF7D; ${renewOpacity}" onclick="renewSubscriptionByAdmin('${o.id}')" ${renewDisabled}>تجديد 30 يوم</button>
       </td>
       <td>
         <div style="display:flex; gap:4px;">
-          <button class="btn" style="padding:4px 8px; font-size:11px; background:${(o.status === 'active' || !o.status) ? 'var(--danger)' : 'var(--success)'}; color:#fff; border:none;" onclick="toggleOfficeStatus('${o.id}')">
-            ${(o.status === 'active' || !o.status) ? '⏸ إيقاف' : '▶ تفعيل'}
+          <button class="btn" style="padding:4px 8px; font-size:11px; background:${isActive ? 'var(--danger)' : 'var(--success)'}; color:#fff; border:none;" onclick="toggleOfficeStatus('${o.id}')">
+            ${isActive ? '⏸ إيقاف' : '▶ تفعيل'}
           </button>
           <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="deleteOfficeAdmin('${o.id}')">🗑️ حذف</button>
         </div>
       </td>
-    </tr>`).join('');
+    </tr>`;
+    }).join('');
 
   // ===== طلبات VIP المعلقة =====
   let pendingSection = document.getElementById('adminPendingSection');
@@ -578,22 +585,26 @@ async function toggleOfficeStatus(id) {
   let currentStatus = 'active';
   try {
     const res = await sbFetch('offices', 'GET', null, `?id=eq.${id}&select=status`);
-    currentStatus = (res && res[0] && res[0].status) || 'active';
+    const raw = res && res[0] && res[0].status;
+    currentStatus = (!raw || raw === 'active') ? 'active' : raw;
   } catch(e) {
     const offices = getOffices();
     const o = offices.find(x => x.id === id);
-    currentStatus = o ? (o.status || 'active') : 'active';
+    currentStatus = (o && o.status && o.status !== 'active') ? o.status : 'active';
   }
 
   const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
 
   try {
     await sbFetch('offices', 'PATCH', { status: newStatus }, `?id=eq.${id}`);
+    // مزامنة localStorage
+    let offices = getOffices(); let o = offices.find(x => x.id === id);
+    if(o) { o.status = newStatus; saveOffices(offices); }
   } catch(e) {
     let offices = getOffices(); let o = offices.find(x => x.id === id);
     if(o) { o.status = newStatus; saveOffices(offices); }
   }
-  renderAdminDashboard();
+  await renderAdminDashboard();
 }
 // موافقة على طلب VIP
 async function approveVip(id) {
