@@ -470,6 +470,17 @@ async function renderAdminDashboard() {
   document.getElementById('statActiveOffices').textContent = offices.filter(o => !o.status || o.status === 'active').length;
   document.getElementById('statTotalProps').textContent = activeListings.length;
 
+  // ✅ إصلاح: أي مكتب بباقة مدفوعة بدون expiry → تعيين 30 يوم تلقائياً
+  for (const o of offices) {
+    if (o.pkg && o.pkg !== 'free' && !o.expiry) {
+      const autoExpiry = new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0];
+      try {
+        await sbFetch('offices', 'PATCH', { expiry: autoExpiry }, `?id=eq.${o.id}`);
+        o.expiry = autoExpiry; // تحديث الكائن المحلي فوراً
+      } catch(e) { /* تجاوز صامت */ }
+    }
+  }
+
   // جدول المكاتب
   document.getElementById('adminOfficesTable').innerHTML = offices.length === 0
     ? '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);">لا توجد مكاتب مسجلة بعد</td></tr>'
@@ -592,6 +603,7 @@ async function renderAdminDashboard() {
     }`;
 }
 
+// ✅ عند تغيير الباقة لأي مكتب → تعيين 30 يوم تلقائياً إذا لم يكن هناك تاريخ
 async function changePackageByAdmin(id, newPkg) {
   const expiry = newPkg === 'free'
     ? null
@@ -729,6 +741,23 @@ async function renderOfficeDashboard() {
 
   if (!currentOffice) return;
 
+  // ✅ إظهار رسالة الإيقاف إذا كان المكتب موقوفاً
+  let suspendedBanner = document.getElementById('officeSuspendedBanner');
+  if (!suspendedBanner) {
+    suspendedBanner = document.createElement('div');
+    suspendedBanner.id = 'officeSuspendedBanner';
+    suspendedBanner.style.cssText = 'background:rgba(255,77,77,0.12); border:2px solid var(--danger); border-radius:12px; padding:18px 24px; margin-bottom:20px; display:none; text-align:center;';
+    suspendedBanner.innerHTML = `<div style="font-size:28px; margin-bottom:8px;">⛔</div>
+      <div style="color:var(--danger); font-weight:700; font-size:16px; margin-bottom:6px;">تم إيقاف حسابك من قِبل الإدارة</div>
+      <div style="color:var(--text-muted); font-size:13px;">لا يمكنك نشر إعلانات جديدة حتى يتم إعادة تفعيل الحساب.<br>يرجى التواصل مع الإدارة لمعرفة السبب وحل المشكلة.</div>`;
+    document.getElementById('officeView').insertBefore(suspendedBanner, document.getElementById('officeView').firstChild.nextSibling);
+  }
+  if (currentOffice.status === 'suspended') {
+    suspendedBanner.style.display = 'block';
+  } else {
+    suspendedBanner.style.display = 'none';
+  }
+
   document.getElementById('lblOfficePkg').textContent = currentOffice.pkg === 'gold' ? 'الذهبية VIP' : currentOffice.pkg === 'eco' ? 'الاقتصادية' : 'المجانية';
   document.getElementById('lblOfficeExpiry').textContent = currentOffice.expiry || 'مفتوح';
 
@@ -808,10 +837,27 @@ async function submitNewPropFromOffice(e) {
   try {
     const offices = await getDbOffices();
     const found = offices.find(o => o.id === officeId || o.phone === (session && session.username));
-    if (found) { officeName = found.name; officeId = found.id; }
+    if (found) {
+      officeName = found.name;
+      officeId = found.id;
+      // ✅ فحص الإيقاف
+      if (found.status === 'suspended') {
+        closeAddPropModal();
+        alert('⛔ تم إيقاف حسابك من قِبل الإدارة.\nلا يمكنك نشر إعلانات حالياً.\nتواصل مع الإدارة لإعادة التفعيل.');
+        return;
+      }
+    }
   } catch(e) {
     const lo = getCurrentOffice();
-    if (lo) { officeName = lo.name; officeId = lo.id; }
+    if (lo) {
+      officeName = lo.name;
+      officeId = lo.id;
+      if (lo.status === 'suspended') {
+        closeAddPropModal();
+        alert('⛔ تم إيقاف حسابك من قِبل الإدارة.\nلا يمكنك نشر إعلانات حالياً.\nتواصل مع الإدارة لإعادة التفعيل.');
+        return;
+      }
+    }
   }
 
   const newListing = {
