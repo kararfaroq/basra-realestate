@@ -332,9 +332,9 @@
       <button class="btn-secondary" onclick="openRegisterModal('free')">💼 سجل مكتبك العقاري الآن</button>
     </div>
     <div class="hero-stats">
-      <div class="stat"><div class="stat-num" id="count-offices">147</div><div class="stat-label">مكتب مسجّل</div></div>
-      <div class="stat"><div class="stat-num" id="count-props">1,842</div><div class="stat-label">عقار نشط</div></div>
-      <div class="stat"><div class="stat-num">24</div><div class="stat-label">منطقة مدعومة</div></div>
+      <div class="stat"><div class="stat-num" id="count-offices">—</div><div class="stat-label">مكتب مسجّل</div></div>
+      <div class="stat"><div class="stat-num" id="count-props">—</div><div class="stat-label">عقار نشط</div></div>
+      <div class="stat"><div class="stat-num">78</div><div class="stat-label">منطقة مدعومة</div></div>
     </div>
   </div>
 </section>
@@ -346,6 +346,90 @@
       <div class="search-filters">
         <select class="filter-select" id="filterAction"><option value="">الكل (بيع/إيجار)</option><option value="للبيع">للبيع</option><option value="للإيجار">للإيجار</option></select>
         <select class="filter-select" id="filterType"><option value="">نوع العقار</option><option value="بيت">بيت سكني</option><option value="شقة">شقة فاخرة</option><option value="أرض">أرض</option><option value="محل">محل تجاري</option></select>
+        <select class="filter-select" id="filterDistrict">
+          <option value="">كل المناطق</option>
+          <optgroup label="── قضاء البصرة المركز ──">
+            <option>العشار</option>
+            <option>الأصمعي</option>
+            <option>الجمهورية</option>
+            <option>الكرامة</option>
+            <option>البراضعية</option>
+            <option>الخندق</option>
+            <option>المعقل</option>
+            <option>الميناء</option>
+            <option>التنومة</option>
+            <option>أبو الخصيب</option>
+            <option>الفاو</option>
+            <option>الزبير</option>
+            <option>السيبة</option>
+            <option>صفوان</option>
+          </optgroup>
+          <optgroup label="── أحياء البصرة الشهيرة ──">
+            <option>الجنينة</option>
+            <option>حي الجزائر</option>
+            <option>حي الثورة</option>
+            <option>الربيعة</option>
+            <option>حي أور</option>
+            <option>حي النهضة</option>
+            <option>المحلة</option>
+            <option>الزهور</option>
+            <option>الضبات</option>
+            <option>حي البكر</option>
+            <option>حي الشهداء</option>
+            <option>الحكيمية</option>
+            <option>كرانة</option>
+            <option>المشراق</option>
+            <option>الخضراء</option>
+            <option>القبلة</option>
+            <option>الشط العرب</option>
+            <option>النزهة</option>
+            <option>البصيتين</option>
+            <option>العروبة</option>
+            <option>الأندلس</option>
+            <option>حي المهندسين</option>
+            <option>السكك</option>
+            <option>كوت الحجاج</option>
+            <option>قبلة السوق</option>
+          </optgroup>
+          <optgroup label="── ناحية أبو الخصيب ──">
+            <option>الدير</option>
+            <option>الحارثة</option>
+            <option>الصالحية</option>
+            <option>المدينة</option>
+            <option>العكيكة</option>
+            <option>السراجي</option>
+          </optgroup>
+          <optgroup label="── قضاء الفاو ──">
+            <option>الفاو المركز</option>
+            <option>ناحية الفاو</option>
+            <option>البوارين</option>
+          </optgroup>
+          <optgroup label="── قضاء الزبير ──">
+            <option>الزبير المركز</option>
+            <option>ناحية الصبيحة</option>
+            <option>ناحية سفوان</option>
+            <option>أم قصر</option>
+            <option>خور الزبير</option>
+          </optgroup>
+          <optgroup label="── قضاء شط العرب ──">
+            <option>الهارثة</option>
+            <option>ناحية الهارثة</option>
+            <option>العزير</option>
+            <option>قرمة علي</option>
+            <option>المدينة الطبية</option>
+          </optgroup>
+          <optgroup label="── قضاء القرنة ──">
+            <option>القرنة</option>
+            <option>ناحية القرنة</option>
+            <option>العماري</option>
+            <option>أبو غرة</option>
+          </optgroup>
+          <optgroup label="── قضاء المدينة ──">
+            <option>المدينة المركز</option>
+            <option>ناحية الدير</option>
+            <option>ناحية أبو الخصيب</option>
+          </optgroup>
+        </select>
       </div>
       <div class="search-input-wrap"><i class="ti ti-search"></i><input class="search-input" type="text" placeholder="ابحث بالمنطقة، مثل العشار..." id="searchInput" onkeyup="if(event.key === 'Enter') executeSearch();" /></div>
       <button class="search-btn" onclick="executeSearch()">بحث سريّع</button>
@@ -849,26 +933,28 @@ async function renderListings(dataToRender = null){
 }
 
 async function executeSearch() {
-  const actionFilter = document.getElementById('filterAction').value;
-  const typeFilter   = document.getElementById('filterType').value;
-  const textSearch   = document.getElementById('searchInput').value.trim();
+  const actionFilter   = document.getElementById('filterAction').value;
+  const typeFilter     = document.getElementById('filterType').value;
+  const districtFilter = document.getElementById('filterDistrict').value;
+  const textSearch     = document.getElementById('searchInput').value.trim();
   
   const allListings = await getAllListings();
 
-  if (!actionFilter && !typeFilter && !textSearch) {
+  if (!actionFilter && !typeFilter && !districtFilter && !textSearch) {
     renderListings(allListings);
     return;
   }
 
   const filteredListings = allListings.filter(item => {
-    const matchAction = !actionFilter || item.action === actionFilter;
-    const matchType   = !typeFilter   || item.type === typeFilter;
-    const matchText   = !textSearch   ||
+    const matchAction   = !actionFilter   || item.action === actionFilter;
+    const matchType     = !typeFilter     || item.type === typeFilter;
+    const matchDistrict = !districtFilter || (item.district || '').includes(districtFilter);
+    const matchText     = !textSearch     ||
       (item.district || '').includes(textSearch) ||
       (item.type     || '').includes(textSearch) ||
       (item.office   || '').includes(textSearch) ||
-      (item.notes     || '').includes(textSearch);
-    return matchAction && matchType && matchText;
+      (item.notes    || '').includes(textSearch);
+    return matchAction && matchType && matchDistrict && matchText;
   });
   renderListings(filteredListings);
 }
@@ -1346,12 +1432,57 @@ if('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(() => {});
 }
 
+// ===== تحميل الإحصائيات الحقيقية من Supabase =====
+async function loadHeroStats() {
+  try {
+    // عدد المكاتب
+    const officesRes = await fetch(`${SUPABASE_REST}/offices?select=id`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'count=exact', 'Accept': 'application/json' }
+    });
+    const officesCount = officesRes.headers.get('content-range')?.split('/')[1] || '0';
+
+    // عدد العقارات النشطة
+    const propsRes = await fetch(`${SUPABASE_REST}/listings?select=id&status=eq.active`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'count=exact', 'Accept': 'application/json' }
+    });
+    const propsCount = propsRes.headers.get('content-range')?.split('/')[1] || '0';
+
+    // تحديث العداد مع تأثير animation
+    animateCount('count-offices', parseInt(officesCount) || 0);
+    animateCount('count-props',   parseInt(propsCount)   || 0);
+  } catch(e) {
+    // fallback من localStorage
+    try {
+      const offices = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      const props   = offices.reduce((acc, o) => acc + (o.listings?.length || 0), 0);
+      animateCount('count-offices', offices.length);
+      animateCount('count-props',   props + defaultListings.length);
+    } catch(e2) {
+      document.getElementById('count-offices').textContent = '—';
+      document.getElementById('count-props').textContent   = '—';
+    }
+  }
+}
+
+function animateCount(id, target) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (target === 0) { el.textContent = '0'; return; }
+  let current = 0;
+  const step = Math.ceil(target / 40);
+  const timer = setInterval(() => {
+    current = Math.min(current + step, target);
+    el.textContent = current.toLocaleString('ar-EG');
+    if (current >= target) clearInterval(timer);
+  }, 30);
+}
+
 // تشغيل العرض عند تحميل الصفحة — مع fallback احتياطي
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => { renderListings(); });
+  document.addEventListener('DOMContentLoaded', () => { renderListings(); loadHeroStats(); });
 } else {
-  // الصفحة محملة مسبقاً
   renderListings();
+  loadHeroStats();
 }
 // fallback إضافي بعد ثانية للتأكد
 setTimeout(() => {
