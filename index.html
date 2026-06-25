@@ -855,30 +855,36 @@ function rowToListing(row) {
 
 async function getAllListings() {
   try {
-    const rows = await sbFetch('listings', 'GET', null, '?status=eq.active&order=created_at.desc');
+    // نجلب كل العقارات ما عدا المعلقة (pending)
+    const rows = await sbFetch('listings', 'GET', null, '?status=neq.pending&order=created_at.desc');
     const dbListings = rows.map(rowToListing);
-    // دمج العقارات الافتراضية مع قاعدة البيانات
     return [...dbListings, ...defaultListings];
   } catch(e) {
-    console.warn('Supabase error, using defaults:', e.message);
-    // fallback للـ localStorage إذا فشل Supabase
-    let offices = [];
-    try { offices = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e2) { offices = []; }
+    // fallback: نجلب الكل ونستثني pending يدوياً
+    try {
+      const rows = await sbFetch('listings', 'GET', null, '?order=created_at.desc');
+      const dbListings = rows.filter(r => r.status !== 'pending').map(rowToListing);
+      return [...dbListings, ...defaultListings];
+    } catch(e2) {
+      console.warn('Supabase error, using defaults:', e2.message);
+      let offices = [];
+      try { offices = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e3) { offices = []; }
     let dynamicListings = [...defaultListings];
-    offices.forEach(office => {
-      if (office.listings && office.listings.length > 0) {
-        office.listings.forEach(prop => {
-          dynamicListings.unshift({
-            type: prop.type, action: prop.action, price: prop.price, area: prop.area,
-            district: prop.district, deedType: prop.deedType || 'طابو صرف',
-            rooms: prop.rooms || '-', notes: prop.notes, image: prop.image || '',
-            office: office.name, officeId: office.id, vip: !!prop.vip,
-            icon: prop.icon || '🏠', phone: prop.phone || ''
+      offices.forEach(office => {
+        if (office.listings && office.listings.length > 0) {
+          office.listings.forEach(prop => {
+            dynamicListings.unshift({
+              type: prop.type, action: prop.action, price: prop.price, area: prop.area,
+              district: prop.district, deedType: prop.deedType || 'طابو صرف',
+              rooms: prop.rooms || '-', notes: prop.notes, image: prop.image || '',
+              office: office.name, officeId: office.id, vip: !!prop.vip,
+              icon: prop.icon || '🏠', phone: prop.phone || ''
+            });
           });
-        });
-      }
-    });
-    return dynamicListings;
+        }
+      });
+      return dynamicListings;
+    }
   }
 }
 
@@ -1016,10 +1022,11 @@ async function sendVipWhatsapp() {
   // حفظ الطلب كـ pending في Supabase
   try {
     await sbFetch('listings', 'POST', {
-      office_id: 'guest', office_name: 'زائر VIP — بانتظار الموافقة',
+      office_id: 'guest',
+      office_name: 'زائر',
       type, action: 'للبيع', price, area: '', district: area,
       deed_type: 'طابو صرف', rooms: '-',
-      notes: 'طلب ترقية VIP — بانتظار تأكيد الدفع',
+      notes: 'طلب VIP — بانتظار تأكيد الدفع',
       phone, vip: true, status: 'pending',
       icon: iconMap[type] || '🏠', image: uploadedVisitorImgBase64 || ''
     });
@@ -1079,6 +1086,7 @@ async function publishVisitorProperty(type, area, price, phone, isVip, img) {
     deed_type: 'طابو صرف', rooms: '-',
     notes: 'إعلان نُشر بواسطة زائر للمنصة.',
     phone, vip: isVip,
+    status: 'active',
     icon: iconMap[type] || '🏠',
     image: img || ''
   };
@@ -1442,7 +1450,7 @@ async function loadHeroStats() {
     const officesCount = officesRes.headers.get('content-range')?.split('/')[1] || '0';
 
     // عدد العقارات النشطة
-    const propsRes = await fetch(`${SUPABASE_REST}/listings?select=id&status=eq.active`, {
+    const propsRes = await fetch(`${SUPABASE_REST}/listings?select=id&status=neq.pending`, {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'count=exact', 'Accept': 'application/json' }
     });
     const propsCount = propsRes.headers.get('content-range')?.split('/')[1] || '0';
