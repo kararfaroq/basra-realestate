@@ -185,6 +185,51 @@
 const STORAGE_KEY = 'basra_data_v3';
 const SESSION_KEY = 'basra_session_v3';
 
+// ===== Supabase =====
+const SUPABASE_URL = 'https://blayfetxmufisvtigugt.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_zCJnnFxjHQ-X7BkkQCuVqA_U_UyaI6y';
+
+async function sbFetch(table, method = 'GET', body = null, filter = '') {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}${filter}`, {
+    method,
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Prefer': method === 'POST' ? 'return=representation' : 'return=minimal'
+    },
+    body: body ? JSON.stringify(body) : null
+  });
+  if (!res.ok) { const e = await res.text(); throw new Error(e); }
+  const text = await res.text();
+  return text ? JSON.parse(text) : [];
+}
+
+// جلب العقارات من Supabase
+async function getDbListings() {
+  try { return await sbFetch('listings', 'GET', null, '?order=created_at.desc'); }
+  catch(e) { console.warn('Supabase listings error:', e); return []; }
+}
+
+// حذف عقار من Supabase
+async function deleteDbListing(id) {
+  try { await sbFetch('listings', 'DELETE', null, `?id=eq.${id}`); return true; }
+  catch(e) { console.error('Delete error:', e); return false; }
+}
+
+// جلب المكاتب من Supabase
+async function getDbOffices() {
+  try { return await sbFetch('offices', 'GET', null, '?order=created_at.desc'); }
+  catch(e) { console.warn('Supabase offices error:', e); return []; }
+}
+
+// حذف مكتب من Supabase
+async function deleteDbOffice(id) {
+  try { await sbFetch('offices', 'DELETE', null, `?id=eq.${id}`); return true; }
+  catch(e) { console.error('Delete office error:', e); return false; }
+}
+
 let tempLogoBase64 = "";
 let tempPropImageBase64 = "";
 
@@ -239,20 +284,30 @@ function handleLogin() {
 }
 function handleLogout() { localStorage.removeItem(SESSION_KEY); checkSession(); }
 
-function renderAdminDashboard() {
-  const offices = getOffices();
-  document.getElementById('statTotalOffices').textContent = offices.length;
-  document.getElementById('statActiveOffices').textContent = offices.filter(o => o.status === 'active').length;
-  let props = 0; offices.forEach(o => props += o.listings ? o.listings.length : 0);
-  document.getElementById('statTotalProps').textContent = props;
+async function renderAdminDashboard() {
+  // المكاتب — من Supabase أولاً ثم localStorage كـ fallback
+  let dbOffices = await getDbOffices();
+  const localOffices = getOffices();
+  const offices = dbOffices.length > 0 ? dbOffices : localOffices;
 
-  document.getElementById('adminOfficesTable').innerHTML = offices.map(o => `
+  // العقارات من Supabase
+  const dbListings = await getDbListings();
+
+  // إحصائيات
+  document.getElementById('statTotalOffices').textContent = offices.length;
+  document.getElementById('statActiveOffices').textContent = offices.filter(o => o.status === 'active' || o.pkg).length;
+  document.getElementById('statTotalProps').textContent = dbListings.length;
+
+  // جدول المكاتب
+  document.getElementById('adminOfficesTable').innerHTML = offices.length === 0
+    ? '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);">لا توجد مكاتب مسجلة بعد</td></tr>'
+    : offices.map(o => `
     <tr>
-      <td style="font-weight:700;">${o.name}</td><td>${o.phone}</td>
-      <td><span class="badge" style="background:rgba(201,168,76,0.2); color:#fff;">${o.pkg}</span></td>
-      <td><span class="badge ${o.status === 'active' ? 'bg-success' : 'bg-danger'}">${o.status}</span></td>
-      <td style="font-family:monospace; font-size:12px;">${o.expiry}</td>
-      
+      <td style="font-weight:700;">${o.name}</td>
+      <td>${o.phone}</td>
+      <td><span class="badge" style="background:rgba(201,168,76,0.2); color:#fff;">${o.pkg || 'free'}</span></td>
+      <td><span class="badge ${o.status === 'active' ? 'bg-success' : 'bg-danger'}">${o.status || 'نشط'}</span></td>
+      <td style="font-family:monospace; font-size:12px;">${o.expiry || 'مفتوح'}</td>
       <td>
         <select class="input-control" style="padding:4px; font-size:11px; width:auto;" onchange="changePackageByAdmin('${o.id}', this.value)">
           <option value="free" ${o.pkg === 'free' ? 'selected' : ''}>مجانية</option>
@@ -261,18 +316,63 @@ function renderAdminDashboard() {
         </select>
       </td>
       <td>
-        <button class="btn btn-success" style="padding:4px 8px; font-size:11px; background:#4CAF7D;" onclick="renewSubscriptionByAdmin('${o.id}')" ${o.pkg === 'free' ? 'disabled' : ''}>
-          تجديد 30 يوم
-        </button>
+        <button class="btn btn-success" style="padding:4px 8px; font-size:11px; background:#4CAF7D;" onclick="renewSubscriptionByAdmin('${o.id}')" ${o.pkg === 'free' ? 'disabled' : ''}>تجديد 30 يوم</button>
       </td>
       <td>
         <div style="display:flex; gap:4px;">
-          <button class="btn" style="padding:4px 8px; font-size:11px; background:var(--navy-light); color:#fff;" onclick="toggleOfficeStatus('${o.id}')">${o.status === 'active' ? 'إيقاف' : 'تفعيل'}</button>
-          <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="deleteOffice('${o.id}')">حذف</button>
+          <button class="btn" style="padding:4px 8px; font-size:11px; background:var(--navy-light); color:#fff;" onclick="toggleOfficeStatus('${o.id}')">
+            ${o.status === 'active' ? 'إيقاف' : 'تفعيل'}
+          </button>
+          <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="deleteOfficeAdmin('${o.id}')">🗑️ حذف</button>
         </div>
       </td>
-    </tr>
-  `).join('');
+    </tr>`).join('');
+
+  // ===== قسم العقارات من Supabase =====
+  let listingsSection = document.getElementById('adminListingsSection');
+  if (!listingsSection) {
+    // أنشئ القسم إذا ما موجود
+    const adminView = document.getElementById('adminView');
+    const section = document.createElement('div');
+    section.id = 'adminListingsSection';
+    section.style.marginTop = '2rem';
+    adminView.appendChild(section);
+    listingsSection = section;
+  }
+
+  listingsSection.innerHTML = `
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+      <h3 style="color:var(--gold); font-size:1rem; font-weight:700;">📋 جميع العقارات المنشورة (${dbListings.length})</h3>
+      <button onclick="renderAdminDashboard()" style="background:transparent; border:1px solid var(--gold); color:var(--gold); padding:6px 12px; border-radius:8px; font-family:'Cairo'; font-size:12px; cursor:pointer;">🔄 تحديث</button>
+    </div>
+    ${dbListings.length === 0
+      ? '<p style="color:var(--text-muted); font-size:13px; text-align:center; padding:2rem;">لا توجد عقارات منشورة في قاعدة البيانات</p>'
+      : `<div style="overflow-x:auto;"><table class="admin-table" style="width:100%; border-collapse:collapse; font-size:13px;">
+        <thead><tr style="background:rgba(201,168,76,0.1);">
+          <th style="padding:10px; text-align:right; color:var(--gold);">النوع</th>
+          <th style="padding:10px; text-align:right; color:var(--gold);">المنطقة</th>
+          <th style="padding:10px; text-align:right; color:var(--gold);">السعر</th>
+          <th style="padding:10px; text-align:right; color:var(--gold);">المكتب</th>
+          <th style="padding:10px; text-align:right; color:var(--gold);">VIP</th>
+          <th style="padding:10px; text-align:right; color:var(--gold);">التاريخ</th>
+          <th style="padding:10px; text-align:center; color:var(--gold);">حذف</th>
+        </tr></thead>
+        <tbody>
+          ${dbListings.map(l => `
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+            <td style="padding:10px;">${l.icon || '🏠'} ${l.type}</td>
+            <td style="padding:10px;">${l.district}</td>
+            <td style="padding:10px; color:var(--gold); font-weight:700;">${l.price}</td>
+            <td style="padding:10px;">${l.office_name || 'زائر'}</td>
+            <td style="padding:10px; text-align:center;">${l.vip ? '👑' : '—'}</td>
+            <td style="padding:10px; font-size:11px; color:var(--text-muted);">${new Date(l.created_at).toLocaleDateString('ar-IQ')}</td>
+            <td style="padding:10px; text-align:center;">
+              <button onclick="deleteListingAdmin('${l.id}')" style="background:#e53935; color:#fff; border:none; border-radius:6px; padding:5px 10px; font-size:12px; cursor:pointer; font-family:'Cairo';">🗑️ حذف</button>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table></div>`
+    }`;
 }
 
 function changePackageByAdmin(id, newPkg) {
@@ -299,6 +399,25 @@ function toggleOfficeStatus(id) {
   let offices = getOffices(); let o = offices.find(x => x.id === id);
   if(o) { o.status = o.status === 'active' ? 'suspended' : 'active'; saveOffices(offices); renderAdminDashboard(); }
 }
+// حذف عقار من Supabase (للمدير)
+async function deleteListingAdmin(id) {
+  if (!confirm('⚠️ هل أنت متأكد من حذف هذا العقار نهائياً؟')) return;
+  const ok = await deleteDbListing(id);
+  if (ok) { alert('✅ تم حذف العقار بنجاح'); renderAdminDashboard(); }
+  else alert('❌ فشل الحذف، حاول مرة أخرى');
+}
+
+// حذف مكتب (للمدير)
+async function deleteOfficeAdmin(id) {
+  if (!confirm('⚠️ هل أنت متأكد من حذف هذا المكتب نهائياً؟')) return;
+  // حذف من Supabase
+  await deleteDbOffice(id);
+  // حذف من localStorage كذلك
+  saveOffices(getOffices().filter(o => o.id !== id));
+  alert('✅ تم حذف المكتب');
+  renderAdminDashboard();
+}
+
 function deleteOffice(id){ if(confirm('تأكيد حذف المكتب؟')) { saveOffices(getOffices().filter(o=>o.id!==id)); renderAdminDashboard(); } }
 
 function getCurrentOffice() {
