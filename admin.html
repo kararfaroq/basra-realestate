@@ -341,6 +341,48 @@ async function renderAdminDashboard() {
       </td>
     </tr>`).join('');
 
+  // ===== طلبات VIP المعلقة =====
+  let pendingSection = document.getElementById('adminPendingSection');
+  if (!pendingSection) {
+    const adminView = document.getElementById('adminView');
+    const sec = document.createElement('div');
+    sec.id = 'adminPendingSection';
+    sec.style.marginTop = '2rem';
+    adminView.insertBefore(sec, adminView.firstChild);
+    pendingSection = sec;
+  }
+
+  let pendingListings = [];
+  try {
+    pendingListings = await sbFetch('listings', 'GET', null, '?status=eq.pending&order=created_at.desc');
+  } catch(e) {}
+
+  pendingSection.innerHTML = pendingListings.length === 0 ? '' : `
+    <div style="background:rgba(201,168,76,0.08); border:1.5px solid rgba(201,168,76,0.4); border-radius:14px; padding:1.2rem; margin-bottom:1.5rem;">
+      <h3 style="color:var(--gold); font-size:1rem; font-weight:700; margin-bottom:1rem;">
+        🔔 طلبات VIP بانتظار الموافقة (${pendingListings.length})
+      </h3>
+      ${pendingListings.map(l => `
+        <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+          <div style="font-size:13px; line-height:2;">
+            <div>👑 <strong style="color:var(--gold);">VIP</strong> — ${l.type} في ${l.district}</div>
+            <div>💰 ${l.price} &nbsp;|&nbsp; 📞 ${l.phone || '—'}</div>
+            <div style="color:var(--text-muted); font-size:11px;">${new Date(l.created_at).toLocaleString('ar-IQ')}</div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button onclick="approveVip('${l.id}')"
+              style="background:#4CAF7D; color:#fff; border:none; border-radius:8px; padding:8px 16px; font-size:13px; font-weight:700; font-family:'Cairo'; cursor:pointer;">
+              ✅ موافقة ونشر
+            </button>
+            <button onclick="rejectVip('${l.id}')"
+              style="background:#e53935; color:#fff; border:none; border-radius:8px; padding:8px 14px; font-size:13px; font-weight:700; font-family:'Cairo'; cursor:pointer;">
+              ❌ رفض
+            </button>
+          </div>
+        </div>
+      `).join('')}
+    </div>`;
+
   // ===== قسم العقارات من Supabase =====
   let listingsSection = document.getElementById('adminListingsSection');
   if (!listingsSection) {
@@ -412,6 +454,33 @@ function toggleOfficeStatus(id) {
   let offices = getOffices(); let o = offices.find(x => x.id === id);
   if(o) { o.status = o.status === 'active' ? 'suspended' : 'active'; saveOffices(offices); renderAdminDashboard(); }
 }
+// موافقة على طلب VIP
+async function approveVip(id) {
+  if (!confirm('✅ تأكيد الموافقة ونشر الإعلان كـ VIP؟')) return;
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/listings?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ status: 'active', vip: true })
+    });
+    alert('✅ تم نشر الإعلان VIP بنجاح!');
+    renderAdminDashboard();
+  } catch(e) { alert('❌ فشل: ' + e.message); }
+}
+
+// رفض طلب VIP وحذفه
+async function rejectVip(id) {
+  if (!confirm('❌ تأكيد رفض وحذف هذا الطلب؟')) return;
+  const ok = await deleteDbListing(id);
+  if (ok) { alert('تم رفض الطلب وحذفه'); renderAdminDashboard(); }
+  else alert('❌ فشل الحذف');
+}
+
 // حذف عقار من Supabase (للمدير)
 async function deleteListingAdmin(id) {
   if (!confirm('⚠️ هل أنت متأكد من حذف هذا العقار نهائياً؟')) return;
@@ -554,6 +623,7 @@ async function submitNewPropFromOffice(e) {
     image:     tempPropImageBase64 || '',
     icon:      iconMap[type] || '🏠',
     vip:       false,
+    status:    'active',
     phone:     ''
   };
 
