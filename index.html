@@ -669,7 +669,7 @@ function rowToListing(row) {
 
 async function getAllListings() {
   try {
-    const rows = await sbFetch('listings', 'GET', null, '?order=created_at.desc');
+    const rows = await sbFetch('listings', 'GET', null, '?status=eq.active&order=created_at.desc');
     const dbListings = rows.map(rowToListing);
     // دمج العقارات الافتراضية مع قاعدة البيانات
     return [...dbListings, ...defaultListings];
@@ -814,31 +814,40 @@ function handleLogoUpload(event) {
   }
 }
 
-function sendVipWhatsapp() {
-  const area  = document.getElementById('modalPropArea').value.trim();
-  const price = document.getElementById('modalPropPrice').value.trim();
-  const phone = document.getElementById('modalPropPhone').value.trim();
-  const selType = document.getElementById('modalPropType').value;
+async function sendVipWhatsapp() {
+  const area     = document.getElementById('modalPropArea').value.trim();
+  const price    = document.getElementById('modalPropPrice').value.trim();
+  const phone    = document.getElementById('modalPropPhone').value.trim();
+  const selType  = document.getElementById('modalPropType').value;
   const customType = document.getElementById('modalPropTypeCustom').value.trim();
-  const type  = selType === 'أخرى' ? (customType || 'أخرى') : selType;
+  const type     = selType === 'أخرى' ? (customType || 'أخرى') : selType;
+  const iconMap  = {'بيت':'🏠','شقة':'🏢','أرض':'🏞️','مكتب':'🏛️','محل':'🏪','مستودع':'🏭','فيلا':'🏡','عمارة':'🏗️'};
 
-  const adminNum = '96407719994201';
+  if (!area || !price || !phone) { alert('⚠️ يرجى ملء جميع الحقول أولاً'); return; }
+
+  // حفظ الطلب كـ pending في Supabase
+  try {
+    await sbFetch('listings', 'POST', {
+      office_id: 'guest', office_name: 'زائر VIP — بانتظار الموافقة',
+      type, action: 'للبيع', price, area: '', district: area,
+      deed_type: 'طابو صرف', rooms: '-',
+      notes: 'طلب ترقية VIP — بانتظار تأكيد الدفع',
+      phone, vip: true, status: 'pending',
+      icon: iconMap[type] || '🏠', image: uploadedVisitorImgBase64 || ''
+    });
+  } catch(e) { console.warn('pending save failed:', e.message); }
+
+  // إرسال واتساب للإدارة
   const msg = encodeURIComponent(
-    `مرحباً إدارة دليل البصرة العقاري 👋\n\n` +
-    `أرغب في ترقية إعلاني إلى VIP ⭐\n\n` +
-    `📋 تفاصيل الإعلان:\n` +
-    `• النوع: ${type}\n` +
-    `• المنطقة: ${area}\n` +
-    `• السعر: ${price}\n` +
-    `• رقم التواصل: ${phone || 'غير محدد'}\n\n` +
-    `سأرسل إيصال التحويل قريباً ✅`
+    `🔔 طلب ترقية VIP جديد!\n\n` +
+    `• النوع: ${type}\n• المنطقة: ${area}\n• السعر: ${price}\n• الهاتف: ${phone}\n\n` +
+    `⏳ الإعلان معلّق — فعّله من لوحة التحكم بعد التحقق ✅`
   );
+  window.open(`https://wa.me/96407719994201?text=${msg}`, '_blank');
 
-  window.open(`https://wa.me/${adminNum}?text=${msg}`, '_blank');
-
-  // ننشر الإعلان كـ VIP معلّق بانتظار التأكيد
   closePaymentModal();
-  publishVisitorProperty(type, area, price, phone, true, uploadedVisitorImgBase64);
+  closeAddPropertyModal();
+  alert('✅ تم إرسال طلبك!\nسيظهر إعلانك بعد تأكيد الإدارة للدفع.');
 }
 
 function submitNewPropertyFromModal() {
