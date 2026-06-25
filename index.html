@@ -84,6 +84,43 @@
     .card-btn:hover{background:rgba(201,168,76,0.12)}
     .empty-search {grid-column: 1 / -1; text-align: center; padding: 4rem; background: rgba(255,255,255,0.02); border-radius: 14px; border: 1px dashed rgba(201,168,76,0.3); color: var(--text-muted);}
 
+    /* ===== PROPERTY DETAIL MODAL ===== */
+    .prop-modal-overlay{display:none;position:fixed;inset:0;background:rgba(5,12,24,0.92);backdrop-filter:blur(6px);z-index:2000;justify-content:center;align-items:flex-start;padding:1rem;overflow-y:auto;}
+    .prop-modal-overlay.open{display:flex;}
+    .prop-modal{background:var(--navy-mid);border:1.5px solid rgba(201,168,76,0.35);border-radius:20px;width:100%;max-width:680px;margin:auto;overflow:hidden;position:relative;animation:modalIn .3s ease;}
+    @keyframes modalIn{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .prop-modal-img-wrap{width:100%;height:260px;background:var(--navy-light);display:flex;align-items:center;justify-content:center;font-size:5rem;position:relative;overflow:hidden;}
+    .prop-modal-img-wrap img{width:100%;height:100%;object-fit:cover;}
+    .prop-modal-close{position:absolute;top:14px;left:14px;width:36px;height:36px;border-radius:50%;background:rgba(10,22,40,0.8);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;transition:.2s;}
+    .prop-modal-close:hover{background:var(--danger);border-color:var(--danger);}
+    .prop-modal-badges{position:absolute;top:14px;right:14px;display:flex;gap:6px;}
+    .prop-modal-body{padding:1.5rem;}
+    .prop-modal-price{font-size:2rem;font-weight:900;color:var(--gold);margin-bottom:4px;}
+    .prop-modal-title{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:14px;}
+    .prop-modal-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+    .prop-modal-tag{background:rgba(255,255,255,0.05);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:7px 14px;font-size:13px;color:var(--text-on-dark);display:flex;align-items:center;gap:6px;}
+    .prop-modal-tag i{color:var(--gold);}
+    .prop-modal-desc{font-size:14px;color:var(--text-muted);line-height:1.9;margin-bottom:20px;padding:14px;background:rgba(255,255,255,0.03);border-radius:10px;border-right:3px solid var(--gold);}
+    .prop-modal-office-box{display:flex;align-items:center;gap:12px;background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:14px;margin-bottom:18px;}
+    .prop-modal-office-avatar{width:48px;height:48px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--navy);flex-shrink:0;overflow:hidden;}
+    .prop-modal-office-avatar img{width:100%;height:100%;object-fit:cover;}
+    .prop-modal-office-info{flex:1;}
+    .prop-modal-office-name{font-weight:700;font-size:15px;color:#fff;}
+    .prop-modal-office-sub{font-size:12px;color:var(--gold);margin-top:2px;}
+    .prop-modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .btn-whatsapp{background:#25D366;color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;font-family:'Cairo';cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s;}
+    .btn-whatsapp:hover{background:#1db954;}
+    .btn-call{background:transparent;color:var(--gold);border:1.5px solid var(--gold);border-radius:10px;padding:13px;font-size:14px;font-weight:700;font-family:'Cairo';cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s;}
+    .btn-call:hover{background:rgba(201,168,76,0.1);}
+    .prop-modal-similar{margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.07);}
+    .similar-title{font-size:14px;font-weight:700;color:var(--text-muted);margin-bottom:12px;}
+    .similar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:10px;}
+    .similar-card{background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.1);border-radius:10px;padding:10px;cursor:pointer;transition:.2s;}
+    .similar-card:hover{border-color:var(--gold);background:rgba(201,168,76,0.05);}
+    .similar-card-price{font-size:13px;font-weight:900;color:var(--gold);}
+    .similar-card-title{font-size:12px;color:var(--text-muted);margin-top:3px;}
+    @media(max-width:600px){.prop-modal-actions{grid-template-columns:1fr;}.prop-modal-img-wrap{height:200px;}}
+
     /* PRICING SECTION */
     .pricing-section{padding:4rem 2rem;max-width:1100px;margin:0 auto;}
     .pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-top:2.5rem;}
@@ -326,11 +363,31 @@
     <div style="margin-bottom: 1.2rem;"><h3 style="color: var(--gold); font-weight: 700;"><i class="ti ti-circle-plus"></i> إضافة عقار سريع (زائر)</h3></div>
     <div>
       <label style="font-size: 11px; color: var(--gold);">نوع العقار</label>
-      <select id="modalPropType" class="input-field-modal"><option value="بيت">بيت سكني</option><option value="شقة">شقة فاخرة</option><option value="أرض">أرض استثمارية</option></select>
+      <select id="modalPropType" class="input-field-modal" onchange="toggleCustomType(this)">
+        <option value="بيت">🏠 بيت سكني</option>
+        <option value="شقة">🏢 شقة فاخرة</option>
+        <option value="أرض">🏞️ أرض استثمارية</option>
+        <option value="مكتب">🏛️ مكتب تجاري</option>
+        <option value="محل">🏪 محل تجاري</option>
+        <option value="مستودع">🏭 مستودع / مخزن</option>
+        <option value="فيلا">🏡 فيلا</option>
+        <option value="عمارة">🏗️ عمارة سكنية</option>
+        <option value="أخرى">✏️ أخرى (اكتب النوع)</option>
+      </select>
+      <input type="text" id="modalPropTypeCustom" class="input-field-modal" placeholder="اكتب نوع العقار..." style="display:none; margin-top:-10px;">
+
       <label style="font-size: 11px; color: var(--gold);">المنطقة</label>
       <input type="text" id="modalPropArea" class="input-field-modal" placeholder="مثال: العشار، الجنينة...">
+
       <label style="font-size: 11px; color: var(--gold);">السعر</label>
       <input type="text" id="modalPropPrice" class="input-field-modal" placeholder="مثال: 140 مليون">
+
+      <label style="font-size: 11px; color: var(--gold);">رقم هاتف التواصل (يظهر للمشترين)</label>
+      <div style="position:relative;">
+        <input type="tel" id="modalPropPhone" class="input-field-modal" placeholder="مثال: 07XXXXXXXXX" style="padding-left:48px; margin-bottom:5px;">
+        <span style="position:absolute;left:14px;top:13px;font-size:13px;color:var(--text-muted);">📞</span>
+      </div>
+      <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;margin-top:-3px;">سيتم عرض رقمك للمشترين المهتمين فقط</p>
       
       <div class="vip-upgrade-box" id="vipBoxContainer">
         <label class="vip-checkbox-wrap">
@@ -407,31 +464,71 @@
 <div id="paymentModal" class="modal-overlay" onclick="if(event.target.id === 'paymentModal') closePaymentModal()">
   <div class="modal-content" style="max-width: 400px; text-align: center;">
     <button onclick="closePaymentModal()" class="modal-close-top-btn">✕</button>
+
     <div style="margin-bottom: 1.5rem;">
-      <i class="ti ti-credit-card-pay" style="font-size: 50px; color: var(--gold);"></i>
-      <h3 style="color: var(--gold); font-weight: 700; margin-top: 10px;">بوابة الدفع الإلكتروني</h3>
-      <p style="font-size: 13px; color: var(--text-muted); margin-top: 5px;">دفع رسوم تمييز الإعلان (VIP) - 5,000 د.ع</p>
+      <div style="font-size: 56px; margin-bottom: 8px;">👑</div>
+      <h3 style="color: var(--gold); font-weight: 900; font-size: 1.2rem;">ترقية الإعلان إلى VIP</h3>
+      <p style="font-size: 13px; color: var(--text-muted); margin-top: 8px; line-height: 1.7;">
+        رسوم التمييز <strong style="color:var(--gold);">5,000 د.ع</strong> فقط<br>
+        أرسل لنا عبر واتساب وسنفعّل إعلانك فوراً بعد التحويل
+      </p>
     </div>
-    
-    <div style="text-align: right; margin-bottom: 20px;">
-      <label style="font-size: 12px; color: var(--gold); margin-bottom: 8px; display: block;">اختر طريقة الدفع المناسبة:</label>
-      
-      <div class="payment-method active" onclick="selectPayment(this)">
-        <div style="width: 30px; height: 30px; background: #e30613; border-radius: 6px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:10px;">Zain</div>
-        <span style="font-size: 14px; font-weight: 600; color: #fff;">زين كاش (Zain Cash)</span>
-      </div>
-      
-      <div class="payment-method" onclick="selectPayment(this)">
-        <div style="width: 30px; height: 30px; background: #1a1f71; border-radius: 6px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:10px;">Asia</div>
-        <span style="font-size: 14px; font-weight: 600; color: #fff;">حوالة رصيد آسيا سيل / زين</span>
+
+    <!-- خطوات -->
+    <div style="text-align:right; background:rgba(201,168,76,0.07); border:1px solid rgba(201,168,76,0.2); border-radius:12px; padding:14px; margin-bottom:20px;">
+      <div style="font-size:13px; color:var(--text-on-dark); margin-bottom:8px; font-weight:700; color:var(--gold);">كيف يعمل؟</div>
+      <div style="font-size:13px; color:var(--text-muted); line-height:2;">
+        <div>1️⃣ اضغط زر "أرسل طلبك عبر واتساب"</div>
+        <div>2️⃣ حوّل المبلغ (زين كاش / حوالة)</div>
+        <div>3️⃣ أرسل لقطة التحويل في نفس المحادثة</div>
+        <div>4️⃣ نفعّل إعلانك VIP خلال دقائق ✅</div>
       </div>
     </div>
 
-    <button onclick="confirmPaymentAndPublish()" class="search-btn" style="width:100%; border-radius:8px; height:44px; background: var(--success); color: #fff;">💳 تأكيد الدفع ونشر الإعلان VIP</button>
+    <button onclick="sendVipWhatsapp()" class="btn-whatsapp" style="width:100%; border-radius:10px; height:50px; font-size:15px; justify-content:center;">
+      <i class="ti ti-brand-whatsapp"></i> أرسل طلبك عبر واتساب
+    </button>
+    <button onclick="closePaymentModal()" class="btn-close-danger-modal" style="margin-top:10px;">إلغاء</button>
   </div>
 </div>
 
 <!-- ودجة المستشار العقاري الذكي تُحقن تلقائياً عبر ai-advisor.js (ملف مستقل تماماً عن الواجهة) -->
+
+<!-- ===== نافذة تفاصيل العقار ===== -->
+<div class="prop-modal-overlay" id="propDetailOverlay" onclick="if(event.target.id==='propDetailOverlay') closePropModal()">
+  <div class="prop-modal" id="propDetailModal">
+    <div class="prop-modal-img-wrap" id="propModalImg">
+      <span id="propModalIcon"></span>
+      <button class="prop-modal-close" onclick="closePropModal()">✕</button>
+      <div class="prop-modal-badges" id="propModalBadges"></div>
+    </div>
+    <div class="prop-modal-body">
+      <div class="prop-modal-price" id="propModalPrice"></div>
+      <div class="prop-modal-title" id="propModalTitle"></div>
+      <div class="prop-modal-tags" id="propModalTags"></div>
+      <div class="prop-modal-desc" id="propModalDesc"></div>
+      <div class="prop-modal-office-box">
+        <div class="prop-modal-office-avatar" id="propModalAvatar">م</div>
+        <div class="prop-modal-office-info">
+          <div class="prop-modal-office-name" id="propModalOfficeName"></div>
+          <div class="prop-modal-office-sub" id="propModalOfficeSub">مكتب عقاري معتمد</div>
+        </div>
+      </div>
+      <div class="prop-modal-actions">
+        <button class="btn-whatsapp" id="propModalWhatsapp">
+          <i class="ti ti-brand-whatsapp"></i> تواصل واتساب
+        </button>
+        <button class="btn-call" id="propModalCall">
+          <i class="ti ti-phone"></i> اتصال مباشر
+        </button>
+      </div>
+      <div class="prop-modal-similar">
+        <div class="similar-title">📌 عقارات مشابهة قد تهمك</div>
+        <div class="similar-grid" id="propModalSimilar"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- بانر تثبيت PWA -->
 <div class="pwa-install-banner" id="pwaInstallBanner">
@@ -501,10 +598,10 @@ function renderListings(dataToRender = null){
     return;
   }
 
-  g.innerHTML = currentListings.map(l => {
+  g.innerHTML = currentListings.map((l, idx) => {
     const imageStyle = l.image ? `background-image:url(${l.image}); background-size:cover; background-position:center;` : '';
     return `
-    <div class="listing-card">
+    <div class="listing-card" onclick="openPropModal(${idx})">
       <div class="card-img" style="${imageStyle}">
         ${!l.image ? `<div class="card-img-placeholder">${l.icon}</div>` : ''}
         <div class="card-badge badge-sale">${l.action || 'للبيع'}</div>
@@ -521,7 +618,7 @@ function renderListings(dataToRender = null){
         ${l.desc ? `<div class="card-desc">${l.desc}</div>` : ''}
         <div class="card-footer">
           <div class="card-office"><div class="office-avatar">م</div><span>${l.office}</span></div>
-          <button class="card-btn">تفاصيل 📞</button>
+          <button class="card-btn" onclick="event.stopPropagation(); openPropModal(${idx})">تفاصيل 📞</button>
         </div>
       </div>
     </div>
@@ -541,6 +638,12 @@ function executeSearch() {
     return matchAction && matchType && matchText;
   });
   renderListings(filteredListings);
+}
+
+function toggleCustomType(sel) {
+  const custom = document.getElementById('modalPropTypeCustom');
+  custom.style.display = sel.value === 'أخرى' ? 'block' : 'none';
+  if (sel.value !== 'أخرى') custom.value = '';
 }
 
 function openAddPropertyModal() { document.getElementById('addPropModal').style.display = 'flex'; }
@@ -580,41 +683,73 @@ function handleLogoUpload(event) {
   }
 }
 
-function selectPayment(element) {
-  document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('active'));
-  element.classList.add('active');
+function sendVipWhatsapp() {
+  const area  = document.getElementById('modalPropArea').value.trim();
+  const price = document.getElementById('modalPropPrice').value.trim();
+  const phone = document.getElementById('modalPropPhone').value.trim();
+  const selType = document.getElementById('modalPropType').value;
+  const customType = document.getElementById('modalPropTypeCustom').value.trim();
+  const type  = selType === 'أخرى' ? (customType || 'أخرى') : selType;
+
+  const adminNum = '96407719994201';
+  const msg = encodeURIComponent(
+    `مرحباً إدارة دليل البصرة العقاري 👋\n\n` +
+    `أرغب في ترقية إعلاني إلى VIP ⭐\n\n` +
+    `📋 تفاصيل الإعلان:\n` +
+    `• النوع: ${type}\n` +
+    `• المنطقة: ${area}\n` +
+    `• السعر: ${price}\n` +
+    `• رقم التواصل: ${phone || 'غير محدد'}\n\n` +
+    `سأرسل إيصال التحويل قريباً ✅`
+  );
+
+  window.open(`https://wa.me/${adminNum}?text=${msg}`, '_blank');
+
+  // ننشر الإعلان كـ VIP معلّق بانتظار التأكيد
+  closePaymentModal();
+  publishVisitorProperty(type, area, price, phone, true, uploadedVisitorImgBase64);
 }
 
 function submitNewPropertyFromModal() {
-  const area = document.getElementById('modalPropArea').value.trim();
+  const area  = document.getElementById('modalPropArea').value.trim();
   const price = document.getElementById('modalPropPrice').value.trim();
-  const type = document.getElementById('modalPropType').value;
+  const phone = document.getElementById('modalPropPhone').value.trim();
+  const selType = document.getElementById('modalPropType').value;
+  const customType = document.getElementById('modalPropTypeCustom').value.trim();
+  const type  = selType === 'أخرى' ? (customType || 'أخرى') : selType;
   const isVip = document.getElementById('modalVipCheck').checked;
 
-  if(!area || !price) { alert("يرجى ملء المنطقة والسعر أولاً!"); return; }
+  if (!area || !price) { alert("يرجى ملء المنطقة والسعر أولاً!"); return; }
+  if (!phone) { alert("يرجى إدخال رقم هاتف التواصل حتى يتمكن المشترون من الوصول إليك."); return; }
 
-  if(isVip) {
+  if (isVip) {
     document.getElementById('paymentModal').style.display = 'flex';
   } else {
-    publishVisitorProperty(type, area, price, false, '');
+    publishVisitorProperty(type, area, price, phone, false, '');
   }
 }
 
 function confirmPaymentAndPublish() {
-  const area = document.getElementById('modalPropArea').value.trim();
+  const area  = document.getElementById('modalPropArea').value.trim();
   const price = document.getElementById('modalPropPrice').value.trim();
-  const type = document.getElementById('modalPropType').value;
-  
+  const phone = document.getElementById('modalPropPhone').value.trim();
+  const selType = document.getElementById('modalPropType').value;
+  const customType = document.getElementById('modalPropTypeCustom').value.trim();
+  const type  = selType === 'أخرى' ? (customType || 'أخرى') : selType;
+
   closePaymentModal();
-  publishVisitorProperty(type, area, price, true, uploadedVisitorImgBase64);
+  publishVisitorProperty(type, area, price, phone, true, uploadedVisitorImgBase64);
 }
 
-function publishVisitorProperty(type, area, price, isVip, img) {
+function publishVisitorProperty(type, area, price, phone, isVip, img) {
+  const iconMap = { 'بيت':'🏠','شقة':'🏢','أرض':'🏞️','مكتب':'🏛️','محل':'🏪','مستودع':'🏭','فيلا':'🏡','عمارة':'🏗️' };
   defaultListings.unshift({
-    type: type, action: 'للبيع', price: price, area: '150', district: area, 
-    deedType: 'طابو صرف', rooms: '3', desc: 'تم النشر السريع بواسطة زائر للمنصة.', 
-    office: 'إعلان زائر ' + (isVip ? '⭐' : ''), officeId: 'guest', vip: isVip, 
-    icon: type === 'شقة' ? '🏢' : '🏠', image: img
+    type, action: 'للبيع', price, area: '150', district: area,
+    deedType: 'طابو صرف', rooms: '-', phone,
+    desc: 'إعلان نُشر بواسطة زائر للمنصة.',
+    office: 'إعلان زائر' + (isVip ? ' ⭐' : ''),
+    officeId: 'guest', vip: isVip,
+    icon: iconMap[type] || '🏠', image: img
   });
   alert("🎉 تم نشر إعلانك بنجاح في المعرض العام!");
   closeAddPropertyModal();
@@ -624,6 +759,10 @@ function publishVisitorProperty(type, area, price, isVip, img) {
 function resetVisitorForm() {
   document.getElementById('modalPropArea').value = "";
   document.getElementById('modalPropPrice').value = "";
+  document.getElementById('modalPropPhone').value = "";
+  document.getElementById('modalPropType').value = "بيت";
+  document.getElementById('modalPropTypeCustom').value = "";
+  document.getElementById('modalPropTypeCustom').style.display = 'none';
   document.getElementById('modalVipCheck').checked = false;
   document.getElementById('vipImageSection').style.display = 'none';
   document.getElementById('visitorImgPreview').style.display = 'none';
@@ -709,6 +848,113 @@ document.addEventListener('click', function(e) {
     btn.classList.remove('open');
   }
 });
+
+// ===== نافذة تفاصيل العقار =====
+let _cachedListings = [];
+
+function openPropModal(idx) {
+  const listings = getAllListings();
+  _cachedListings = listings;
+  const l = listings[idx];
+  if (!l) return;
+
+  // الصورة
+  const imgWrap = document.getElementById('propModalImg');
+  document.getElementById('propModalIcon').textContent = l.image ? '' : (l.icon || '🏠');
+  if (l.image) {
+    // إزالة أي صورة سابقة
+    const oldImg = imgWrap.querySelector('img');
+    if (oldImg) oldImg.remove();
+    const img = document.createElement('img');
+    img.src = l.image;
+    imgWrap.insertBefore(img, imgWrap.firstChild);
+  } else {
+    const oldImg = imgWrap.querySelector('img');
+    if (oldImg) oldImg.remove();
+  }
+
+  // الشارات
+  document.getElementById('propModalBadges').innerHTML =
+    `<span class="card-badge badge-sale" style="position:static">${l.action || 'للبيع'}</span>` +
+    (l.vip ? '<span class="badge-vip" style="position:static">👑 VIP</span>' : '');
+
+  // السعر والعنوان
+  document.getElementById('propModalPrice').textContent = l.price;
+  document.getElementById('propModalTitle').textContent = `${l.type} في ${l.district}`;
+
+  // التاغات
+  document.getElementById('propModalTags').innerHTML = `
+    <div class="prop-modal-tag"><i class="ti ti-ruler-measure"></i>${l.area} م²</div>
+    <div class="prop-modal-tag"><i class="ti ti-door"></i>${l.rooms} غرف</div>
+    <div class="prop-modal-tag"><i class="ti ti-file-certificate"></i>${l.deedType}</div>
+    <div class="prop-modal-tag"><i class="ti ti-map-pin"></i>${l.district}</div>
+    ${l.type ? `<div class="prop-modal-tag"><i class="ti ti-home"></i>${l.type}</div>` : ''}
+  `;
+
+  // الوصف
+  document.getElementById('propModalDesc').textContent = l.desc || 'لا يوجد وصف إضافي لهذا العقار.';
+
+  // معلومات المكتب — ابحث عن رقم هاتفه من localStorage
+  document.getElementById('propModalOfficeName').textContent = l.office || 'مكتب عقاري';
+  let officePhone = '';
+  try {
+    const offices = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    const found = offices.find(o => o.id === l.officeId);
+    if (found) {
+      officePhone = found.phone || '';
+      document.getElementById('propModalOfficeSub').textContent =
+        `📦 ${found.pkg === 'gold' ? 'الباقة الذهبية VIP' : found.pkg === 'eco' ? 'الباقة الاقتصادية' : 'الباقة المجانية'}`;
+      if (found.logo) {
+        document.getElementById('propModalAvatar').innerHTML = `<img src="${found.logo}">`;
+      } else {
+        document.getElementById('propModalAvatar').textContent = (found.name||'م')[0];
+      }
+    } else {
+      document.getElementById('propModalAvatar').textContent = (l.office||'م')[0];
+      document.getElementById('propModalOfficeSub').textContent = 'مكتب عقاري معتمد';
+    }
+  } catch(e) {}
+
+  // أزرار التواصل — أولوية للمكتب ثم هاتف الزائر
+  const waBtn  = document.getElementById('propModalWhatsapp');
+  const callBtn = document.getElementById('propModalCall');
+  let contactPhone = officePhone || l.phone || '';
+
+  if (contactPhone) {
+    const waNum = '964' + contactPhone.replace(/^0/, '');
+    const waMsg = encodeURIComponent(`مرحباً، رأيت عقار (${l.type} في ${l.district}) بسعر ${l.price} على دليل البصرة العقاري وأريد الاستفسار.`);
+    waBtn.onclick  = () => window.open(`https://wa.me/${waNum}?text=${waMsg}`, '_blank');
+    callBtn.onclick = () => window.location.href = `tel:${contactPhone}`;
+  } else {
+    waBtn.onclick  = () => alert('رقم التواصل غير متوفر لهذا الإعلان.');
+    callBtn.onclick = () => alert('رقم التواصل غير متوفر لهذا الإعلان.');
+  }
+
+  // العقارات المشابهة (نفس النوع أو نفس المنطقة — باستثناء الحالي)
+  const similar = listings.filter((x, i) => i !== idx && (x.type === l.type || x.district === l.district)).slice(0, 4);
+  document.getElementById('propModalSimilar').innerHTML = similar.length
+    ? similar.map((s, si) => {
+        const realIdx = listings.indexOf(s);
+        return `<div class="similar-card" onclick="openPropModal(${realIdx})">
+          <div style="font-size:1.5rem;margin-bottom:5px;">${s.icon||'🏠'}</div>
+          <div class="similar-card-price">${s.price}</div>
+          <div class="similar-card-title">${s.type} · ${s.district}</div>
+        </div>`;
+      }).join('')
+    : '<p style="color:var(--text-muted);font-size:13px;">لا توجد عقارات مشابهة حالياً</p>';
+
+  // فتح النافذة
+  document.getElementById('propDetailOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePropModal() {
+  document.getElementById('propDetailOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// إغلاق بـ Escape
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closePropModal(); });
 
 // ===== PWA Install Logic =====
 let deferredPrompt = null;
