@@ -531,6 +531,12 @@
           <i class="ti ti-phone"></i> اتصال مباشر
         </button>
       </div>
+      <!-- زر حذف للمدير فقط -->
+      <div id="propModalAdminActions" style="display:none; margin-top:12px;">
+        <button id="propModalDeleteBtn" style="width:100%; background:#e53935; color:#fff; border:none; border-radius:10px; padding:12px; font-size:14px; font-weight:700; font-family:'Cairo'; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+          🗑️ حذف هذا العقار (صلاحية المدير)
+        </button>
+      </div>
       <div class="prop-modal-similar">
         <div class="similar-title">📌 عقارات مشابهة قد تهمك</div>
         <div class="similar-grid" id="propModalSimilar"></div>
@@ -700,6 +706,8 @@ async function renderListings(dataToRender = null){
   }
 
   const currentListings = dataToRender || await getAllListings();
+  // حفظ الكاش لاستخدامه في openPropModal
+  if (!dataToRender) _cachedListings = currentListings;
   
   if(!currentListings || currentListings.length === 0) {
     g.innerHTML = `<div class="empty-search"><h3>عذراً، لم نجد أي عقارات تطابق بحثك الحالي!</h3></div>`;
@@ -976,9 +984,12 @@ document.addEventListener('click', function(e) {
 // ===== نافذة تفاصيل العقار =====
 let _cachedListings = [];
 
-function openPropModal(idx) {
-  const listings = getAllListings();
-  _cachedListings = listings;
+async function openPropModal(idx) {
+  // استخدم الكاش إذا موجود وإلا اجلب من Supabase
+  if (_cachedListings.length === 0) {
+    _cachedListings = await getAllListings();
+  }
+  const listings = _cachedListings;
   const l = listings[idx];
   if (!l) return;
 
@@ -1066,6 +1077,28 @@ function openPropModal(idx) {
         </div>`;
       }).join('')
     : '<p style="color:var(--text-muted);font-size:13px;">لا توجد عقارات مشابهة حالياً</p>';
+
+  // زر الحذف — يظهر فقط للمدير
+  const adminActions = document.getElementById('propModalAdminActions');
+  const deleteBtn    = document.getElementById('propModalDeleteBtn');
+  const session = (() => { try { return JSON.parse(localStorage.getItem('basra_session_v3')); } catch(e) { return null; } })();
+  if (session && session.role === 'admin' && l.id) {
+    adminActions.style.display = 'block';
+    deleteBtn.onclick = async () => {
+      if (!confirm('⚠️ تأكيد حذف هذا العقار نهائياً؟')) return;
+      try {
+        await sbFetch('listings', 'DELETE', null, `?id=eq.${l.id}`);
+        closePropModal();
+        _cachedListings = [];
+        renderListings();
+        alert('✅ تم حذف العقار بنجاح');
+      } catch(e) {
+        alert('❌ فشل الحذف: ' + e.message);
+      }
+    };
+  } else {
+    adminActions.style.display = 'none';
+  }
 
   // فتح النافذة
   document.getElementById('propDetailOverlay').classList.add('open');
