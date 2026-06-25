@@ -984,11 +984,14 @@ function previewVisitorImage(event) {
   }
 }
 
+let regLogoBase64 = '';
+
 function handleLogoUpload(event) {
   const file = event.target.files[0];
   if(file) {
     const reader = new FileReader();
     reader.onload = function(e) {
+      regLogoBase64 = e.target.result;
       document.getElementById('logoPreviewCircle').innerHTML = `<img src="${e.target.result}">`;
     }
     reader.readAsDataURL(file);
@@ -1123,31 +1126,47 @@ async function submitNewOffice() {
     return;
   }
 
-  const newOffice = { name, phone, district, pkg, password: pass, logo: '', description: '' };
+  // زر تحميل
+  const btn = document.querySelector('#registerOfficeModal .search-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ جاري التسجيل...'; }
 
   try {
-    await sbFetch('offices', 'POST', newOffice);
-  } catch(e) {
-    // fallback للـ localStorage
-    let offices = [];
-    try { offices = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e2) { offices = []; }
-    if (offices.find(o => o.phone === phone)) {
-      alert("⚠️ رقم الهاتف هذا مسجّل مسبقاً.");
+    // تحقق من عدم تكرار الرقم في Supabase
+    const existing = await sbFetch('offices', 'GET', null, `?phone=eq.${encodeURIComponent(phone)}`);
+    if (existing && existing.length > 0) {
+      alert("⚠️ رقم الهاتف هذا مسجّل مسبقاً.\n\nإذا نسيت كلمة المرور تواصل مع الإدارة.");
+      if (btn) { btn.disabled = false; btn.textContent = '💎 تفعيل الحساب وحفظ البيانات'; }
       return;
     }
-    offices.push({ id: 'office_' + Date.now(), ...newOffice, listings: [], createdAt: new Date().toISOString() });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(offices));
+
+    // حفظ في Supabase فقط
+    await sbFetch('offices', 'POST', {
+      name, phone, district, pkg,
+      password: pass,
+      status: 'active',
+      logo: regLogoBase64 || '',
+      description: ''
+    });
+
+  } catch(e) {
+    alert("❌ فشل التسجيل: " + e.message + "\nتأكد من اتصالك بالإنترنت وحاول مجدداً.");
+    if (btn) { btn.disabled = false; btn.textContent = '💎 تفعيل الحساب وحفظ البيانات'; }
+    return;
   }
 
+  // تنظيف النموذج
   closeRegisterModal();
   ['regOfficeName','regOfficePhone','regOfficeDistrict','regOfficePass'].forEach(id => {
     document.getElementById(id).value = '';
   });
   document.getElementById('regOfficePkg').value = 'free';
   document.getElementById('logoPreviewCircle').innerHTML = '<i class="ti ti-building-store"></i>';
+  regLogoBase64 = '';
+  if (btn) { btn.disabled = false; btn.textContent = '💎 تفعيل الحساب وحفظ البيانات'; }
 
-  const goRegister = confirm("🎉 تم تسجيل مكتبك بنجاح!\n\nهل تريد الانتقال إلى صفحة إكمال بيانات مكتبك؟");
-  if (goRegister) window.location.href = 'register.html';
+  // توجيه مباشر للوحة التحكم
+  alert(`🎉 تم تسجيل مكتب "${name}" بنجاح!\n\nسيتم توجيهك الآن للدخول إلى لوحة التحكم.`);
+  window.location.href = 'admin.html';
 }
 
 // دوال المستشار العقاري الذكي (toggleAiChat / sendAiMessage) أصبحت في ملف ai-advisor.js المستقل
