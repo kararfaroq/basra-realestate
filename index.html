@@ -600,81 +600,159 @@
 </footer>
 
 <script>
-const STORAGE_KEY = 'basra_data_v3';
+// ===== Supabase Config =====
+const SUPABASE_URL = 'https://blayfetxmufisvtigugt.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_zCJnnFxjHQ-X7BkkQCuVqA_U_UyaI6y';
+const STORAGE_KEY  = 'basra_data_v3'; // للتوافق مع admin.html
 let uploadedVisitorImgBase64 = "";
 
-let defaultListings = [
-  {type:'بيت', action:'للبيع', price:'145 مليون', area:'200', district:'العشار', deedType:'طابو صرف (ملك)', rooms:'4', desc:'بيت بناء حديث درجة أولى قرب الشارع التجاري، جاهز للسكن.', office:'مكتب الأمانة العقاري', officeId:'1', vip:true, icon:'🏠', image:''},
-  {type:'شقة', action:'للإيجار', price:'450 ألف/شهر', area:'120', district:'الجمهورية', deedType:'طابو صرف', rooms:'2', desc:'شقة مؤثثة بالكامل ضمن مجمع آمن مع موقف للسيارات.', office:'عقارات الخليج بالبصرة', officeId:'2', vip:false, icon:'🏢', image:''},
-  {type:'أرض', action:'للبيع', price:'300 مليون', area:'600', district:'المعقل', deedType:'طابو زراعي (إقرار)', rooms:'-', desc:'قطعة أرض مسيجة في موقع مميز جداً ومناسبة للاستثمار.', office:'مكتب الرافدين', officeId:'3', vip:true, icon:'🏞️', image:''}
-];
-
-function getAllListings() {
-  let offices = [];
-  try { offices = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { offices = []; }
-  let dynamicListings = [...defaultListings];
-
-  offices.forEach(office => {
-    if(office.listings && office.listings.length > 0) {
-      office.listings.forEach(prop => {
-        dynamicListings.unshift({
-          type: prop.type, action: prop.action, price: prop.price, area: prop.area, district: prop.district,
-          deedType: prop.deedType || 'طابو صرف', rooms: prop.rooms || '-', desc: prop.desc, image: prop.image || '',
-          office: office.name, officeId: office.id, vip: !!prop.vip, icon: prop.icon || '🏠'
-        });
-      });
-    }
+// دالة مساعدة لاستدعاء Supabase REST API
+async function sbFetch(table, method = 'GET', body = null, filter = '') {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}${filter}`, {
+    method,
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': method === 'POST' ? 'return=representation' : ''
+    },
+    body: body ? JSON.stringify(body) : null
   });
-  return dynamicListings;
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err);
+  }
+  return method === 'DELETE' ? null : res.json();
 }
 
-function renderListings(dataToRender = null){
+// إنشاء الجداول إذا ما كانت موجودة (عبر SQL Editor في Supabase)
+// جدول offices: id, name, phone, password, district, pkg, logo, description, created_at
+// جدول listings: id, office_id, office_name, type, action, price, area, district, deed_type, rooms, desc, phone, vip, icon, image, created_at
+
+let defaultListings = [
+  {type:'بيت', action:'للبيع', price:'145 مليون', area:'200', district:'العشار', deedType:'طابو صرف (ملك)', rooms:'4', desc:'بيت بناء حديث درجة أولى قرب الشارع التجاري، جاهز للسكن.', office:'مكتب الأمانة العقاري', officeId:'default', vip:true, icon:'🏠', image:'', phone:''},
+  {type:'شقة', action:'للإيجار', price:'450 ألف/شهر', area:'120', district:'الجمهورية', deedType:'طابو صرف', rooms:'2', desc:'شقة مؤثثة بالكامل ضمن مجمع آمن مع موقف للسيارات.', office:'عقارات الخليج بالبصرة', officeId:'default', vip:false, icon:'🏢', image:'', phone:''},
+  {type:'أرض', action:'للبيع', price:'300 مليون', area:'600', district:'المعقل', deedType:'طابو زراعي (إقرار)', rooms:'-', desc:'قطعة أرض مسيجة في موقع مميز جداً ومناسبة للاستثمار.', office:'مكتب الرافدين', officeId:'default', vip:true, icon:'🏞️', image:'', phone:''}
+];
+
+// تحويل صف Supabase إلى كائن listing
+function rowToListing(row) {
+  return {
+    id: row.id,
+    type: row.type || '',
+    action: row.action || 'للبيع',
+    price: row.price || '',
+    area: row.area || '',
+    district: row.district || '',
+    deedType: row.deed_type || 'طابو صرف',
+    rooms: row.rooms || '-',
+    desc: row.desc || '',
+    office: row.office_name || '',
+    officeId: row.office_id || '',
+    vip: !!row.vip,
+    icon: row.icon || '🏠',
+    image: row.image || '',
+    phone: row.phone || ''
+  };
+}
+
+async function getAllListings() {
+  try {
+    const rows = await sbFetch('listings', 'GET', null, '?order=created_at.desc');
+    const dbListings = rows.map(rowToListing);
+    // دمج العقارات الافتراضية مع قاعدة البيانات
+    return [...dbListings, ...defaultListings];
+  } catch(e) {
+    console.warn('Supabase error, using defaults:', e.message);
+    // fallback للـ localStorage إذا فشل Supabase
+    let offices = [];
+    try { offices = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e2) { offices = []; }
+    let dynamicListings = [...defaultListings];
+    offices.forEach(office => {
+      if (office.listings && office.listings.length > 0) {
+        office.listings.forEach(prop => {
+          dynamicListings.unshift({
+            type: prop.type, action: prop.action, price: prop.price, area: prop.area,
+            district: prop.district, deedType: prop.deedType || 'طابو صرف',
+            rooms: prop.rooms || '-', desc: prop.desc, image: prop.image || '',
+            office: office.name, officeId: office.id, vip: !!prop.vip,
+            icon: prop.icon || '🏠', phone: prop.phone || ''
+          });
+        });
+      }
+    });
+    return dynamicListings;
+  }
+}
+
+async function renderListings(dataToRender = null){
   const g = document.getElementById('listingGrid');
   if(!g) return;
-  const currentListings = dataToRender || getAllListings();
+
+  // مؤشر تحميل
+  if (!dataToRender) {
+    g.innerHTML = `<div class="empty-search" style="border:none;"><div style="font-size:2rem;margin-bottom:10px;">⏳</div><p>جاري تحميل العقارات...</p></div>`;
+  }
+
+  const currentListings = dataToRender || await getAllListings();
   
-  if(currentListings.length === 0) {
+  if(!currentListings || currentListings.length === 0) {
     g.innerHTML = `<div class="empty-search"><h3>عذراً، لم نجد أي عقارات تطابق بحثك الحالي!</h3></div>`;
     return;
   }
 
   g.innerHTML = currentListings.map((l, idx) => {
     const imageStyle = l.image ? `background-image:url(${l.image}); background-size:cover; background-position:center;` : '';
+    const icon = l.icon || '🏠';
+    const action = l.action || 'للبيع';
+    const vipBadge = l.vip ? '<div class="badge-vip">&#x1F451; VIP</div>' : '';
+    const imgPlaceholder = !l.image ? `<div class="card-img-placeholder">${icon}</div>` : '';
+    const desc = l.desc ? `<div class="card-desc">${l.desc}</div>` : '';
     return `
     <div class="listing-card" onclick="openPropModal(${idx})">
       <div class="card-img" style="${imageStyle}">
-        ${!l.image ? `<div class="card-img-placeholder">${l.icon}</div>` : ''}
-        <div class="card-badge badge-sale">${l.action || 'للبيع'}</div>
-        ${l.vip ? '<div class="badge-vip">👑 VIP</div>' : ''}
+        ${imgPlaceholder}
+        <div class="card-badge badge-sale">${action}</div>
+        ${vipBadge}
       </div>
       <div class="card-body">
-        <div class="card-price">${l.price}</div>
-        <div class="card-title">${l.type} في ${l.district}</div>
+        <div class="card-price">${l.price || ''}</div>
+        <div class="card-title">${l.type || ''} في ${l.district || ''}</div>
         <div class="card-meta">
-           <span class="meta-tag"><i class="ti ti-ruler-measure"></i> ${l.area} م²</span>
-           <span class="meta-tag"><i class="ti ti-door"></i> ${l.rooms} غرف</span>
-           <span class="meta-tag"><i class="ti ti-file-certificate"></i> ${l.deedType}</span>
+           <span class="meta-tag"><i class="ti ti-ruler-measure"></i> ${l.area || '-'} م²</span>
+           <span class="meta-tag"><i class="ti ti-door"></i> ${l.rooms || '-'} غرف</span>
+           <span class="meta-tag"><i class="ti ti-file-certificate"></i> ${l.deedType || ''}</span>
         </div>
-        ${l.desc ? `<div class="card-desc">${l.desc}</div>` : ''}
+        ${desc}
         <div class="card-footer">
-          <div class="card-office"><div class="office-avatar">م</div><span>${l.office}</span></div>
+          <div class="card-office"><div class="office-avatar">م</div><span>${l.office || ''}</span></div>
           <button class="card-btn" onclick="event.stopPropagation(); openPropModal(${idx})">تفاصيل 📞</button>
         </div>
       </div>
-    </div>
-  `}).join('');
+    </div>`;
+  }).join('');
 }
 
-function executeSearch() {
+async function executeSearch() {
   const actionFilter = document.getElementById('filterAction').value;
-  const typeFilter = document.getElementById('filterType').value;
-  const textSearch = document.getElementById('searchInput').value.trim().toLowerCase();
+  const typeFilter   = document.getElementById('filterType').value;
+  const textSearch   = document.getElementById('searchInput').value.trim();
   
-  const allListings = getAllListings();
+  const allListings = await getAllListings();
+
+  if (!actionFilter && !typeFilter && !textSearch) {
+    renderListings(allListings);
+    return;
+  }
+
   const filteredListings = allListings.filter(item => {
-    const matchAction = actionFilter === "" || item.action === actionFilter;
-    const matchType = typeFilter === "" || item.type === typeFilter;
-    const matchText = textSearch === "" || item.district.includes(textSearch) || item.type.includes(textSearch) || item.office.includes(textSearch);
+    const matchAction = !actionFilter || item.action === actionFilter;
+    const matchType   = !typeFilter   || item.type === typeFilter;
+    const matchText   = !textSearch   ||
+      (item.district || '').includes(textSearch) ||
+      (item.type     || '').includes(textSearch) ||
+      (item.office   || '').includes(textSearch) ||
+      (item.desc     || '').includes(textSearch);
     return matchAction && matchType && matchText;
   });
   renderListings(filteredListings);
@@ -781,17 +859,35 @@ function confirmPaymentAndPublish() {
   publishVisitorProperty(type, area, price, phone, true, uploadedVisitorImgBase64);
 }
 
-function publishVisitorProperty(type, area, price, phone, isVip, img) {
+async function publishVisitorProperty(type, area, price, phone, isVip, img) {
   const iconMap = { 'بيت':'🏠','شقة':'🏢','أرض':'🏞️','مكتب':'🏛️','محل':'🏪','مستودع':'🏭','فيلا':'🏡','عمارة':'🏗️' };
-  defaultListings.unshift({
-    type, action: 'للبيع', price, area: '150', district: area,
-    deedType: 'طابو صرف', rooms: '-', phone,
+  const newListing = {
+    office_id: 'guest',
+    office_name: 'إعلان زائر' + (isVip ? ' ⭐' : ''),
+    type, action: 'للبيع', price,
+    area: '150', district: area,
+    deed_type: 'طابو صرف', rooms: '-',
     desc: 'إعلان نُشر بواسطة زائر للمنصة.',
-    office: 'إعلان زائر' + (isVip ? ' ⭐' : ''),
-    officeId: 'guest', vip: isVip,
-    icon: iconMap[type] || '🏠', image: img
-  });
-  alert("🎉 تم نشر إعلانك بنجاح في المعرض العام!");
+    phone, vip: isVip,
+    icon: iconMap[type] || '🏠',
+    image: img || ''
+  };
+
+  try {
+    await sbFetch('listings', 'POST', newListing);
+    alert("🎉 تم نشر إعلانك بنجاح في المعرض العام!");
+  } catch(e) {
+    // إذا فشل Supabase (الجدول ما موجود بعد) — نضيف محلياً
+    defaultListings.unshift({
+      type, action: 'للبيع', price, area: '150', district: area,
+      deedType: 'طابو صرف', rooms: '-', phone,
+      desc: 'إعلان نُشر بواسطة زائر للمنصة.',
+      office: 'إعلان زائر' + (isVip ? ' ⭐' : ''),
+      officeId: 'guest', vip: isVip,
+      icon: iconMap[type] || '🏠', image: img || ''
+    });
+    alert("🎉 تم نشر إعلانك! (تحتاج إنشاء جدول listings في Supabase لحفظه دائماً)");
+  }
   closeAddPropertyModal();
   renderListings();
 }
@@ -810,7 +906,7 @@ function resetVisitorForm() {
   uploadedVisitorImgBase64 = "";
 }
 
-function submitNewOffice() {
+async function submitNewOffice() {
   const name     = document.getElementById('regOfficeName').value.trim();
   const phone    = document.getElementById('regOfficePhone').value.trim();
   const district = document.getElementById('regOfficeDistrict').value.trim();
@@ -822,47 +918,30 @@ function submitNewOffice() {
     return;
   }
 
-  // قراءة المكاتب الموجودة
-  let offices = [];
-  try { offices = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { offices = []; }
+  const newOffice = { name, phone, district, pkg, password: pass, logo: '', description: '' };
 
-  // التحقق من عدم تكرار رقم الهاتف
-  if (offices.find(o => o.phone === phone)) {
-    alert("⚠️ رقم الهاتف هذا مسجّل مسبقاً. يرجى تسجيل الدخول من بوابة المكاتب.");
-    return;
+  try {
+    await sbFetch('offices', 'POST', newOffice);
+  } catch(e) {
+    // fallback للـ localStorage
+    let offices = [];
+    try { offices = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e2) { offices = []; }
+    if (offices.find(o => o.phone === phone)) {
+      alert("⚠️ رقم الهاتف هذا مسجّل مسبقاً.");
+      return;
+    }
+    offices.push({ id: 'office_' + Date.now(), ...newOffice, listings: [], createdAt: new Date().toISOString() });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(offices));
   }
 
-  // إنشاء كائن المكتب الجديد
-  const newOffice = {
-    id: 'office_' + Date.now(),
-    name, phone, district, pkg,
-    password: pass,
-    listings: [],
-    createdAt: new Date().toISOString()
-  };
-
-  offices.push(newOffice);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(offices));
-
   closeRegisterModal();
-
-  // مسح الحقول
   ['regOfficeName','regOfficePhone','regOfficeDistrict','regOfficePass'].forEach(id => {
     document.getElementById(id).value = '';
   });
   document.getElementById('regOfficePkg').value = 'free';
   document.getElementById('logoPreviewCircle').innerHTML = '<i class="ti ti-building-store"></i>';
 
-  // تحديث عداد المكاتب
-  const counter = document.getElementById('count-offices');
-  if (counter) counter.textContent = offices.length + 140;
-
-  // رسالة نجاح مع توجيه لصفحة التسجيل الكاملة
-  const goRegister = confirm(
-    "🎉 تم تسجيل مكتبك بنجاح!\n\nاسم المكتب: " + name +
-    "\nالباقة: " + pkg +
-    "\n\nهل تريد الانتقال إلى صفحة إكمال بيانات مكتبك؟"
-  );
+  const goRegister = confirm("🎉 تم تسجيل مكتبك بنجاح!\n\nهل تريد الانتقال إلى صفحة إكمال بيانات مكتبك؟");
   if (goRegister) window.location.href = 'register.html';
 }
 
@@ -1064,7 +1143,18 @@ if('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(() => {});
 }
 
-document.addEventListener('DOMContentLoaded', () => { renderListings(); });
+// تشغيل العرض عند تحميل الصفحة — مع fallback احتياطي
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => { renderListings(); });
+} else {
+  // الصفحة محملة مسبقاً
+  renderListings();
+}
+// fallback إضافي بعد ثانية للتأكد
+setTimeout(() => {
+  const g = document.getElementById('listingGrid');
+  if (g && g.children.length === 0) renderListings();
+}, 1000);
 </script>
 
 <!-- المستشار العقاري الذكي: مكوّن مستقل بالكامل (CSS+HTML+JS) — حذف هذا السطر فقط يعطّل الميزة بدون أي تأثير على باقي الواجهة -->
