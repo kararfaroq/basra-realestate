@@ -439,24 +439,61 @@ function getCurrentOffice() {
   return getOffices().find(o => o.id === session.officeId);
 }
 
-function renderOfficeDashboard() {
-  const currentOffice = getCurrentOffice();
-  if(!currentOffice) return;
-  document.getElementById('lblOfficePkg').textContent = currentOffice.pkg === 'gold' ? 'الذهبية VIP' : currentOffice.pkg === 'eco' ? 'الاقتصادية' : 'المجانية';
-  document.getElementById('lblOfficeExpiry').textContent = currentOffice.expiry;
-  const tBody = document.getElementById('officePropsTable');
-  if(!currentOffice.listings || currentOffice.listings.length === 0) {
-    tBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">لا توجد عقارات</td></tr>`; return;
+async function renderOfficeDashboard() {
+  const session = JSON.parse(localStorage.getItem(SESSION_KEY));
+  
+  // جلب بيانات المكتب
+  let currentOffice = null;
+  try {
+    const offices = await getDbOffices();
+    currentOffice = offices.find(o => o.id === session.officeId || o.phone === session.username);
+    // fallback localStorage
+    if (!currentOffice) currentOffice = getCurrentOffice();
+  } catch(e) {
+    currentOffice = getCurrentOffice();
   }
-  tBody.innerHTML = currentOffice.listings.map((p, idx) => `
-    <tr>
-      <td>${p.image ? `<img src="${p.image}" style="width:40px; height:40px; border-radius:6px; object-fit:cover;">` : p.icon}</td>
-      <td style="color:var(--gold);">${p.type}</td><td>${p.district}</td><td>${p.price}</td><td>${p.deedType}</td>
-      <td><button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="delProp(${idx})">حذف</button></td>
-    </tr>
-  `).join('');
+
+  if (!currentOffice) return;
+
+  document.getElementById('lblOfficePkg').textContent = currentOffice.pkg === 'gold' ? 'الذهبية VIP' : currentOffice.pkg === 'eco' ? 'الاقتصادية' : 'المجانية';
+  document.getElementById('lblOfficeExpiry').textContent = currentOffice.expiry || 'مفتوح';
+
+  // جلب عقارات هذا المكتب من Supabase
+  const tBody = document.getElementById('officePropsTable');
+  tBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">⏳ جاري التحميل...</td></tr>`;
+
+  try {
+    const officeId = currentOffice.id;
+    const listings = await sbFetch('listings', 'GET', null, `?office_id=eq.${officeId}&order=created_at.desc`);
+
+    if (!listings || listings.length === 0) {
+      tBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">لا توجد عقارات منشورة بعد</td></tr>`;
+      return;
+    }
+
+    tBody.innerHTML = listings.map(p => `
+      <tr>
+        <td>${p.image ? `<img src="${p.image}" style="width:40px; height:40px; border-radius:6px; object-fit:cover;">` : (p.icon || '🏠')}</td>
+        <td style="color:var(--gold);">${p.type}</td>
+        <td>${p.district}</td>
+        <td>${p.price}</td>
+        <td>${p.deed_type || ''}</td>
+        <td>
+          <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="delProp('${p.id}')">🗑️ حذف</button>
+        </td>
+      </tr>
+    `).join('');
+  } catch(e) {
+    tBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">❌ خطأ في التحميل</td></tr>`;
+  }
 }
-function delProp(idx){ if(confirm('حذف؟')){ let o=getOffices(); let i=o.findIndex(x=>x.id===JSON.parse(localStorage.getItem(SESSION_KEY)).officeId); o[i].listings.splice(idx,1); saveOffices(o); renderOfficeDashboard(); } }
+
+async function delProp(id) {
+  if (!confirm('هل تريد حذف هذا العقار نهائياً؟')) return;
+  const ok = await deleteDbListing(id);
+  if (ok) { alert('✅ تم الحذف'); renderOfficeDashboard(); }
+  else alert('❌ فشل الحذف');
+}
 
 function switchOfficeTab(t){ document.getElementById('officePropsSection').style.display=t==='props'?'block':'none'; document.getElementById('officeSettingsSection').style.display=t==='settings'?'block':'none'; }
 function fillOfficeSettingsForm(){
@@ -519,6 +556,15 @@ async function submitNewPropFromOffice(e) {
     vip:       false,
     phone:     ''
   };
+
+  // التحقق من عدم التكرار
+  try {
+    const existing = await sbFetch('listings', 'GET', null,
+      `?office_id=eq.${officeId}&type=eq.${encodeURIComponent(type)}&district=eq.${encodeURIComponent(newListing.district)}&price=eq.${encodeURIComponent(newListing.price)}`);
+    if (existing && existing.length > 0) {
+      if (!confirm('⚠️ يوجد عقار مشابه منشور مسبقاً (نفس النوع والمنطقة والسعر).\nهل تريد النشر على أي حال؟')) return;
+    }
+  } catch(e) { /* تجاوز خطأ التحقق */ }
 
   try {
     await sbFetch('listings', 'POST', newListing);
