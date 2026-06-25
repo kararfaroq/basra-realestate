@@ -304,10 +304,22 @@ async function sbFetch(table, method = 'GET', body = null, filter = '') {
   return text ? JSON.parse(text) : [];
 }
 
-// جلب العقارات من Supabase
+// جلب العقارات النشطة من Supabase
 async function getDbListings() {
   try { return await sbFetch('listings', 'GET', null, '?order=created_at.desc'); }
   catch(e) { console.warn('Supabase listings error:', e); return []; }
+}
+
+// جلب العقارات المعلقة فقط
+async function getDbPendingListings() {
+  try { return await sbFetch('listings', 'GET', null, '?status=eq.pending&order=created_at.desc'); }
+  catch(e) { console.warn('Supabase pending error:', e); return []; }
+}
+
+// جلب العقارات المنشورة (active) فقط
+async function getDbActiveListings() {
+  try { return await sbFetch('listings', 'GET', null, '?status=eq.active&order=created_at.desc'); }
+  catch(e) { console.warn('Supabase active listings error:', e); return []; }
 }
 
 // حذف عقار من Supabase
@@ -432,13 +444,15 @@ async function renderAdminDashboard() {
   const localOffices = getOffices();
   const offices = dbOffices.length > 0 ? dbOffices : localOffices;
 
-  // العقارات من Supabase
-  const dbListings = await getDbListings();
+  // العقارات — نجلب الكل ونقسمها
+  const allListings    = await getDbListings();
+  const pendingListings = allListings.filter(l => l.status === 'pending');
+  const activeListings  = allListings.filter(l => !l.status || l.status === 'active');
 
   // إحصائيات
   document.getElementById('statTotalOffices').textContent = offices.length;
-  document.getElementById('statActiveOffices').textContent = offices.filter(o => o.status === 'active' || o.pkg).length;
-  document.getElementById('statTotalProps').textContent = dbListings.length;
+  document.getElementById('statActiveOffices').textContent = offices.filter(o => !o.status || o.status === 'active').length;
+  document.getElementById('statTotalProps').textContent = activeListings.length;
 
   // جدول المكاتب
   document.getElementById('adminOfficesTable').innerHTML = offices.length === 0
@@ -487,12 +501,10 @@ async function renderAdminDashboard() {
     pendingSection = sec;
   }
 
-  let pendingListings = [];
-  try {
-    pendingListings = await sbFetch('listings', 'GET', null, '?status=eq.pending&order=created_at.desc');
-  } catch(e) {}
-
-  pendingSection.innerHTML = pendingListings.length === 0 ? '' : `
+  if (pendingListings.length === 0) {
+    pendingSection.innerHTML = '';
+  } else {
+    pendingSection.innerHTML = `
     <div style="background:rgba(201,168,76,0.08); border:1.5px solid rgba(201,168,76,0.4); border-radius:14px; padding:1.2rem; margin-bottom:1.5rem;">
       <h3 style="color:var(--gold); font-size:1rem; font-weight:700; margin-bottom:1rem;">
         🔔 طلبات VIP بانتظار الموافقة (${pendingListings.length})
@@ -500,9 +512,9 @@ async function renderAdminDashboard() {
       ${pendingListings.map(l => `
         <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
           <div style="font-size:13px; line-height:2;">
-            <div>👑 <strong style="color:var(--gold);">VIP</strong> — ${l.type} في ${l.district}</div>
-            <div>💰 ${l.price} &nbsp;|&nbsp; 📞 ${l.phone || '—'}</div>
-            <div style="color:var(--text-muted); font-size:11px;">${new Date(l.created_at).toLocaleString('ar-IQ')}</div>
+            <div>👑 <strong style="color:var(--gold);">VIP</strong> — ${l.type || '—'} في ${l.district || '—'}</div>
+            <div>💰 ${l.price || '—'} &nbsp;|&nbsp; 📞 ${l.phone || l.office || '—'}</div>
+            <div style="color:var(--text-muted); font-size:11px;">${l.created_at ? new Date(l.created_at).toLocaleString('ar-IQ') : '—'}</div>
           </div>
           <div style="display:flex; gap:8px;">
             <button onclick="approveVip('${l.id}')"
@@ -514,14 +526,13 @@ async function renderAdminDashboard() {
               ❌ رفض
             </button>
           </div>
-        </div>
-      `).join('')}
+        </div>`).join('')}
     </div>`;
+  }
 
-  // ===== قسم العقارات من Supabase =====
+  // ===== قسم العقارات النشطة =====
   let listingsSection = document.getElementById('adminListingsSection');
   if (!listingsSection) {
-    // أنشئ القسم إذا ما موجود
     const adminView = document.getElementById('adminView');
     const section = document.createElement('div');
     section.id = 'adminListingsSection';
@@ -532,12 +543,12 @@ async function renderAdminDashboard() {
 
   listingsSection.innerHTML = `
     <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
-      <h3 style="color:var(--gold); font-size:1rem; font-weight:700;">📋 جميع العقارات المنشورة (${dbListings.length})</h3>
+      <h3 style="color:var(--gold); font-size:1rem; font-weight:700;">📋 جميع العقارات المنشورة (${activeListings.length})</h3>
       <button onclick="renderAdminDashboard()" style="background:transparent; border:1px solid var(--gold); color:var(--gold); padding:6px 12px; border-radius:8px; font-family:'Cairo'; font-size:12px; cursor:pointer;">🔄 تحديث</button>
     </div>
-    ${dbListings.length === 0
+    ${activeListings.length === 0
       ? '<p style="color:var(--text-muted); font-size:13px; text-align:center; padding:2rem;">لا توجد عقارات منشورة في قاعدة البيانات</p>'
-      : `<div style="overflow-x:auto;"><table class="admin-table" style="width:100%; border-collapse:collapse; font-size:13px;">
+      : `<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:13px;">
         <thead><tr style="background:rgba(201,168,76,0.1);">
           <th style="padding:10px; text-align:right; color:var(--gold);">النوع</th>
           <th style="padding:10px; text-align:right; color:var(--gold);">المنطقة</th>
@@ -548,14 +559,14 @@ async function renderAdminDashboard() {
           <th style="padding:10px; text-align:center; color:var(--gold);">حذف</th>
         </tr></thead>
         <tbody>
-          ${dbListings.map(l => `
+          ${activeListings.map(l => `
           <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-            <td style="padding:10px;">${l.icon || '🏠'} ${l.type}</td>
-            <td style="padding:10px;">${l.district}</td>
-            <td style="padding:10px; color:var(--gold); font-weight:700;">${l.price}</td>
-            <td style="padding:10px;">${l.office_name || 'زائر'}</td>
+            <td style="padding:10px;">${l.icon || '🏠'} ${l.type || '—'}</td>
+            <td style="padding:10px;">${l.district || '—'}</td>
+            <td style="padding:10px; color:var(--gold); font-weight:700;">${l.price || '—'}</td>
+            <td style="padding:10px;">${l.office_name || l.office || 'زائر'}</td>
             <td style="padding:10px; text-align:center;">${l.vip ? '👑' : '—'}</td>
-            <td style="padding:10px; font-size:11px; color:var(--text-muted);">${new Date(l.created_at).toLocaleDateString('ar-IQ')}</td>
+            <td style="padding:10px; font-size:11px; color:var(--text-muted);">${l.created_at ? new Date(l.created_at).toLocaleDateString('ar-IQ') : '—'}</td>
             <td style="padding:10px; text-align:center;">
               <button onclick="deleteListingAdmin('${l.id}')" style="background:#e53935; color:#fff; border:none; border-radius:6px; padding:5px 10px; font-size:12px; cursor:pointer; font-family:'Cairo';">🗑️ حذف</button>
             </td>
@@ -645,16 +656,7 @@ async function toggleOfficeStatus(id) {
 async function approveVip(id) {
   if (!confirm('✅ تأكيد الموافقة ونشر الإعلان كـ VIP؟')) return;
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/listings?id=eq.${id}`, {
-      method: 'PATCH',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=minimal'
-      },
-      body: JSON.stringify({ status: 'active', vip: true })
-    });
+    await sbFetch('listings', 'PATCH', { status: 'active', vip: true }, `?id=eq.${id}`);
     alert('✅ تم نشر الإعلان VIP بنجاح!');
     renderAdminDashboard();
   } catch(e) { alert('❌ فشل: ' + e.message); }
