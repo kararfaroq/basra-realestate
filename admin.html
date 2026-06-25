@@ -215,17 +215,27 @@ function checkSession() {
 }
 
 function handleLogin() {
-  const u = document.getElementById('usernameInput').value.trim(); const p = document.getElementById('passwordInput').value.trim();
+  const u = document.getElementById('usernameInput').value.trim();
+  const p = document.getElementById('passwordInput').value.trim();
+
+  if (!u || !p) { alert('❌ يرجى إدخال رقم الهاتف وكلمة المرور'); return; }
+
+  // دخول المدير العام
   if (u === 'admin' && p === 'admin123') {
-    localStorage.setItem(SESSION_KEY, JSON.stringify({ role: 'admin', username: 'المدير' })); checkSession(); return;
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ role: 'admin', username: 'المدير' }));
+    checkSession(); return;
   }
+
+  // دخول المكاتب — يقبل كلمة المرور بالحقلين password أو pass (توافق مع index.html)
   let offices = getOffices();
-  let office = offices.find(o => (o.phone === u || u === 'office') && (o.password === p || p === '123'));
-  
+  let office = offices.find(o => o.phone === u && (o.password === p || o.pass === p));
+
   if (office) {
     localStorage.setItem(SESSION_KEY, JSON.stringify({ role: 'office', officeId: office.id, username: office.name }));
     checkSession();
-  } else { alert('❌ البيانات غير صحيحة!'); }
+  } else {
+    alert('❌ البيانات غير صحيحة!\n\nتأكد من:\n• رقم الهاتف المسجّل في index.html\n• كلمة المرور');
+  }
 }
 function handleLogout() { localStorage.removeItem(SESSION_KEY); checkSession(); }
 
@@ -344,7 +354,7 @@ function submitNewPropFromOffice(e){
 function contactAdminForRenewal() {
   const currentOffice = getCurrentOffice();
   if(!currentOffice) return;
-  const adminWhatsAppNumber = "9647700000000"; // 🔴 ضع رقمك الحقيقي هنا
+  const adminWhatsAppNumber = "9647719994201"; // 🔴 ضع رقمك الحقيقي هنا
   const message = `مرحباً إدارة دليل البصرة العقاري،%0Aأود تجديد أو ترقية باقة اشتراك مكتبي.%0A%0A🏢 اسم المكتب: ${currentOffice.name}%0A📱 رقم الهاتف: ${currentOffice.phone}%0A📦 الباقة الحالية: ${currentOffice.pkg === 'gold' ? 'الذهبية' : currentOffice.pkg === 'eco' ? 'الاقتصادية' : 'المجانية'}%0A%0Aيرجى تزويدي بتفاصيل الدفع (زين كاش / حوالة).`;
   window.open(`https://wa.me/${adminWhatsAppNumber}?text=${message}`, '_blank');
 }
