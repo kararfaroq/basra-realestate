@@ -1265,25 +1265,8 @@ async function submitNewOffice() {
       agent_id: refAgentId
     });
 
-    // إنشاء عمولة تلقائية للوكيل إذا الباقة مدفوعة
-    if (refAgentId && pkg !== 'free') {
-      try {
-        const PKG_PRICES_LOCAL = { eco: 25000, gold: 50000 };
-        const agents = await sbFetch('agents','GET',null,`?id=eq.${refAgentId}&select=commission_rate,name`);
-        if (agents && agents[0]) {
-          const rate   = agents[0].commission_rate || 0;
-          const amount = Math.round(PKG_PRICES_LOCAL[pkg] * rate / 100);
-          const month  = new Date().toLocaleDateString('ar-IQ',{year:'numeric',month:'long'});
-          if (amount > 0) {
-            await sbFetch('commissions','POST',{
-              agent_id: refAgentId,
-              office_name: name,
-              amount, month, status: 'pending'
-            });
-          }
-        }
-      } catch(e) { console.warn('فشل إنشاء عمولة الوكيل:', e); }
-    }
+    // ✅ لا عمولة عند التسجيل — الشهر الأول مجاني
+    // العمولة تُحسب فقط عند التجديد من لوحة المدير
 
   } catch(e) {
     alert("❌ فشل التسجيل: " + e.message + "\nتأكد من اتصالك بالإنترنت وحاول مجدداً.");
