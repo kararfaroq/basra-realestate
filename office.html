@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بروفايل المكتب — دليل البصرة العقاري</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+  :root {
+    --navy:      #0A1628;
+    --navy-mid:  #0d1f3c;
+    --navy-light:#112244;
+    --gold:      #C9A84C;
+    --gold-dark: #a8832a;
+    --text:      #e8eaf0;
+    --muted:     #8899bb;
+    --success:   #4CAF7D;
+    --danger:    #e53935;
+    --radius:    14px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Cairo',sans-serif; background:var(--navy); color:var(--text); min-height:100vh; }
+
+  /* ===== NAV ===== */
+  .nav { display:flex; align-items:center; justify-content:space-between; padding:14px 24px; background:rgba(10,22,40,0.95); border-bottom:1px solid rgba(201,168,76,0.15); position:sticky; top:0; z-index:100; backdrop-filter:blur(10px); }
+  .nav-logo { display:flex; align-items:center; gap:10px; text-decoration:none; }
+  .nav-logo-icon { width:36px; height:36px; background:var(--gold); border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:18px; color:var(--navy); }
+  .nav-logo-text { font-size:14px; font-weight:700; color:#fff; line-height:1.2; }
+  .nav-logo-text span { font-size:11px; color:var(--muted); display:block; font-weight:400; }
+  .nav-back { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:var(--text); padding:8px 16px; border-radius:8px; font-family:'Cairo'; font-size:13px; cursor:pointer; text-decoration:none; display:flex; align-items:center; gap:6px; transition:.2s; }
+  .nav-back:hover { background:rgba(201,168,76,0.1); border-color:var(--gold); color:var(--gold); }
+
+  /* ===== HERO ===== */
+  .hero { background:linear-gradient(135deg, var(--navy-mid) 0%, var(--navy) 100%); border-bottom:1px solid rgba(201,168,76,0.1); padding:40px 24px 0; }
+  .hero-inner { max-width:900px; margin:0 auto; }
+  .office-card { display:flex; align-items:flex-start; gap:24px; margin-bottom:32px; flex-wrap:wrap; }
+  .office-avatar { width:100px; height:100px; border-radius:20px; background:linear-gradient(135deg,var(--gold),var(--gold-dark)); display:flex; align-items:center; justify-content:center; font-size:42px; font-weight:900; color:var(--navy); flex-shrink:0; overflow:hidden; border:3px solid rgba(201,168,76,0.3); }
+  .office-avatar img { width:100%; height:100%; object-fit:cover; }
+  .office-info { flex:1; min-width:200px; }
+  .office-name { font-size:1.8rem; font-weight:900; color:#fff; line-height:1.2; margin-bottom:6px; }
+  .office-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.3); color:var(--gold); padding:4px 12px; border-radius:20px; font-size:12px; font-weight:700; margin-bottom:10px; }
+  .office-desc { font-size:14px; color:var(--muted); line-height:1.8; max-width:500px; }
+  .office-meta { display:flex; flex-wrap:wrap; gap:12px; margin-top:12px; }
+  .office-meta-item { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--muted); }
+  .office-meta-item i { color:var(--gold); font-size:15px; }
+
+  /* تابات */
+  .tabs { display:flex; gap:4px; border-bottom:none; margin-top:24px; }
+  .tab { padding:12px 24px; font-family:'Cairo'; font-size:14px; font-weight:700; color:var(--muted); background:transparent; border:none; cursor:pointer; border-bottom:3px solid transparent; transition:.2s; }
+  .tab.active { color:var(--gold); border-bottom-color:var(--gold); }
+
+  /* ===== CONTENT ===== */
+  .content { max-width:900px; margin:0 auto; padding:28px 24px; }
+
+  /* أزرار التواصل */
+  .contact-bar { display:flex; gap:12px; margin-bottom:28px; flex-wrap:wrap; }
+  .btn-wa { background:#25D366; color:#fff; border:none; border-radius:10px; padding:12px 24px; font-size:14px; font-weight:700; font-family:'Cairo'; cursor:pointer; display:flex; align-items:center; gap:8px; transition:.2s; text-decoration:none; }
+  .btn-wa:hover { background:#1db954; transform:translateY(-1px); }
+  .btn-call { background:rgba(201,168,76,0.1); color:var(--gold); border:1.5px solid var(--gold); border-radius:10px; padding:12px 24px; font-size:14px; font-weight:700; font-family:'Cairo'; cursor:pointer; display:flex; align-items:center; gap:8px; transition:.2s; text-decoration:none; }
+  .btn-call:hover { background:rgba(201,168,76,0.2); transform:translateY(-1px); }
+  .btn-share { background:rgba(255,255,255,0.05); color:var(--text); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:12px 18px; font-size:14px; font-family:'Cairo'; cursor:pointer; display:flex; align-items:center; gap:8px; transition:.2s; }
+  .btn-share:hover { background:rgba(255,255,255,0.1); }
+
+  /* إحصائيات */
+  .stats-bar { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:28px; }
+  .stat { background:var(--navy-mid); border:1px solid rgba(201,168,76,0.12); border-radius:12px; padding:16px; text-align:center; }
+  .stat-num { font-size:1.8rem; font-weight:900; color:var(--gold); }
+  .stat-label { font-size:12px; color:var(--muted); margin-top:2px; }
+
+  /* العقارات */
+  .section-title { font-size:16px; font-weight:700; color:#fff; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+  .section-title i { color:var(--gold); }
+  .listings-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; margin-bottom:32px; }
+  .listing-card { background:var(--navy-mid); border:1px solid rgba(201,168,76,0.1); border-radius:var(--radius); overflow:hidden; cursor:pointer; transition:.25s; }
+  .listing-card:hover { border-color:rgba(201,168,76,0.35); transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,0.3); }
+  .card-img { height:160px; background:var(--navy-light); display:flex; align-items:center; justify-content:center; font-size:3rem; position:relative; overflow:hidden; }
+  .card-img img { width:100%; height:100%; object-fit:cover; }
+  .card-badge { position:absolute; top:10px; right:10px; background:var(--gold); color:var(--navy); font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; }
+  .vip-badge { position:absolute; top:10px; left:10px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; font-size:11px; font-weight:700; padding:3px 8px; border-radius:20px; }
+  .card-body { padding:14px; }
+  .card-price { font-size:1.1rem; font-weight:900; color:var(--gold); }
+  .card-title { font-size:13px; color:#fff; font-weight:600; margin:4px 0 8px; }
+  .card-tags { display:flex; flex-wrap:wrap; gap:6px; }
+  .card-tag { background:rgba(255,255,255,0.05); border-radius:6px; padding:3px 8px; font-size:11px; color:var(--muted); display:flex; align-items:center; gap:4px; }
+  .card-tag i { color:var(--gold); font-size:12px; }
+
+  /* الخريطة */
+  .map-section { background:var(--navy-mid); border:1px solid rgba(201,168,76,0.12); border-radius:var(--radius); overflow:hidden; margin-bottom:28px; }
+  .map-header { padding:16px 20px; display:flex; align-items:center; gap:8px; border-bottom:1px solid rgba(255,255,255,0.05); }
+  .map-header i { color:var(--gold); font-size:18px; }
+  .map-header span { font-size:14px; font-weight:700; }
+  .map-embed { width:100%; height:280px; border:none; filter:invert(0.9) hue-rotate(180deg) brightness(0.85); }
+  .map-placeholder { height:220px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; color:var(--muted); }
+  .map-placeholder i { font-size:40px; color:var(--gold); opacity:0.4; }
+
+  /* empty state */
+  .empty { text-align:center; padding:48px 24px; color:var(--muted); }
+  .empty i { font-size:48px; color:var(--gold); opacity:0.3; display:block; margin-bottom:12px; }
+
+  /* loading */
+  .loader { display:flex; justify-content:center; padding:40px; }
+  .spinner { width:36px; height:36px; border:3px solid rgba(201,168,76,0.2); border-top-color:var(--gold); border-radius:50%; animation:spin .8s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  /* tab panels */
+  .tab-panel { display:none; }
+  .tab-panel.active { display:block; }
+
+  /* share toast */
+  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--success); color:#fff; padding:12px 24px; border-radius:10px; font-size:14px; font-weight:700; transition:.3s; z-index:999; pointer-events:none; }
+  .toast.show { transform:translateX(-50%) translateY(0); }
+
+  /* mobile */
+  @media(max-width:600px){
+    .office-card { gap:16px; }
+    .office-avatar { width:72px; height:72px; font-size:28px; }
+    .office-name { font-size:1.3rem; }
+    .tabs { overflow-x:auto; }
+    .tab { white-space:nowrap; padding:10px 16px; }
+    .stats-bar { grid-template-columns:repeat(3,1fr); gap:8px; }
+    .stat-num { font-size:1.4rem; }
+    .contact-bar { flex-direction:column; }
+    .btn-wa,.btn-call,.btn-share { justify-content:center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-icon">ب</div>
+    <div class="nav-logo-text">دليل البصرة العقاري<span>أكبر منصة عقارية في البصرة</span></div>
+  </a>
+  <a href="index.html" class="nav-back"><i class="ti ti-arrow-right"></i> الرئيسية</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="office-card" id="officeCard">
+      <div class="loader"><div class="spinner"></div></div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('listings')"><i class="ti ti-building-estate"></i> العقارات</button>
+      <button class="tab" onclick="switchTab('about')"><i class="ti ti-info-circle"></i> عن المكتب</button>
+      <button class="tab" onclick="switchTab('map')"><i class="ti ti-map-pin"></i> الموقع</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- إحصائيات -->
+  <div class="stats-bar" id="statsBar" style="display:none;">
+    <div class="stat"><div class="stat-num" id="statListings">0</div><div class="stat-label">عقار منشور</div></div>
+    <div class="stat"><div class="stat-num" id="statVip">0</div><div class="stat-label">إعلان VIP</div></div>
+    <div class="stat"><div class="stat-num" id="statPkg">—</div><div class="stat-label">الباقة</div></div>
+  </div>
+
+  <!-- أزرار التواصل -->
+  <div class="contact-bar" id="contactBar" style="display:none;">
+    <a id="btnWa" href="#" class="btn-wa" target="_blank"><i class="ti ti-brand-whatsapp"></i> تواصل عبر واتساب</a>
+    <a id="btnCall" href="#" class="btn-call"><i class="ti ti-phone"></i> اتصال مباشر</a>
+    <button class="btn-share" onclick="shareProfile()"><i class="ti ti-share"></i> مشاركة البروفايل</button>
+  </div>
+
+  <!-- تاب العقارات -->
+  <div class="tab-panel active" id="panel-listings">
+    <div class="section-title"><i class="ti ti-building-estate"></i> عقارات المكتب</div>
+    <div id="listingsGrid" class="listings-grid">
+      <div class="loader"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- تاب عن المكتب -->
+  <div class="tab-panel" id="panel-about">
+    <div class="section-title"><i class="ti ti-info-circle"></i> عن المكتب</div>
+    <div id="aboutContent" style="background:var(--navy-mid); border:1px solid rgba(201,168,76,0.12); border-radius:14px; padding:24px; font-size:14px; line-height:2; color:var(--text);"></div>
+  </div>
+
+  <!-- تاب الموقع -->
+  <div class="tab-panel" id="panel-map">
+    <div class="section-title"><i class="ti ti-map-pin"></i> موقع المكتب</div>
+    <div class="map-section">
+      <div class="map-header"><i class="ti ti-map-2"></i><span id="mapTitle">موقع المكتب</span></div>
+      <div id="mapContainer"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">✅ تم نسخ رابط البروفايل!</div>
+
+<script>
+const SUPABASE_URL = 'https://blayfetxmufisvtigugt.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_zCJnnFxjHQ-X7BkkQCuVqA_U_UyaI6y';
+
+async function sbFetch(table, filter = '') {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}${filter}`, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Accept': 'application/json'
+    }
+  });
+  if (!res.ok) throw new Error(await res.text());
+  const t = await res.text();
+  return t ? JSON.parse(t) : [];
+}
+
+// قراءة الـ id من الرابط
+const params  = new URLSearchParams(location.search);
+const officeId = params.get('id');
+
+if (!officeId) {
+  document.getElementById('officeCard').innerHTML = `
+    <div class="empty" style="width:100%"><i class="ti ti-building-off"></i>
+    <p>لم يتم تحديد مكتب</p>
+    <a href="index.html" style="color:var(--gold);">← العودة للرئيسية</a></div>`;
+} else {
+  loadOffice();
+}
+
+async function loadOffice() {
+  try {
+    // جلب المكتب
+    const offices = await sbFetch('offices', `?id=eq.${officeId}`);
+    if (!offices.length) throw new Error('المكتب غير موجود');
+    const office = offices[0];
+
+    // جلب عقاراته
+    const listings = await sbFetch('listings', `?office_id=eq.${officeId}&status=eq.active&order=created_at.desc`);
+
+    renderOfficeHero(office, listings);
+    renderListings(listings);
+    renderAbout(office);
+    renderMap(office);
+
+  } catch(e) {
+    document.getElementById('officeCard').innerHTML = `
+      <div class="empty" style="width:100%"><i class="ti ti-alert-circle"></i>
+      <p>تعذّر تحميل بيانات المكتب</p></div>`;
+  }
+}
+
+function renderOfficeHero(office, listings) {
+  const pkgLabel = office.pkg === 'gold' ? '👑 الباقة الذهبية' : office.pkg === 'eco' ? '💼 الباقة الاقتصادية' : '🎁 الباقة المجانية';
+  const vipCount = listings.filter(l => l.vip).length;
+
+  document.getElementById('officeCard').innerHTML = `
+    <div class="office-avatar">${office.logo ? `<img src="${office.logo}">` : (office.name||'م')[0]}</div>
+    <div class="office-info">
+      <div class="office-name">${office.name}</div>
+      <div class="office-badge"><i class="ti ti-rosette"></i>${pkgLabel}</div>
+      <div class="office-desc">${office.description || 'مكتب عقاري معتمد في دليل البصرة العقاري'}</div>
+      <div class="office-meta">
+        ${office.district ? `<div class="office-meta-item"><i class="ti ti-map-pin"></i>${office.district}</div>` : ''}
+        <div class="office-meta-item"><i class="ti ti-phone"></i>${office.phone}</div>
+        <div class="office-meta-item"><i class="ti ti-calendar"></i>عضو منذ ${new Date(office.created_at).toLocaleDateString('ar-IQ')}</div>
+      </div>
+    </div>`;
+
+  // إحصائيات
+  document.getElementById('statListings').textContent = listings.length;
+  document.getElementById('statVip').textContent = vipCount;
+  document.getElementById('statPkg').textContent = office.pkg === 'gold' ? 'ذهبية' : office.pkg === 'eco' ? 'اقتصادية' : 'مجانية';
+  document.getElementById('statsBar').style.display = 'grid';
+
+  // أزرار التواصل
+  const waNum = '964' + office.phone.replace(/^0/, '');
+  const waMsg = encodeURIComponent(`مرحباً، وجدتكم على دليل البصرة العقاري وأريد الاستفسار.`);
+  document.getElementById('btnWa').href   = `https://wa.me/${waNum}?text=${waMsg}`;
+  document.getElementById('btnCall').href = `tel:${office.phone}`;
+  document.getElementById('contactBar').style.display = 'flex';
+
+  // عنوان الصفحة
+  document.title = `${office.name} — دليل البصرة العقاري`;
+}
+
+function renderListings(listings) {
+  const grid = document.getElementById('listingsGrid');
+  if (!listings.length) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><i class="ti ti-building-off"></i><p>لا توجد عقارات منشورة حالياً</p></div>`;
+    return;
+  }
+  grid.innerHTML = listings.map(l => `
+    <div class="listing-card">
+      <div class="card-img" style="${l.image ? `background-image:url(${l.image});background-size:cover;background-position:center;` : ''}">
+        ${!l.image ? (l.icon || '🏠') : ''}
+        <div class="card-badge">${l.action || 'للبيع'}</div>
+        ${l.vip ? '<div class="vip-badge">👑 VIP</div>' : ''}
+      </div>
+      <div class="card-body">
+        <div class="card-price">${l.price}</div>
+        <div class="card-title">${l.type} في ${l.district}</div>
+        <div class="card-tags">
+          <span class="card-tag"><i class="ti ti-ruler-measure"></i>${l.area || '—'} م²</span>
+          <span class="card-tag"><i class="ti ti-door"></i>${l.rooms || '—'} غرف</span>
+          <span class="card-tag"><i class="ti ti-file-certificate"></i>${l.deed_type || ''}</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderAbout(office) {
+  document.getElementById('aboutContent').innerHTML = `
+    <div style="display:grid; gap:14px;">
+      <div style="display:flex; gap:10px; align-items:start;">
+        <i class="ti ti-building-store" style="color:var(--gold); font-size:20px; margin-top:2px;"></i>
+        <div><div style="font-size:12px; color:var(--muted); margin-bottom:2px;">اسم المكتب</div><div style="font-weight:700;">${office.name}</div></div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:start;">
+        <i class="ti ti-map-pin" style="color:var(--gold); font-size:20px; margin-top:2px;"></i>
+        <div><div style="font-size:12px; color:var(--muted); margin-bottom:2px;">منطقة العمل</div><div style="font-weight:700;">${office.district || 'البصرة'}</div></div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:start;">
+        <i class="ti ti-phone" style="color:var(--gold); font-size:20px; margin-top:2px;"></i>
+        <div><div style="font-size:12px; color:var(--muted); margin-bottom:2px;">رقم التواصل</div><div style="font-weight:700;">${office.phone}</div></div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:start;">
+        <i class="ti ti-package" style="color:var(--gold); font-size:20px; margin-top:2px;"></i>
+        <div><div style="font-size:12px; color:var(--muted); margin-bottom:2px;">الباقة</div><div style="font-weight:700;">${office.pkg === 'gold' ? 'الذهبية VIP' : office.pkg === 'eco' ? 'الاقتصادية' : 'المجانية'}</div></div>
+      </div>
+      ${office.description ? `
+      <div style="border-top:1px solid rgba(255,255,255,0.07); padding-top:14px; margin-top:4px;">
+        <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">نبذة عن المكتب</div>
+        <div style="line-height:1.9;">${office.description}</div>
+      </div>` : ''}
+    </div>`;
+}
+
+function renderMap(office) {
+  const district = office.district || 'البصرة';
+  const query    = encodeURIComponent(`${office.name} ${district} البصرة العراق`);
+  document.getElementById('mapTitle').textContent = `${office.name} — ${district}`;
+  document.getElementById('mapContainer').innerHTML = `
+    <iframe class="map-embed"
+      src="https://maps.google.com/maps?q=${query}&output=embed&hl=ar"
+      allowfullscreen loading="lazy">
+    </iframe>`;
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  event.target.closest('.tab').classList.add('active');
+  document.getElementById(`panel-${tab}`).classList.add('active');
+}
+
+function shareProfile() {
+  const url = location.href;
+  if (navigator.share) {
+    navigator.share({ title: document.title, url });
+  } else {
+    navigator.clipboard.writeText(url).then(() => {
+      const t = document.getElementById('toast');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    });
+  }
+}
+</script>
+</body>
+</html>
