@@ -269,7 +269,19 @@
         <div class="form-group"><label class="form-label">المنطقة</label><input type="text" id="pDistrict" class="input-control" required></div>
         <div class="form-group"><label class="form-label">السعر</label><input type="text" id="pPrice" class="input-control" required></div>
         <div class="form-group"><label class="form-label">المساحة</label><input type="number" id="pArea" class="input-control" required></div>
-        <div class="form-group"><label class="form-label">السند</label><select id="pDeed" class="input-control"><option value="ملك">ملك</option><option value="زراعي">زراعي</option></select></div>
+        <div class="form-group"><label class="form-label">نوع السند</label>
+          <select id="pDeed" class="input-control" onchange="toggleCustomDeed(this)">
+            <option value="طابو صرف">طابو صرف</option>
+            <option value="طابو زراعي">طابو زراعي</option>
+            <option value="ملك">ملك</option>
+            <option value="سند 25">سند 25</option>
+            <option value="تجاوز">تجاوز</option>
+            <option value="إقرار">إقرار</option>
+            <option value="وكالة">وكالة</option>
+            <option value="أخرى">✏️ أخرى (اكتب النوع)</option>
+          </select>
+          <input type="text" id="pDeedCustom" class="input-control" placeholder="اكتب نوع السند..." style="display:none; margin-top:8px;">
+        </div>
       </div>
       <div class="form-group"><label class="form-label">الغرف</label><input type="text" id="pRooms" class="input-control" required></div>
       <div class="form-group"><label class="form-label">وصف إضافي</label><textarea id="pDesc" class="input-control" rows="2"></textarea></div>
@@ -850,10 +862,33 @@ async function delProp(id) {
 }
 
 function switchOfficeTab(t){ document.getElementById('officePropsSection').style.display=t==='props'?'block':'none'; document.getElementById('officeSettingsSection').style.display=t==='settings'?'block':'none'; }
-function fillOfficeSettingsForm(){
-  const o = getCurrentOffice(); if(!o) return;
-  document.getElementById('setOfficeName').value = o.name; document.getElementById('setOfficePhone').value = o.phone; document.getElementById('setOfficePass').value = o.password; document.getElementById('setOfficeDesc').value = o.description||'';
-  tempLogoBase64 = o.logo||''; if(tempLogoBase64){ document.getElementById('logoPreview').src=tempLogoBase64; document.getElementById('logoPreview').style.display='inline-block'; }
+function fillOfficeSettingsForm(){ loadOfficeProfile(); }
+
+async function loadOfficeProfile() {
+  const session = JSON.parse(localStorage.getItem(SESSION_KEY));
+  let o = null;
+
+  try {
+    const offices = await getDbOffices();
+    o = offices.find(x =>
+      x.id    === session.officeId ||
+      x.phone === session.username ||
+      x.name  === session.username
+    );
+  } catch(e) {}
+
+  if (!o) o = getCurrentOffice();
+  if (!o) { alert('❌ لم يُعثر على بيانات المكتب'); return; }
+
+  document.getElementById('setOfficeName').value  = o.name        || '';
+  document.getElementById('setOfficePhone').value = o.phone       || '';
+  document.getElementById('setOfficePass').value  = o.password    || '';
+  document.getElementById('setOfficeDesc').value  = o.description || '';
+  tempLogoBase64 = o.logo || '';
+  if (tempLogoBase64) {
+    document.getElementById('logoPreview').src          = tempLogoBase64;
+    document.getElementById('logoPreview').style.display = 'inline-block';
+  }
 }
 function handleLogoUpload(e) {
   const f = e.target.files[0];
@@ -870,41 +905,67 @@ function handleLogoUpload(e) {
 }
 async function saveOfficeAccountSettings(e){
   e.preventDefault();
-  let o = getOffices();
-  let i = o.findIndex(x => x.id === JSON.parse(localStorage.getItem(SESSION_KEY)).officeId);
-  if (i === -1) { alert('❌ لم يُعثر على بيانات المكتب'); return; }
+  const session = JSON.parse(localStorage.getItem(SESSION_KEY));
 
-  // رفع الشعار للـ Storage إذا تم اختيار ملف جديد
-  let logoUrl = o[i].logo || tempLogoBase64 || '';
+  // جلب بيانات المكتب من Supabase
+  let currentOffice = null;
+  try {
+    const offices = await getDbOffices();
+    currentOffice = offices.find(o =>
+      o.id === session.officeId ||
+      o.phone === session.username ||
+      o.name  === session.username
+    );
+  } catch(err) {}
+
+  // fallback localStorage
+  if (!currentOffice) {
+    const lo = getOffices();
+    const i  = lo.findIndex(x => x.id === session.officeId);
+    if (i !== -1) currentOffice = lo[i];
+  }
+
+  if (!currentOffice) { alert('❌ لم يُعثر على بيانات المكتب'); return; }
+
+  // رفع الشعار إذا تم اختيار ملف جديد
+  let logoUrl = currentOffice.logo || tempLogoBase64 || '';
   if (tempLogoFile) {
     try {
       logoUrl = await uploadToStorage(tempLogoFile, 'properties', 'logos');
       tempLogoFile = null;
     } catch(uploadErr) {
-      console.warn('فشل رفع الشعار:', uploadErr);
-      logoUrl = tempLogoBase64 || o[i].logo || '';
+      logoUrl = tempLogoBase64 || currentOffice.logo || '';
     }
   }
 
-  o[i].name        = document.getElementById('setOfficeName').value;
-  o[i].phone       = document.getElementById('setOfficePhone').value;
-  o[i].password    = document.getElementById('setOfficePass').value;
-  o[i].description = document.getElementById('setOfficeDesc').value;
-  o[i].logo        = logoUrl;
+  const updatedData = {
+    name:        document.getElementById('setOfficeName').value.trim(),
+    phone:       document.getElementById('setOfficePhone').value.trim(),
+    password:    document.getElementById('setOfficePass').value.trim(),
+    description: document.getElementById('setOfficeDesc').value.trim(),
+    logo:        logoUrl
+  };
 
-  // حفظ في Supabase أيضاً
+  // حفظ في Supabase
   try {
-    await sbFetch('offices', 'PATCH', {
-      name: o[i].name,
-      phone: o[i].phone,
-      password: o[i].password,
-      description: o[i].description,
-      logo: logoUrl
-    }, `?id=eq.${o[i].id}`);
-  } catch(e) { /* fallback localStorage فقط */ }
-
-  saveOffices(o);
-  alert('✅ تم حفظ الإعدادات بنجاح');
+    await fetch(`${SUPABASE_URL}/rest/v1/offices?id=eq.${currentOffice.id}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(updatedData)
+    });
+    alert('✅ تم حفظ بيانات المكتب بنجاح');
+  } catch(err) {
+    // fallback localStorage
+    let lo = getOffices();
+    let i  = lo.findIndex(x => x.id === currentOffice.id);
+    if (i !== -1) { Object.assign(lo[i], updatedData); saveOffices(lo); }
+    alert('✅ تم الحفظ (محلياً)');
+  }
 }
 
 function handlePropImageUpload(e) {
@@ -928,6 +989,13 @@ function openAddPropModal() {
   document.getElementById('addPropModal').style.display = 'flex';
 }
 function closeAddPropModal(){ document.getElementById('addPropModal').style.display='none'; }
+
+function toggleCustomDeed(sel) {
+  const custom = document.getElementById('pDeedCustom');
+  if (!custom) return;
+  custom.style.display = sel.value === 'أخرى' ? 'block' : 'none';
+  if (sel.value !== 'أخرى') custom.value = '';
+}
 
 function toggleAdminCustomType(sel) {
   const custom = document.getElementById('pTypeCustom');
@@ -988,6 +1056,10 @@ async function submitNewPropFromOffice(e) {
     if (uploadBtn) { uploadBtn.disabled = false; uploadBtn.innerHTML = '✅ نشر العقار'; }
   }
 
+  const selDeed    = document.getElementById('pDeed').value;
+  const deedCustom = document.getElementById('pDeedCustom') ? document.getElementById('pDeedCustom').value.trim() : '';
+  const deedVal    = selDeed === 'أخرى' ? (deedCustom || 'أخرى') : selDeed;
+
   const newListing = {
     office_id:   officeId,
     office_name: officeName,
@@ -996,7 +1068,7 @@ async function submitNewPropFromOffice(e) {
     district:  document.getElementById('pDistrict').value,
     price:     document.getElementById('pPrice').value,
     area:      document.getElementById('pArea').value || '',
-    deed_type: document.getElementById('pDeed').value || 'طابو صرف',
+    deed_type: deedVal,
     rooms:     document.getElementById('pRooms').value || '-',
     notes:     document.getElementById('pDesc').value || '',
     image:     imageUrl,
