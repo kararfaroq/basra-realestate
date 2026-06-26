@@ -529,6 +529,25 @@
       <label style="font-size: 11px; color: var(--gold);">المنطقة</label>
       <input type="text" id="modalPropArea" class="input-field-modal" placeholder="مثال: العشار، الجنينة...">
 
+      <label style="font-size: 11px; color: var(--gold);">نوع العملية</label>
+      <select id="modalPropAction" class="input-field-modal">
+        <option value="للبيع">🏷️ للبيع</option>
+        <option value="للإيجار">🔑 للإيجار</option>
+      </select>
+
+      <label style="font-size: 11px; color: var(--gold);">نوع السند</label>
+      <select id="modalPropDeed" class="input-field-modal" onchange="toggleCustomDeedVisitor(this)">
+        <option value="طابو صرف">طابو صرف</option>
+        <option value="طابو زراعي">طابو زراعي</option>
+        <option value="ملك">ملك</option>
+        <option value="سند 25">سند 25</option>
+        <option value="تجاوز">تجاوز</option>
+        <option value="إقرار">إقرار</option>
+        <option value="وكالة">وكالة</option>
+        <option value="أخرى">✏️ أخرى (اكتب النوع)</option>
+      </select>
+      <input type="text" id="modalPropDeedCustom" class="input-field-modal" placeholder="اكتب نوع السند..." style="display:none; margin-top:-10px;">
+
       <label style="font-size: 11px; color: var(--gold);">السعر</label>
       <input type="text" id="modalPropPrice" class="input-field-modal" placeholder="مثال: 140 مليون">
 
@@ -995,6 +1014,12 @@ async function executeSearch() {
   renderListings(filteredListings);
 }
 
+function toggleCustomDeedVisitor(sel) {
+  const custom = document.getElementById('modalPropDeedCustom');
+  custom.style.display = sel.value === 'أخرى' ? 'block' : 'none';
+  if (sel.value !== 'أخرى') custom.value = '';
+}
+
 function toggleCustomType(sel) {
   const custom = document.getElementById('modalPropTypeCustom');
   custom.style.display = sel.value === 'أخرى' ? 'block' : 'none';
@@ -1050,27 +1075,29 @@ async function sendVipWhatsapp() {
   const selType  = document.getElementById('modalPropType').value;
   const customType = document.getElementById('modalPropTypeCustom').value.trim();
   const type     = selType === 'أخرى' ? (customType || 'أخرى') : selType;
+  const action   = document.getElementById('modalPropAction').value;
+  const selDeed  = document.getElementById('modalPropDeed').value;
+  const customDeed = document.getElementById('modalPropDeedCustom').value.trim();
+  const deedType = selDeed === 'أخرى' ? (customDeed || 'أخرى') : selDeed;
   const iconMap  = {'بيت':'🏠','شقة':'🏢','أرض':'🏞️','مكتب':'🏛️','محل':'🏪','مستودع':'🏭','فيلا':'🏡','عمارة':'🏗️'};
 
   if (!area || !price || !phone) { alert('⚠️ يرجى ملء جميع الحقول أولاً'); return; }
 
-  // حفظ الطلب كـ pending في Supabase
   try {
     await sbFetch('listings', 'POST', {
-      office_id: 'guest',
-      office_name: 'زائر',
-      type, action: 'للبيع', price, area: '', district: area,
-      deed_type: 'طابو صرف', rooms: '-',
+      office_id: 'guest', office_name: 'زائر VIP — بانتظار الموافقة',
+      type, action, price, area: '', district: area,
+      deed_type: deedType, rooms: '-',
       notes: 'طلب VIP — بانتظار تأكيد الدفع',
       phone, vip: true, status: 'pending',
-      icon: iconMap[type] || '🏠', image: uploadedVisitorImgFile ? await uploadToStorage(uploadedVisitorImgFile, 'properties', 'listings').catch(()=>'') : ''
+      icon: iconMap[type] || '🏠',
+      image: uploadedVisitorImgFile ? await uploadToStorage(uploadedVisitorImgFile, 'properties', 'listings').catch(()=>'') : ''
     });
   } catch(e) { console.warn('pending save failed:', e.message); }
 
-  // إرسال واتساب للإدارة
   const msg = encodeURIComponent(
     `🔔 طلب ترقية VIP جديد!\n\n` +
-    `• النوع: ${type}\n• المنطقة: ${area}\n• السعر: ${price}\n• الهاتف: ${phone}\n\n` +
+    `• النوع: ${type}\n• العملية: ${action}\n• السند: ${deedType}\n• المنطقة: ${area}\n• السعر: ${price}\n• الهاتف: ${phone}\n\n` +
     `⏳ الإعلان معلّق — فعّله من لوحة التحكم بعد التحقق ✅`
   );
   window.open(`https://wa.me/96407719994201?text=${msg}`, '_blank');
@@ -1087,6 +1114,10 @@ function submitNewPropertyFromModal() {
   const selType = document.getElementById('modalPropType').value;
   const customType = document.getElementById('modalPropTypeCustom').value.trim();
   const type  = selType === 'أخرى' ? (customType || 'أخرى') : selType;
+  const action = document.getElementById('modalPropAction').value;
+  const selDeed = document.getElementById('modalPropDeed').value;
+  const customDeed = document.getElementById('modalPropDeedCustom').value.trim();
+  const deedType = selDeed === 'أخرى' ? (customDeed || 'أخرى') : selDeed;
   const isVip = document.getElementById('modalVipCheck').checked;
 
   if (!area || !price) { alert("يرجى ملء المنطقة والسعر أولاً!"); return; }
@@ -1095,7 +1126,7 @@ function submitNewPropertyFromModal() {
   if (isVip) {
     document.getElementById('paymentModal').style.display = 'flex';
   } else {
-    publishVisitorProperty(type, area, price, phone, false, '');
+    publishVisitorProperty(type, area, price, phone, action, deedType, false, '');
   }
 }
 
@@ -1106,12 +1137,16 @@ function confirmPaymentAndPublish() {
   const selType = document.getElementById('modalPropType').value;
   const customType = document.getElementById('modalPropTypeCustom').value.trim();
   const type  = selType === 'أخرى' ? (customType || 'أخرى') : selType;
+  const action = document.getElementById('modalPropAction').value;
+  const selDeed = document.getElementById('modalPropDeed').value;
+  const customDeed = document.getElementById('modalPropDeedCustom').value.trim();
+  const deedType = selDeed === 'أخرى' ? (customDeed || 'أخرى') : selDeed;
 
   closePaymentModal();
-  publishVisitorProperty(type, area, price, phone, true, uploadedVisitorImgFile);
+  publishVisitorProperty(type, area, price, phone, action, deedType, true, uploadedVisitorImgFile);
 }
 
-async function publishVisitorProperty(type, area, price, phone, isVip, img) {
+async function publishVisitorProperty(type, area, price, phone, action, deedType, isVip, img) {
   const iconMap = { 'بيت':'🏠','شقة':'🏢','أرض':'🏞️','مكتب':'🏛️','محل':'🏪','مستودع':'🏭','فيلا':'🏡','عمارة':'🏗️' };
 
   // رفع الصورة للـ Storage إذا وُجد ملف
@@ -1128,9 +1163,9 @@ async function publishVisitorProperty(type, area, price, phone, isVip, img) {
   const newListing = {
     office_id: 'guest',
     office_name: 'إعلان زائر' + (isVip ? ' ⭐' : ''),
-    type, action: 'للبيع', price,
-    area: '150', district: area,
-    deed_type: 'طابو صرف', rooms: '-',
+    type, action: action || 'للبيع', price,
+    area: '', district: area,
+    deed_type: deedType || 'طابو صرف', rooms: '-',
     notes: 'إعلان نُشر بواسطة زائر للمنصة.',
     phone, vip: isVip,
     status: 'active',
@@ -1142,16 +1177,15 @@ async function publishVisitorProperty(type, area, price, phone, isVip, img) {
     await sbFetch('listings', 'POST', newListing);
     alert("🎉 تم نشر إعلانك بنجاح في المعرض العام!");
   } catch(e) {
-    // إذا فشل Supabase (الجدول ما موجود بعد) — نضيف محلياً
     defaultListings.unshift({
-      type, action: 'للبيع', price, area: '150', district: area,
-      deedType: 'طابو صرف', rooms: '-', phone,
+      type, action: action || 'للبيع', price, area: '', district: area,
+      deedType: deedType || 'طابو صرف', rooms: '-', phone,
       notes: 'إعلان نُشر بواسطة زائر للمنصة.',
       office: 'إعلان زائر' + (isVip ? ' ⭐' : ''),
       officeId: 'guest', vip: isVip,
       icon: iconMap[type] || '🏠', image: img || ''
     });
-    alert("🎉 تم نشر إعلانك! (تحتاج إنشاء جدول listings في Supabase لحفظه دائماً)");
+    alert("🎉 تم نشر إعلانك!");
   }
   closeAddPropertyModal();
   renderListings();
@@ -1164,6 +1198,10 @@ function resetVisitorForm() {
   document.getElementById('modalPropType').value = "بيت";
   document.getElementById('modalPropTypeCustom').value = "";
   document.getElementById('modalPropTypeCustom').style.display = 'none';
+  document.getElementById('modalPropAction').value = "للبيع";
+  document.getElementById('modalPropDeed').value = "طابو صرف";
+  document.getElementById('modalPropDeedCustom').value = "";
+  document.getElementById('modalPropDeedCustom').style.display = 'none';
   document.getElementById('modalVipCheck').checked = false;
   document.getElementById('vipImageSection').style.display = 'none';
   document.getElementById('visitorImgPreview').style.display = 'none';
