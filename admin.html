@@ -1442,6 +1442,26 @@ document.addEventListener('DOMContentLoaded', checkSession);
   </div>
 </div>
 
+<!-- ===== مودال مشاركة بيانات الوكيل ===== -->
+<div id="agentShareModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;z-index:999;padding:1rem;">
+  <div class="modal-box" style="max-width:480px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+      <h3 style="color:var(--gold);font-size:18px;font-weight:700;">📤 مشاركة بيانات الوكيل</h3>
+      <button onclick="closeAgentShareModal()" style="background:none;border:none;color:var(--text-muted);font-size:22px;cursor:pointer;">✕</button>
+    </div>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:1rem;">✅ تم إضافة الوكيل بنجاح. شارك معه هذه الرسالة عبر واتساب أو انسخها:</p>
+    <textarea id="agentShareText" class="input-control" readonly style="min-height:220px;resize:vertical;font-size:13px;line-height:1.8;margin-bottom:1.2rem;"></textarea>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button onclick="shareAgentViaWhatsApp()" class="btn btn-success" style="flex:1;justify-content:center;padding:12px;">
+        <i class="ti ti-brand-whatsapp"></i> مشاركة عبر واتساب
+      </button>
+      <button onclick="copyAgentShareMessage()" class="btn" style="background:rgba(255,255,255,0.08);color:#fff;flex:1;justify-content:center;padding:12px;">
+        <i class="ti ti-copy"></i> نسخ الرسالة
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ===== أسعار الباقات =====
 const PKG_PRICES = { free: 0, eco: 25000, gold: 50000 };
@@ -1559,6 +1579,47 @@ async function editAgent(id) {
   } catch(e) { alert('خطأ في التحميل'); }
 }
 
+// ===== مشاركة بيانات الوكيل بعد إنشائه =====
+let _agentShareData = { phone: '', message: '' };
+
+function buildAgentShareMessage(phone, pass) {
+  const link = 'https://basra-realestate.onrender.com/agent.html';
+  return `مرحباً، وكيلنا العزيز. هذا رابط لوحة التحكم الخاصة بك كوكيل في دليل البصرة العقاري:
+🔗 ${link}
+
+بيانات الدخول:
+📱 الهاتف: ${phone}
+🔑 كلمة المرور: ${pass}
+
+من خلال لوحتك تستطيع:
+- تسجيل مكاتب جديدة
+- متابعة عمولاتك
+- مشاركة رابطك الخاص مع المكاتب`;
+}
+
+function openAgentShareModal(phone, pass) {
+  const message = buildAgentShareMessage(phone, pass);
+  _agentShareData = { phone, message };
+  document.getElementById('agentShareText').value = message;
+  document.getElementById('agentShareModal').style.display = 'flex';
+}
+
+function closeAgentShareModal() {
+  document.getElementById('agentShareModal').style.display = 'none';
+}
+
+function copyAgentShareMessage() {
+  navigator.clipboard.writeText(_agentShareData.message)
+    .then(() => alert('✅ تم نسخ الرسالة'))
+    .catch(() => alert('❌ تعذر النسخ'));
+}
+
+function shareAgentViaWhatsApp() {
+  const waPhone = _agentShareData.phone.replace(/^0/, '964');
+  const text = encodeURIComponent(_agentShareData.message);
+  window.open(`https://wa.me/${waPhone}?text=${text}`, '_blank');
+}
+
 async function saveAgent() {
   const id   = document.getElementById('editAgentId').value;
   const name = document.getElementById('agentModalName').value.trim();
@@ -1579,7 +1640,10 @@ async function saveAgent() {
       const exists = await sbFetch('agents','GET',null,`?phone=eq.${phone}&select=id`);
       if (exists && exists.length > 0) { alert('❌ رقم الهاتف مسجّل مسبقاً'); return; }
       await sbFetch('agents','POST', data);
-      alert('✅ تم إضافة الوكيل بنجاح');
+      closeAgentModal();
+      renderAgentsTable();
+      openAgentShareModal(phone, pass);
+      return;
     }
     closeAgentModal();
     renderAgentsTable();
