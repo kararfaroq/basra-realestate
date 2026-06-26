@@ -194,10 +194,10 @@
         <div class="table-container" style="overflow-x:auto;">
           <table>
             <thead><tr>
-              <th>المكتب</th><th>الشهر</th><th>المبلغ</th><th>الحالة</th><th>التاريخ</th>
+              <th>المكتب</th><th>الشهر</th><th>المبلغ</th><th>الحالة</th><th>التاريخ</th><th>الإجراء</th>
             </tr></thead>
             <tbody id="commissionsTable">
-              <tr><td colspan="5" class="empty-msg">لا توجد سجلات عمولات بعد</td></tr>
+              <tr><td colspan="6" class="empty-msg">لا توجد سجلات عمولات بعد</td></tr>
             </tbody>
           </table>
         </div>
@@ -336,7 +336,7 @@ async function loadAgentData(agent) {
 
     // حساب العمولات
     const commissions = await sbFetch('commissions','GET',null,`?agent_id=eq.${agent.id}&select=*&order=created_at.desc`);
-    const pending = commissions.filter(c=>c.status==='pending').reduce((s,c)=>s+Number(c.amount),0);
+    const pending = commissions.filter(c=>c.status==='pending' || c.status==='claimed').reduce((s,c)=>s+Number(c.amount),0);
     const paid    = commissions.filter(c=>c.status==='paid').reduce((s,c)=>s+Number(c.amount),0);
 
     document.getElementById('stPending').textContent  = pending.toLocaleString('ar-IQ') + ' د.ع';
@@ -380,20 +380,52 @@ function renderAgentOffices(offices, commRate) {
 // ===== Render Commissions =====
 function renderCommissions(commissions, offices) {
   const tb = document.getElementById('commissionsTable');
-  if (!commissions.length) { tb.innerHTML = '<tr><td colspan="5" class="empty-msg">لا توجد سجلات عمولات بعد</td></tr>'; return; }
+  if (!commissions.length) { tb.innerHTML = '<tr><td colspan="6" class="empty-msg">لا توجد سجلات عمولات بعد</td></tr>'; return; }
 
   tb.innerHTML = commissions.map(c => {
     const office = offices.find(o=>o.id===c.office_id);
     const officeName = office ? office.name : c.office_name || '—';
     const date = new Date(c.created_at).toLocaleDateString('ar-IQ');
+
+    const statusBadge = c.status === 'paid'
+      ? '<span class="badge badge-green">✅ مدفوع</span>'
+      : c.status === 'claimed'
+        ? '<span class="badge badge-gold">🔔 بانتظار تأكيد الإدارة</span>'
+        : '<span class="badge badge-gray">⏳ معلّق</span>';
+
+    const actionCell = c.status === 'paid'
+      ? `<span style="color:var(--success);font-size:12px;">✅ استلمت ${Number(c.claimed_amount || c.amount).toLocaleString('ar-IQ')} د.ع</span>`
+      : c.status === 'claimed'
+        ? `<span style="color:var(--gold);font-size:12px;">ذكرت استلام ${Number(c.claimed_amount||0).toLocaleString('ar-IQ')} د.ع</span>`
+        : `<button onclick="confirmReceivedCommission('${c.id}', ${Number(c.amount)})" class="btn btn-outline" style="padding:5px 10px;font-size:11px;"><i class="ti ti-check"></i> تأكيد الاستلام</button>`;
+
     return `<tr>
       <td style="font-weight:600;">${officeName}</td>
       <td>${c.month || '—'}</td>
       <td style="color:var(--gold);font-weight:700;">${Number(c.amount).toLocaleString('ar-IQ')} د.ع</td>
-      <td><span class="badge ${c.status==='paid'?'badge-green':'badge-gray'}">${c.status==='paid'?'✅ مدفوع':'⏳ معلّق'}</span></td>
+      <td>${statusBadge}</td>
       <td style="color:var(--muted);">${date}</td>
+      <td>${actionCell}</td>
     </tr>`;
   }).join('');
+}
+
+// ===== Agent confirms they received commission (awaiting admin confirmation) =====
+async function confirmReceivedCommission(commId, expectedAmount) {
+  const input = prompt('أدخل المبلغ الذي استلمته فعلياً (د.ع):', expectedAmount);
+  if (input === null) return;
+  const amount = Number(input);
+  if (!amount || amount <= 0) { alert('⚠️ يرجى إدخال مبلغ صحيح'); return; }
+
+  try {
+    await sbFetch('commissions','PATCH', { status: 'claimed', claimed_amount: amount }, `?id=eq.${commId}`);
+    alert('✅ تم تسجيل تأكيدك، وسيظهر للإدارة لمراجعته وتأكيده.');
+    const session = getSession();
+    const agentData = await sbFetch('agents','GET',null,`?id=eq.${session.agentId}&select=*`);
+    if (agentData[0]) loadAgentData(agentData[0]);
+  } catch(e) {
+    alert('❌ تعذر حفظ التأكيد: ' + e.message + '\nملاحظة: يجب إضافة عمود claimed_amount (رقمي) إلى جدول commissions في Supabase أولاً.');
+  }
 }
 
 // ===== Register Office =====
@@ -435,22 +467,7 @@ async function agentRegisterOffice() {
       expiry, logo: '', description: ''
     });
 
-    // إنشاء سجل عمولة تلقائي إذا الباقة مدفوعة
-    if (pkg !== 'free') {
-      const agent = await sbFetch('agents','GET',null,`?id=eq.${session.agentId}&select=commission_rate`);
-      const rate = agent[0]?.commission_rate || 0;
-      const amount = Math.round(PKG_PRICES[pkg] * rate / 100);
-      const month = new Date().toLocaleDateString('ar-IQ', {year:'numeric',month:'long'});
-      if (amount > 0) {
-        await sbFetch('commissions','POST',{
-          agent_id: session.agentId,
-          office_id: null,
-          office_name: name,
-          amount, month,
-          status: 'pending'
-        });
-      }
-    }
+    // ملاحظة: لا تُسجَّل أي عمولة عند التسجيل الأول — العمولة تُحسب فقط عند التجديد (من لوحة الإدارة)
 
     msgEl.style.display='block'; msgEl.style.color='var(--success)';
     msgEl.textContent = `✅ تم تسجيل مكتب "${name}" بنجاح وربطه بحسابك!`;
