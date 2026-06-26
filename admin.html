@@ -1679,77 +1679,125 @@ function openPayCommModal(agentId, agentName, pendingAmount) {
 function closePayCommModal() { document.getElementById('payCommModal').style.display = 'none'; }
 
 async function confirmPayComm() {
-  const agentId     = document.getElementById('payAgentId').value;
-  const paidAmount  = Number(document.getElementById('payAmount').value);
-  const note        = document.getElementById('payNote').value.trim();
+  const agentId    = document.getElementById('payAgentId').value;
+  const paidAmount = Number(document.getElementById('payAmount').value);
+  const note       = document.getElementById('payNote').value.trim();
   if (!paidAmount || paidAmount <= 0) { alert('يرجى إدخال مبلغ صحيح'); return; }
+
+  const btn = document.querySelector('#payCommModal .btn-gold');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ جاري الحفظ...'; }
 
   const month = note || new Date().toLocaleDateString('ar-IQ',{year:'numeric',month:'long'});
 
   try {
-    // جلب كل العمولات المعلّقة أو المطالب بها
+    // جلب كل العمولات المعلّقة مرتبة من الأقدم
     const pendingComms = await sbFetch('commissions','GET',null,
-      `?agent_id=eq.${agentId}&status=in.(pending,claimed)&select=id,amount,claimed_amount&order=created_at.asc`);
+      `?agent_id=eq.${agentId}&status=in.(pending,claimed)&order=created_at.asc`);
 
     const totalPending = pendingComms.reduce((s,c) => s + Number(c.amount), 0);
-    let remaining = paidAmount;
 
-    // خصم المبلغ المدفوع من العمولات بالترتيب
-    for (const c of pendingComms) {
-      if (remaining <= 0) break;
-      const commAmount = Number(c.amount);
-      if (remaining >= commAmount) {
-        // دفع كامل هذه العمولة
-        await sbFetch('commissions','PATCH',{ status:'paid', paid_amount: commAmount }, `?id=eq.${c.id}`);
-        remaining -= commAmount;
-      } else {
-        // دفع جزئي — يبقى الفرق
-        const leftover = commAmount - remaining;
-        // سجّل الجزء المدفوع كـ paid
-        await sbFetch('commissions','POST',{
-          agent_id: agentId,
-          office_name: 'دفع جزئي',
-          amount: remaining,
-          month,
-          status: 'paid',
-          paid_amount: remaining
-        });
-        // حدّث العمولة الأصلية بالمبلغ المتبقي
-        await sbFetch('commissions','PATCH',{
-          amount: leftover,
-          status: 'pending',
-          claimed_amount: null
-        }, `?id=eq.${c.id}`);
-        remaining = 0;
-      }
-    }
-
-    // إذا المبلغ المدفوع أكبر من المستحق
-    if (remaining > 0 && pendingComms.length === 0) {
+    if (pendingComms.length === 0) {
+      // لا توجد عمولات معلّقة — سجّل دفعة مباشرة
       await sbFetch('commissions','POST',{
         agent_id: agentId, office_name: 'دفعة مباشرة',
         amount: paidAmount, month, status: 'paid'
       });
+    } else {
+      let remaining = paidAmount;
+
+      for (const c of pendingComms) {
+        if (remaining <= 0) break;
+        const commAmount = Number(c.amount);
+
+        if (remaining >= commAmount) {
+          // دفع كامل هذه العمولة
+          await sbFetch('commissions','PATCH',{ status:'paid' }, `?id=eq.${c.id}`);
+          remaining -= commAmount;
+        } else {
+          // دفع جزئي — أعدّل مبلغ السجل الأصلي للمتبقي
+          // وأنشئ سجل جديد للجزء المدفوع
+          const leftover = commAmount - remaining;
+
+          // 1) حدّث السجل الأصلي: اجعله pending بالمبلغ المتبقي
+          await sbFetch('commissions','PATCH',{
+            amount: leftover,
+            status: 'pending',
+            claimed_amount: null
+          }, `?id=eq.${c.id}`);
+
+          // 2) أنشئ سجل paid للجزء المدفوع
+          await sbFetch('commissions','POST',{
+            agent_id: agentId,
+            office_name: c.office_name || 'دفع جزئي',
+            amount: remaining,
+            month,
+            status: 'paid'
+          });
+
+          remaining = 0;
+        }
+      }
     }
 
-    const leftoverTotal = totalPending - paidAmount;
+    // رسالة النتيجة
+    const leftoverTotal = Math.max(0, totalPending - paidAmount);
     let msg = `✅ تم تسجيل دفعة ${paidAmount.toLocaleString('ar-IQ')} د.ع للوكيل`;
     if (leftoverTotal > 0)
-      msg += `\n\n⚠️ المتبقي للوكيل: ${leftoverTotal.toLocaleString('ar-IQ')} د.ع`;
-    else if (paidAmount > totalPending)
-      msg += `\n\nتم دفع أكثر من المستحق بـ ${(paidAmount - totalPending).toLocaleString('ar-IQ')} د.ع`;
+      msg += `\n\n📌 المتبقي للوكيل: ${leftoverTotal.toLocaleString('ar-IQ')} د.ع`;
+    else if (paidAmount > totalPending && totalPending > 0)
+      msg += `\n\nملاحظة: تم الدفع أكثر من المستحق بـ ${(paidAmount - totalPending).toLocaleString('ar-IQ')} د.ع`;
 
     alert(msg);
     closePayCommModal();
     renderAgentsTable();
-  } catch(e) { alert('خطأ: ' + e.message); }
+
+  } catch(e) {
+    alert('❌ خطأ: ' + e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-check"></i> تأكيد الدفع'; }
+  }
 }
 
-// ===== تحويل عمولة من معلّقة إلى مدفوعة =====
+// ===== تحويل عمولة من معلّقة إلى مدفوعة (موافقة الإدارة على تأكيد الوكيل) =====
 async function markCommPaid(commId) {
-  if (!confirm('تأكيد تسجيل هذه العمولة كمدفوعة؟')) return;
   try {
-    await sbFetch('commissions','PATCH',{status:'paid'},`?id=eq.${commId}`);
+    // جلب بيانات العمولة
+    const res = await sbFetch('commissions','GET',null,`?id=eq.${commId}`);
+    const comm = res && res[0];
+    if (!comm) { alert('لم يتم العثور على العمولة'); return; }
+
+    const fullAmount    = Number(comm.amount);
+    const claimedAmount = Number(comm.claimed_amount || fullAmount);
+    const leftover      = fullAmount - claimedAmount;
+
+    let confirmMsg = `تأكيد أن الوكيل استلم ${claimedAmount.toLocaleString('ar-IQ')} د.ع؟`;
+    if (leftover > 0)
+      confirmMsg += `\n\nسيبقى ${leftover.toLocaleString('ar-IQ')} د.ع كمستحق معلّق.`;
+
+    if (!confirm(confirmMsg)) return;
+
+    if (leftover > 0) {
+      // دفع جزئي: حدّث السجل الحالي بالمبلغ المدفوع فقط
+      await sbFetch('commissions','PATCH',{
+        status: 'paid',
+        amount: claimedAmount
+      }, `?id=eq.${commId}`);
+
+      // أنشئ سجل جديد للمبلغ المتبقي
+      const month = new Date().toLocaleDateString('ar-IQ',{year:'numeric',month:'long'});
+      await sbFetch('commissions','POST',{
+        agent_id: comm.agent_id,
+        office_name: comm.office_name,
+        amount: leftover,
+        month,
+        status: 'pending',
+        claimed_amount: null
+      });
+    } else {
+      // دفع كامل
+      await sbFetch('commissions','PATCH',{ status:'paid' }, `?id=eq.${commId}`);
+    }
+
     renderAgentsTable();
   } catch(e) { alert('خطأ: ' + e.message); }
 }
