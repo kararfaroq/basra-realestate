@@ -1449,8 +1449,8 @@ document.addEventListener('DOMContentLoaded', checkSession);
       <h3 style="color:var(--gold);font-size:18px;font-weight:700;">📤 مشاركة بيانات الوكيل</h3>
       <button onclick="closeAgentShareModal()" style="background:none;border:none;color:var(--text-muted);font-size:22px;cursor:pointer;">✕</button>
     </div>
-    <p style="font-size:13px;color:var(--text-muted);margin-bottom:1rem;">✅ تم إضافة الوكيل بنجاح. شارك معه هذه الرسالة عبر واتساب أو انسخها:</p>
-    <textarea id="agentShareText" class="input-control" readonly style="min-height:220px;resize:vertical;font-size:13px;line-height:1.8;margin-bottom:1.2rem;"></textarea>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:1rem;">✅ تم إضافة الوكيل بنجاح. يمكنك تعديل الرسالة ثم مشاركتها:</p>
+    <textarea id="agentShareText" class="input-control" style="min-height:220px;resize:vertical;font-size:13px;line-height:1.8;margin-bottom:1.2rem;"></textarea>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
       <button onclick="shareAgentViaWhatsApp()" class="btn btn-success" style="flex:1;justify-content:center;padding:12px;">
         <i class="ti ti-brand-whatsapp"></i> مشاركة عبر واتساب
@@ -1609,14 +1609,20 @@ function closeAgentShareModal() {
 }
 
 function copyAgentShareMessage() {
-  navigator.clipboard.writeText(_agentShareData.message)
+  const text = document.getElementById('agentShareText').value;
+  navigator.clipboard.writeText(text)
     .then(() => alert('✅ تم نسخ الرسالة'))
-    .catch(() => alert('❌ تعذر النسخ'));
+    .catch(() => {
+      // fallback
+      document.getElementById('agentShareText').select();
+      document.execCommand('copy');
+      alert('✅ تم نسخ الرسالة');
+    });
 }
 
 function shareAgentViaWhatsApp() {
+  const text = encodeURIComponent(document.getElementById('agentShareText').value);
   const waPhone = _agentShareData.phone.replace(/^0/, '964');
-  const text = encodeURIComponent(_agentShareData.message);
   window.open(`https://wa.me/${waPhone}?text=${text}`, '_blank');
 }
 
@@ -1673,24 +1679,67 @@ function openPayCommModal(agentId, agentName, pendingAmount) {
 function closePayCommModal() { document.getElementById('payCommModal').style.display = 'none'; }
 
 async function confirmPayComm() {
-  const agentId = document.getElementById('payAgentId').value;
-  const amount  = Number(document.getElementById('payAmount').value);
-  const note    = document.getElementById('payNote').value.trim();
-  if (!amount || amount <= 0) { alert('يرجى إدخال مبلغ صحيح'); return; }
+  const agentId     = document.getElementById('payAgentId').value;
+  const paidAmount  = Number(document.getElementById('payAmount').value);
+  const note        = document.getElementById('payNote').value.trim();
+  if (!paidAmount || paidAmount <= 0) { alert('يرجى إدخال مبلغ صحيح'); return; }
 
   const month = note || new Date().toLocaleDateString('ar-IQ',{year:'numeric',month:'long'});
+
   try {
-    // تسجيل دفعة مدفوعة
-    await sbFetch('commissions','POST',{
-      agent_id: agentId, office_name: 'دفعة مباشرة',
-      amount, month, status: 'paid'
-    });
-    // تحديث العمولات المعلّقة → مدفوعة
-    const pending = await sbFetch('commissions','GET',null,`?agent_id=eq.${agentId}&status=in.(pending,claimed)&select=id`);
-    for (const c of pending) {
-      await sbFetch('commissions','PATCH',{status:'paid'},`?id=eq.${c.id}`);
+    // جلب كل العمولات المعلّقة أو المطالب بها
+    const pendingComms = await sbFetch('commissions','GET',null,
+      `?agent_id=eq.${agentId}&status=in.(pending,claimed)&select=id,amount,claimed_amount&order=created_at.asc`);
+
+    const totalPending = pendingComms.reduce((s,c) => s + Number(c.amount), 0);
+    let remaining = paidAmount;
+
+    // خصم المبلغ المدفوع من العمولات بالترتيب
+    for (const c of pendingComms) {
+      if (remaining <= 0) break;
+      const commAmount = Number(c.amount);
+      if (remaining >= commAmount) {
+        // دفع كامل هذه العمولة
+        await sbFetch('commissions','PATCH',{ status:'paid', paid_amount: commAmount }, `?id=eq.${c.id}`);
+        remaining -= commAmount;
+      } else {
+        // دفع جزئي — يبقى الفرق
+        const leftover = commAmount - remaining;
+        // سجّل الجزء المدفوع كـ paid
+        await sbFetch('commissions','POST',{
+          agent_id: agentId,
+          office_name: 'دفع جزئي',
+          amount: remaining,
+          month,
+          status: 'paid',
+          paid_amount: remaining
+        });
+        // حدّث العمولة الأصلية بالمبلغ المتبقي
+        await sbFetch('commissions','PATCH',{
+          amount: leftover,
+          status: 'pending',
+          claimed_amount: null
+        }, `?id=eq.${c.id}`);
+        remaining = 0;
+      }
     }
-    alert(`✅ تم تسجيل دفعة ${amount.toLocaleString('ar-IQ')} د.ع للوكيل`);
+
+    // إذا المبلغ المدفوع أكبر من المستحق
+    if (remaining > 0 && pendingComms.length === 0) {
+      await sbFetch('commissions','POST',{
+        agent_id: agentId, office_name: 'دفعة مباشرة',
+        amount: paidAmount, month, status: 'paid'
+      });
+    }
+
+    const leftoverTotal = totalPending - paidAmount;
+    let msg = `✅ تم تسجيل دفعة ${paidAmount.toLocaleString('ar-IQ')} د.ع للوكيل`;
+    if (leftoverTotal > 0)
+      msg += `\n\n⚠️ المتبقي للوكيل: ${leftoverTotal.toLocaleString('ar-IQ')} د.ع`;
+    else if (paidAmount > totalPending)
+      msg += `\n\nتم دفع أكثر من المستحق بـ ${(paidAmount - totalPending).toLocaleString('ar-IQ')} د.ع`;
+
+    alert(msg);
     closePayCommModal();
     renderAgentsTable();
   } catch(e) { alert('خطأ: ' + e.message); }
