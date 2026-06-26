@@ -868,8 +868,12 @@ function handleLogoUpload(e) {
   };
   reader.readAsDataURL(f);
 }
-function saveOfficeAccountSettings(e){
-  e.preventDefault(); let o=getOffices(); let i=o.findIndex(x=>x.id===JSON.parse(localStorage.getItem(SESSION_KEY)).officeId);
+async function saveOfficeAccountSettings(e){
+  e.preventDefault();
+  let o = getOffices();
+  let i = o.findIndex(x => x.id === JSON.parse(localStorage.getItem(SESSION_KEY)).officeId);
+  if (i === -1) { alert('❌ لم يُعثر على بيانات المكتب'); return; }
+
   // رفع الشعار للـ Storage إذا تم اختيار ملف جديد
   let logoUrl = o[i].logo || tempLogoBase64 || '';
   if (tempLogoFile) {
@@ -881,8 +885,26 @@ function saveOfficeAccountSettings(e){
       logoUrl = tempLogoBase64 || o[i].logo || '';
     }
   }
-  o[i].name=document.getElementById('setOfficeName').value; o[i].phone=document.getElementById('setOfficePhone').value; o[i].password=document.getElementById('setOfficePass').value; o[i].description=document.getElementById('setOfficeDesc').value; o[i].logo=logoUrl;
-  saveOffices(o); alert('✅ تم الحفظ');
+
+  o[i].name        = document.getElementById('setOfficeName').value;
+  o[i].phone       = document.getElementById('setOfficePhone').value;
+  o[i].password    = document.getElementById('setOfficePass').value;
+  o[i].description = document.getElementById('setOfficeDesc').value;
+  o[i].logo        = logoUrl;
+
+  // حفظ في Supabase أيضاً
+  try {
+    await sbFetch('offices', 'PATCH', {
+      name: o[i].name,
+      phone: o[i].phone,
+      password: o[i].password,
+      description: o[i].description,
+      logo: logoUrl
+    }, `?id=eq.${o[i].id}`);
+  } catch(e) { /* fallback localStorage فقط */ }
+
+  saveOffices(o);
+  alert('✅ تم حفظ الإعدادات بنجاح');
 }
 
 function handlePropImageUpload(e) {
