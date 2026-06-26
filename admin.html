@@ -1473,7 +1473,7 @@ async function renderAgentsTable() {
     tb.innerHTML = agents.map(a => {
       const myOffices = offices.filter(o => o.agent_id === a.id);
       const myComms   = commissions.filter(c => c.agent_id === a.id);
-      const pending   = myComms.filter(c=>c.status==='pending').reduce((s,c)=>s+Number(c.amount),0);
+      const pending   = myComms.filter(c=>c.status==='pending' || c.status==='claimed').reduce((s,c)=>s+Number(c.amount),0);
       const paid      = myComms.filter(c=>c.status==='paid').reduce((s,c)=>s+Number(c.amount),0);
       const isActive  = !a.status || a.status === 'active';
       return `<tr>
@@ -1507,17 +1507,26 @@ async function renderAgentsTable() {
       const agentName  = allAgentsMap[c.agent_id] || '—';
       const officeName = allOfficesMap[c.office_id] || c.office_name || '—';
       const date = new Date(c.created_at).toLocaleDateString('ar-IQ');
+
+      const statusBadge = c.status === 'paid'
+        ? '<span class="badge bg-success">✅ مدفوع</span>'
+        : c.status === 'claimed'
+          ? '<span class="badge" style="background:rgba(201,168,76,0.2);color:var(--gold);border:1px solid rgba(201,168,76,0.3);">🔔 الوكيل أكد الاستلام</span>'
+          : '<span class="badge bg-danger">⏳ معلّق</span>';
+
+      const actionCell = c.status === 'paid'
+        ? '<span style="color:var(--text-muted);font-size:12px;">—</span>'
+        : c.status === 'claimed'
+          ? `<button onclick="markCommPaid('${c.id}')" class="btn btn-success" style="padding:3px 8px;font-size:11px;">✅ تأكيد (ذكر الوكيل ${Number(c.claimed_amount||0).toLocaleString('ar-IQ')} د.ع)</button>`
+          : `<button onclick="markCommPaid('${c.id}')" class="btn btn-success" style="padding:3px 8px;font-size:11px;">تأكيد الدفع</button>`;
+
       return `<tr>
         <td style="font-weight:700;">${agentName}</td>
         <td>${officeName}</td>
         <td style="color:var(--muted);">${c.month||'—'}</td>
         <td style="color:var(--gold);font-weight:700;">${Number(c.amount).toLocaleString('ar-IQ')} د.ع</td>
-        <td><span class="badge ${c.status==='paid'?'bg-success':'bg-danger'}">${c.status==='paid'?'✅ مدفوع':'⏳ معلّق'}</span></td>
-        <td>
-          ${c.status==='pending'
-            ? `<button onclick="markCommPaid('${c.id}')" class="btn btn-success" style="padding:3px 8px;font-size:11px;">تأكيد الدفع</button>`
-            : '<span style="color:var(--muted);font-size:12px;">—</span>'}
-        </td>
+        <td>${statusBadge}</td>
+        <td>${actionCell}</td>
       </tr>`;
     }).join('');
   }
@@ -1613,7 +1622,7 @@ async function confirmPayComm() {
       amount, month, status: 'paid'
     });
     // تحديث العمولات المعلّقة → مدفوعة
-    const pending = await sbFetch('commissions','GET',null,`?agent_id=eq.${agentId}&status=eq.pending&select=id`);
+    const pending = await sbFetch('commissions','GET',null,`?agent_id=eq.${agentId}&status=in.(pending,claimed)&select=id`);
     for (const c of pending) {
       await sbFetch('commissions','PATCH',{status:'paid'},`?id=eq.${c.id}`);
     }
