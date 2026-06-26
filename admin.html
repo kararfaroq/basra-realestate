@@ -212,6 +212,7 @@
       <div class="sub-nav">
         <button id="tabPropsBtn" class="tab-btn active" onclick="switchOfficeTab('props')"><i class="ti ti-home-cog"></i> عقاراتي المنشورة</button>
         <button id="tabSettingsBtn" class="tab-btn" onclick="switchOfficeTab('settings')"><i class="ti ti-user-edit"></i> إعدادات حسابي والبروفايل</button>
+        <button id="tabProfileBtn" class="tab-btn" onclick="openMyProfile()"><i class="ti ti-eye"></i> عرض بروفايلي</button>
       </div>
 
       <div id="officePropsSection" class="dash-section" style="display: block;">
@@ -989,6 +990,28 @@ function openAddPropModal() {
   document.getElementById('addPropModal').style.display = 'flex';
 }
 function closeAddPropModal(){ document.getElementById('addPropModal').style.display='none'; }
+
+async function openMyProfile() {
+  const session = JSON.parse(localStorage.getItem(SESSION_KEY));
+  if (!session || !session.officeId) { alert('يرجى تسجيل الدخول أولاً'); return; }
+
+  // جلب الـ id الحقيقي من Supabase إذا لم يكن UUID
+  let officeId = session.officeId;
+  if (!officeId || officeId.startsWith('office_')) {
+    try {
+      const offices = await getDbOffices();
+      const found = offices.find(o => o.phone === session.username || o.name === session.username);
+      if (found) officeId = found.id;
+    } catch(e) {}
+  }
+
+  if (!officeId || officeId.startsWith('office_')) {
+    alert('❌ لم يتم العثور على بروفايلك في قاعدة البيانات\nتأكد من أن تسجيلك تم عبر الموقع الرسمي');
+    return;
+  }
+
+  window.open(`office.html?id=${officeId}`, '_blank');
+}
 
 function toggleCustomDeed(sel) {
   const custom = document.getElementById('pDeedCustom');
