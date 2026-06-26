@@ -1924,11 +1924,12 @@ function printContract(agentId, agentName, agentPhone, commRate, joinDate) {
   .clause { font-size:13px; color:#333; margin-bottom:8px; padding-right:16px; position:relative; }
   .clause::before { content:'•'; position:absolute; right:0; color:#C9A84C; font-weight:900; }
   .highlight { background:#fff8e7; border:1px solid #C9A84C; border-radius:8px; padding:12px 16px; font-size:14px; font-weight:700; text-align:center; color:#1A3A5C; margin:16px 0; }
-  .sign-area { display:grid; grid-template-columns:1fr 1fr; gap:60px; margin-top:40px; border-top:2px solid #e0e0e0; padding-top:24px; }
-  .sign-box { text-align:center; font-size:13px; }
+  .sign-area { display:grid; grid-template-columns:1fr 1fr; gap:60px; margin-top:40px; border-top:2px solid #e0e0e0; padding-top:24px; align-items:end; }
+  .sign-box { text-align:center; font-size:13px; display:flex; flex-direction:column; align-items:center; }
   .sign-box .sign-title { font-weight:700; color:#1A3A5C; margin-bottom:4px; }
-  .sign-box .sign-name { font-size:12px; color:#888; margin-bottom:30px; }
-  .sign-box .sign-line { border-top:1px solid #333; padding-top:6px; font-size:11px; color:#aaa; }
+  .sign-box .sign-name { font-size:12px; color:#555; margin-bottom:2px; }
+  .sign-box .sign-sub { font-size:11px; color:#aaa; margin-bottom:40px; }
+  .sign-box .sign-line { border-top:1px solid #333; width:100%; padding-top:6px; font-size:11px; color:#aaa; }
   .footer { text-align:center; font-size:11px; color:#aaa; border-top:1px solid #eee; padding-top:14px; margin-top:24px; }
   @media print { body { padding:25px; } }
 </style>
@@ -2013,12 +2014,13 @@ function printContract(agentId, agentName, agentPhone, commRate, joinDate) {
   <div class="sign-box">
     <div class="sign-title">الطرف الأول — المنصة</div>
     <div class="sign-name">كرار فاروق صبري</div>
-    <div class="sign-name" style="font-size:11px;color:#aaa;">صاحب ومدير دليل البصرة العقاري</div>
+    <div class="sign-sub">صاحب ومدير دليل البصرة العقاري</div>
     <div class="sign-line">التوقيع والختم</div>
   </div>
   <div class="sign-box">
     <div class="sign-title">الطرف الثاني — الوكيل</div>
-    <div class="sign-name">${agentName} — ${agentPhone}</div>
+    <div class="sign-name">${agentName}</div>
+    <div class="sign-sub">${agentPhone}</div>
     <div class="sign-line">التوقيع</div>
   </div>
 </div>
