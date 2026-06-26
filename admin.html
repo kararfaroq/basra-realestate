@@ -750,6 +750,24 @@ async function renewSubscriptionByAdmin(id) {
     if(idx !== -1) { offices[idx].expiry = newExpiry; offices[idx].status = 'active'; saveOffices(offices); }
   }
   alert(`✅ تم تجديد الاشتراك 30 يوم!\nتاريخ الانتهاء الجديد: ${newExpiry}`);
+    // ✅ عمولة الوكيل عند التجديد فقط (الشهر الأول مجاني)
+  if (office.agent_id) {
+    try {
+      const agents = await sbFetch('agents','GET',null,`?id=eq.${office.agent_id}&select=commission_rate`);
+      if (agents && agents[0]) {
+        const rate   = agents[0].commission_rate || 0;
+        const amount = Math.round((PKG_PRICES[office.pkg] || 0) * rate / 100);
+        if (amount > 0) {
+          const month = new Date().toLocaleDateString('ar-IQ',{year:'numeric',month:'long'});
+          await sbFetch('commissions','POST',{
+            agent_id: office.agent_id, office_id: office.id,
+            office_name: office.name, amount, month, status: 'pending'
+          });
+        }
+      }
+    } catch(e) { console.warn('فشل تسجيل عمولة التجديد:', e); }
+  }
+
   renderAdminDashboard();
 }
 
