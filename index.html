@@ -682,6 +682,9 @@
           <div class="prop-modal-office-name" id="propModalOfficeName"></div>
           <div class="prop-modal-office-sub" id="propModalOfficeSub">مكتب عقاري معتمد</div>
         </div>
+        <a id="propModalOfficeLink" href="#" target="_blank" style="display:none; background:rgba(201,168,76,0.1); color:var(--gold); border:1px solid rgba(201,168,76,0.3); border-radius:8px; padding:6px 12px; font-size:12px; font-weight:700; text-decoration:none; white-space:nowrap; align-items:center; gap:4px;">
+          <i class="ti ti-user"></i> بروفايل المكتب
+        </a>
       </div>
       <div class="prop-modal-actions">
         <button class="btn-whatsapp" id="propModalWhatsapp">
@@ -979,7 +982,11 @@ async function renderListings(dataToRender = null){
         </div>
         ${desc}
         <div class="card-footer">
-          <div class="card-office"><div class="office-avatar">م</div><span>${l.office || ''}</span></div>
+          <div class="card-office" onclick="event.stopPropagation(); ${l.officeId && l.officeId !== 'default' && l.officeId !== 'guest' ? `window.location.href='office.html?id=${l.officeId}'` : ''}" style="${l.officeId && l.officeId !== 'default' && l.officeId !== 'guest' ? 'cursor:pointer;' : ''}">
+            <div class="office-avatar">م</div>
+            <span>${l.office || ''}</span>
+            ${l.officeId && l.officeId !== 'default' && l.officeId !== 'guest' ? '<i class="ti ti-external-link" style="font-size:11px; color:var(--gold-light); margin-right:2px;"></i>' : ''}
+          </div>
           <button class="card-btn" onclick="event.stopPropagation(); openPropModal(${idx})">تفاصيل 📞</button>
         </div>
       </div>
@@ -1421,6 +1428,15 @@ async function openPropModal(idx) {
       document.getElementById('propModalOfficeSub').textContent = 'مكتب عقاري معتمد';
     }
   } catch(e) {}
+
+  // رابط بروفايل المكتب
+  const officeLink = document.getElementById('propModalOfficeLink');
+  if (l.officeId && l.officeId !== 'default' && l.officeId !== 'guest') {
+    officeLink.href = `office.html?id=${l.officeId}`;
+    officeLink.style.display = 'flex';
+  } else {
+    officeLink.style.display = 'none';
+  }
 
   // أزرار التواصل — أولوية للمكتب ثم هاتف الزائر
   const waBtn  = document.getElementById('propModalWhatsapp');
