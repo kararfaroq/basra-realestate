@@ -124,6 +124,7 @@
         <div class="stat-card"><div class="stat-icon"><i class="ti ti-building-community"></i></div><div><div style="font-size:13px; color:var(--text-muted);">المكاتب</div><h3 id="statTotalOffices" style="font-size:22px; font-weight:900;">0</h3></div></div>
         <div class="stat-card"><div class="stat-icon" style="color:var(--success);"><i class="ti ti-discount-check"></i></div><div><div style="font-size:13px; color:var(--text-muted);">نشط</div><h3 id="statActiveOffices" style="font-size:22px; font-weight:900; color:var(--success);">0</h3></div></div>
         <div class="stat-card"><div class="stat-icon" style="color:var(--warning);"><i class="ti ti-home-stats"></i></div><div><div style="font-size:13px; color:var(--text-muted);">العقارات</div><h3 id="statTotalProps" style="font-size:22px; font-weight:900; color:var(--warning);">0</h3></div></div>
+        <div class="stat-card"><div class="stat-icon" style="color:#a78bfa;"><i class="ti ti-users"></i></div><div><div style="font-size:13px; color:var(--text-muted);">الوكلاء</div><h3 id="statTotalAgents" style="font-size:22px; font-weight:900; color:#a78bfa;">0</h3></div></div>
       </div>
 
       <!-- ===== قسم النسخ الاحتياطي — للمدير فقط ===== -->
@@ -192,6 +193,43 @@
           <table>
             <thead><tr><th>اسم المكتب</th><th>الهاتف</th><th>الباقة</th><th>الحالة</th><th>تاريخ الانتهاء</th><th>تغيير الباقة</th><th>تجديد (30 يوم)</th><th>الرقابة</th></tr></thead>
             <tbody id="adminOfficesTable"></tbody>
+          </table>
+        </div>
+      </div>
+      <!-- ===== قسم إدارة الوكلاء ===== -->
+      <div class="dash-section" style="display:block; margin-top:1.5rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;border-bottom:1px solid rgba(255,255,255,0.05);padding-bottom:10px;flex-wrap:wrap;gap:10px;">
+          <div class="section-title" style="margin-bottom:0;border:none;padding:0;"><i class="ti ti-users"></i> إدارة الوكلاء</div>
+          <button onclick="openAddAgentModal()" class="btn btn-gold" style="font-size:13px;padding:8px 16px;">
+            <i class="ti ti-plus"></i> إضافة وكيل جديد
+          </button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead><tr>
+              <th>اسم الوكيل</th><th>الهاتف</th><th>نسبة العمولة</th>
+              <th>المكاتب</th><th>العمولة المستحقة</th><th>المدفوع</th>
+              <th>الحالة</th><th>إجراءات</th>
+            </tr></thead>
+            <tbody id="agentsTable">
+              <tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:2rem;">جاري التحميل...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== سجل عمولات الوكلاء ===== -->
+      <div class="dash-section" style="display:block; margin-top:1.5rem;">
+        <div class="section-title"><i class="ti ti-receipt"></i> سجل العمولات الكاملة</div>
+        <div class="table-container">
+          <table>
+            <thead><tr>
+              <th>الوكيل</th><th>المكتب</th><th>الشهر</th>
+              <th>المبلغ</th><th>الحالة</th><th>إجراء</th>
+            </tr></thead>
+            <tbody id="allCommissionsTable">
+              <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem;">لا توجد سجلات بعد</td></tr>
+            </tbody>
           </table>
         </div>
       </div>
@@ -533,6 +571,9 @@ async function renderAdminDashboard() {
   document.getElementById('statTotalOffices').textContent = offices.length;
   document.getElementById('statActiveOffices').textContent = offices.filter(o => !o.status || o.status === 'active').length;
   document.getElementById('statTotalProps').textContent = activeListings.length;
+
+  // تحميل جدول الوكلاء
+  renderAgentsTable();
 
   // ✅ إصلاح: أي مكتب بباقة مدفوعة بدون expiry → تعيين 30 يوم تلقائياً
   for (const o of offices) {
@@ -1327,5 +1368,252 @@ function deleteLocalBackup(id) {
 
 document.addEventListener('DOMContentLoaded', checkSession);
 </script>
+<!-- ===== مودال إضافة/تعديل وكيل ===== -->
+<div id="agentModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:999;padding:1rem;">
+  <div class="modal-box" style="max-width:480px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+      <h3 style="color:var(--gold);font-size:18px;font-weight:700;" id="agentModalTitle">➕ إضافة وكيل جديد</h3>
+      <button onclick="closeAgentModal()" style="background:none;border:none;color:var(--text-muted);font-size:22px;cursor:pointer;">✕</button>
+    </div>
+    <input type="hidden" id="editAgentId">
+    <div style="margin-bottom:1rem;">
+      <label style="font-size:13px;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:600;">اسم الوكيل *</label>
+      <input id="agentModalName" class="input-control" type="text" placeholder="الاسم الكامل">
+    </div>
+    <div style="margin-bottom:1rem;">
+      <label style="font-size:13px;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:600;">رقم الهاتف *</label>
+      <input id="agentModalPhone" class="input-control" type="text" placeholder="07xxxxxxxxx">
+    </div>
+    <div style="margin-bottom:1rem;">
+      <label style="font-size:13px;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:600;">كلمة المرور *</label>
+      <input id="agentModalPass" class="input-control" type="text" placeholder="كلمة المرور">
+    </div>
+    <div style="margin-bottom:1.5rem;">
+      <label style="font-size:13px;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:600;">نسبة العمولة % <span style="color:var(--gold);">(من قيمة الاشتراك الشهري)</span></label>
+      <input id="agentModalComm" class="input-control" type="number" min="0" max="100" placeholder="مثال: 20" value="20">
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="saveAgent()" class="btn btn-gold" style="flex:1;justify-content:center;padding:12px;">
+        <i class="ti ti-device-floppy"></i> حفظ
+      </button>
+      <button onclick="closeAgentModal()" class="btn" style="background:rgba(255,255,255,0.06);color:#fff;">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== مودال تسجيل دفعة عمولة ===== -->
+<div id="payCommModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;z-index:999;padding:1rem;">
+  <div class="modal-box" style="max-width:420px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+      <h3 style="color:var(--gold);font-size:18px;font-weight:700;">💰 تسجيل دفعة عمولة</h3>
+      <button onclick="closePayCommModal()" style="background:none;border:none;color:var(--text-muted);font-size:22px;cursor:pointer;">✕</button>
+    </div>
+    <input type="hidden" id="payAgentId">
+    <div id="payAgentInfo" style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:12px;margin-bottom:1rem;font-size:13px;color:var(--text-muted);"></div>
+    <div style="margin-bottom:1rem;">
+      <label style="font-size:13px;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:600;">المبلغ المدفوع (د.ع) *</label>
+      <input id="payAmount" class="input-control" type="number" placeholder="مثال: 50000">
+    </div>
+    <div style="margin-bottom:1.5rem;">
+      <label style="font-size:13px;color:var(--text-muted);margin-bottom:6px;display:block;font-weight:600;">ملاحظة (اختياري)</label>
+      <input id="payNote" class="input-control" type="text" placeholder="مثال: دفعة شهر يونيو">
+    </div>
+    <button onclick="confirmPayComm()" class="btn btn-gold" style="width:100%;justify-content:center;padding:12px;">
+      <i class="ti ti-check"></i> تأكيد الدفع
+    </button>
+  </div>
+</div>
+
+<script>
+// ===== أسعار الباقات =====
+const PKG_PRICES = { free: 0, eco: 25000, gold: 50000 };
+
+// ===== جلب الوكلاء =====
+async function getAgents() {
+  try { return await sbFetch('agents','GET',null,'?order=created_at.desc'); }
+  catch(e) { return []; }
+}
+
+// ===== جلب العمولات =====
+async function getCommissions() {
+  try { return await sbFetch('commissions','GET',null,'?order=created_at.desc'); }
+  catch(e) { return []; }
+}
+
+// ===== عرض الوكلاء في جدول admin =====
+async function renderAgentsTable() {
+  const agents      = await getAgents();
+  const offices     = await getDbOffices();
+  const commissions = await getCommissions();
+
+  document.getElementById('statTotalAgents').textContent = agents.length;
+
+  const tb = document.getElementById('agentsTable');
+  if (!agents.length) {
+    tb.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:2rem;">لا يوجد وكلاء بعد — أضف أول وكيل!</td></tr>';
+  } else {
+    tb.innerHTML = agents.map(a => {
+      const myOffices = offices.filter(o => o.agent_id === a.id);
+      const myComms   = commissions.filter(c => c.agent_id === a.id);
+      const pending   = myComms.filter(c=>c.status==='pending').reduce((s,c)=>s+Number(c.amount),0);
+      const paid      = myComms.filter(c=>c.status==='paid').reduce((s,c)=>s+Number(c.amount),0);
+      const isActive  = !a.status || a.status === 'active';
+      return `<tr>
+        <td style="font-weight:700;">${a.name}</td>
+        <td>${a.phone}</td>
+        <td><span style="color:var(--gold);font-weight:700;">${a.commission_rate || 0}%</span></td>
+        <td><span style="font-weight:700;">${myOffices.length}</span></td>
+        <td style="color:var(--warning);font-weight:700;">${pending.toLocaleString('ar-IQ')} د.ع</td>
+        <td style="color:var(--success);font-weight:700;">${paid.toLocaleString('ar-IQ')} د.ع</td>
+        <td><span class="badge ${isActive?'bg-success':'bg-danger'}">${isActive?'نشط':'موقوف'}</span></td>
+        <td>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;">
+            <button onclick="openPayCommModal('${a.id}','${a.name}',${pending})" class="btn btn-gold" style="padding:4px 8px;font-size:11px;">💰 دفع</button>
+            <button onclick="editAgent('${a.id}')" class="btn" style="padding:4px 8px;font-size:11px;background:rgba(255,255,255,0.08);color:#fff;">✏️ تعديل</button>
+            <button onclick="toggleAgentStatus('${a.id}','${a.status||'active'}')" class="btn" style="padding:4px 8px;font-size:11px;background:${isActive?'var(--danger)':'var(--success)'};color:#fff;">${isActive?'⏸ إيقاف':'▶ تفعيل'}</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  // جدول العمولات الكاملة
+  const allComms = await getCommissions();
+  const allAgentsMap = Object.fromEntries(agents.map(a=>[a.id,a.name]));
+  const allOfficesMap = Object.fromEntries(offices.map(o=>[o.id,o.name]));
+  const commTb = document.getElementById('allCommissionsTable');
+  if (!allComms.length) {
+    commTb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem;">لا توجد سجلات عمولات بعد</td></tr>';
+  } else {
+    commTb.innerHTML = allComms.map(c => {
+      const agentName  = allAgentsMap[c.agent_id] || '—';
+      const officeName = allOfficesMap[c.office_id] || c.office_name || '—';
+      const date = new Date(c.created_at).toLocaleDateString('ar-IQ');
+      return `<tr>
+        <td style="font-weight:700;">${agentName}</td>
+        <td>${officeName}</td>
+        <td style="color:var(--muted);">${c.month||'—'}</td>
+        <td style="color:var(--gold);font-weight:700;">${Number(c.amount).toLocaleString('ar-IQ')} د.ع</td>
+        <td><span class="badge ${c.status==='paid'?'bg-success':'bg-danger'}">${c.status==='paid'?'✅ مدفوع':'⏳ معلّق'}</span></td>
+        <td>
+          ${c.status==='pending'
+            ? `<button onclick="markCommPaid('${c.id}')" class="btn btn-success" style="padding:3px 8px;font-size:11px;">تأكيد الدفع</button>`
+            : '<span style="color:var(--muted);font-size:12px;">—</span>'}
+        </td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+// ===== مودال إضافة وكيل =====
+function openAddAgentModal() {
+  document.getElementById('agentModalTitle').textContent = '➕ إضافة وكيل جديد';
+  document.getElementById('editAgentId').value = '';
+  document.getElementById('agentModalName').value = '';
+  document.getElementById('agentModalPhone').value = '';
+  document.getElementById('agentModalPass').value = '';
+  document.getElementById('agentModalComm').value = '20';
+  document.getElementById('agentModal').style.display = 'flex';
+}
+
+function closeAgentModal() { document.getElementById('agentModal').style.display = 'none'; }
+
+async function editAgent(id) {
+  try {
+    const agents = await sbFetch('agents','GET',null,`?id=eq.${id}&select=*`);
+    const a = agents[0]; if (!a) return;
+    document.getElementById('agentModalTitle').textContent = '✏️ تعديل بيانات الوكيل';
+    document.getElementById('editAgentId').value = a.id;
+    document.getElementById('agentModalName').value = a.name;
+    document.getElementById('agentModalPhone').value = a.phone;
+    document.getElementById('agentModalPass').value = a.password || '';
+    document.getElementById('agentModalComm').value = a.commission_rate || 20;
+    document.getElementById('agentModal').style.display = 'flex';
+  } catch(e) { alert('خطأ في التحميل'); }
+}
+
+async function saveAgent() {
+  const id   = document.getElementById('editAgentId').value;
+  const name = document.getElementById('agentModalName').value.trim();
+  const phone= document.getElementById('agentModalPhone').value.trim();
+  const pass = document.getElementById('agentModalPass').value.trim();
+  const comm = Number(document.getElementById('agentModalComm').value) || 20;
+
+  if (!name || !phone || !pass) { alert('يرجى تعبئة الحقول الإلزامية'); return; }
+
+  const data = { name, phone, password: pass, commission_rate: comm, status: 'active' };
+
+  try {
+    if (id) {
+      await sbFetch('agents','PATCH', data, `?id=eq.${id}`);
+      alert('✅ تم تحديث بيانات الوكيل');
+    } else {
+      // التحقق من عدم التكرار
+      const exists = await sbFetch('agents','GET',null,`?phone=eq.${phone}&select=id`);
+      if (exists && exists.length > 0) { alert('❌ رقم الهاتف مسجّل مسبقاً'); return; }
+      await sbFetch('agents','POST', data);
+      alert('✅ تم إضافة الوكيل بنجاح');
+    }
+    closeAgentModal();
+    renderAgentsTable();
+  } catch(e) { alert('❌ خطأ: ' + e.message); }
+}
+
+// ===== إيقاف/تفعيل وكيل =====
+async function toggleAgentStatus(id, currentStatus) {
+  const newStatus = (currentStatus === 'active' || !currentStatus) ? 'suspended' : 'active';
+  try {
+    await sbFetch('agents','PATCH',{status:newStatus},`?id=eq.${id}`);
+    renderAgentsTable();
+  } catch(e) { alert('خطأ: ' + e.message); }
+}
+
+// ===== مودال دفع العمولة =====
+function openPayCommModal(agentId, agentName, pendingAmount) {
+  document.getElementById('payAgentId').value = agentId;
+  document.getElementById('payAgentInfo').innerHTML =
+    `<strong style="color:#fff;">${agentName}</strong><br>
+     العمولة المستحقة: <strong style="color:var(--warning);">${pendingAmount.toLocaleString('ar-IQ')} د.ع</strong>`;
+  document.getElementById('payAmount').value = pendingAmount || '';
+  document.getElementById('payNote').value = '';
+  document.getElementById('payCommModal').style.display = 'flex';
+}
+
+function closePayCommModal() { document.getElementById('payCommModal').style.display = 'none'; }
+
+async function confirmPayComm() {
+  const agentId = document.getElementById('payAgentId').value;
+  const amount  = Number(document.getElementById('payAmount').value);
+  const note    = document.getElementById('payNote').value.trim();
+  if (!amount || amount <= 0) { alert('يرجى إدخال مبلغ صحيح'); return; }
+
+  const month = note || new Date().toLocaleDateString('ar-IQ',{year:'numeric',month:'long'});
+  try {
+    // تسجيل دفعة مدفوعة
+    await sbFetch('commissions','POST',{
+      agent_id: agentId, office_name: 'دفعة مباشرة',
+      amount, month, status: 'paid'
+    });
+    // تحديث العمولات المعلّقة → مدفوعة
+    const pending = await sbFetch('commissions','GET',null,`?agent_id=eq.${agentId}&status=eq.pending&select=id`);
+    for (const c of pending) {
+      await sbFetch('commissions','PATCH',{status:'paid'},`?id=eq.${c.id}`);
+    }
+    alert(`✅ تم تسجيل دفعة ${amount.toLocaleString('ar-IQ')} د.ع للوكيل`);
+    closePayCommModal();
+    renderAgentsTable();
+  } catch(e) { alert('خطأ: ' + e.message); }
+}
+
+// ===== تحويل عمولة من معلّقة إلى مدفوعة =====
+async function markCommPaid(commId) {
+  if (!confirm('تأكيد تسجيل هذه العمولة كمدفوعة؟')) return;
+  try {
+    await sbFetch('commissions','PATCH',{status:'paid'},`?id=eq.${commId}`);
+    renderAgentsTable();
+  } catch(e) { alert('خطأ: ' + e.message); }
+}
+</script>
+
 </body>
 </html>
