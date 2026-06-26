@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة الوكيل — دليل البصرة العقاري</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+  :root { --gold:#C9A84C; --navy:#0A1628; --navy-mid:#1A3A5C; --navy-light:#2A5080; --text:#F5F0E8; --muted:#8BA0B8; --success:#4CAF7D; --danger:#ff4d4d; --warning:#ff9800; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Cairo',sans-serif;background:var(--navy);color:var(--text);min-height:100vh;direction:rtl;}
+
+  /* ===== LOGIN ===== */
+  .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;}
+  .login-card{background:var(--navy-mid);border:2px solid var(--gold);border-radius:16px;padding:2.5rem;width:100%;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.5);}
+  .login-logo{text-align:center;margin-bottom:2rem;}
+  .login-logo-icon{width:64px;height:64px;background:var(--gold);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 12px;}
+  .login-title{font-size:22px;font-weight:900;color:#fff;text-align:center;margin-bottom:4px;}
+  .login-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:2rem;}
+
+  /* ===== DASHBOARD ===== */
+  .dash-header{background:var(--navy-mid);border-bottom:1px solid rgba(201,168,76,0.2);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+  .main-wrap{max-width:1100px;margin:0 auto;padding:2rem;}
+
+  .grid-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;margin-bottom:2rem;}
+  .stat-card{background:var(--navy-mid);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:1.5rem;display:flex;align-items:center;gap:15px;}
+  .stat-icon{width:48px;height:48px;border-radius:12px;background:rgba(201,168,76,0.1);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--gold);flex-shrink:0;}
+
+  .section{background:var(--navy-mid);border-radius:16px;border:1px solid rgba(201,168,76,0.1);padding:2rem;margin-bottom:2rem;}
+  .section-title{font-size:17px;font-weight:700;color:var(--gold);margin-bottom:1.5rem;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.05);padding-bottom:10px;}
+  table{width:100%;border-collapse:collapse;font-size:13px;text-align:right;}
+  th{padding:10px;color:var(--muted);font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06);}
+  td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.04);}
+  tr:last-child td{border-bottom:none;}
+  .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+  .badge-green{background:rgba(76,175,125,0.15);color:var(--success);border:1px solid rgba(76,175,125,0.3);}
+  .badge-red{background:rgba(255,77,77,0.15);color:var(--danger);border:1px solid rgba(255,77,77,0.3);}
+  .badge-gold{background:rgba(201,168,76,0.15);color:var(--gold);border:1px solid rgba(201,168,76,0.3);}
+  .badge-gray{background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid rgba(255,255,255,0.1);}
+
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:'Cairo';font-size:13px;font-weight:600;transition:.2s;}
+  .btn-gold{background:var(--gold);color:var(--navy);}
+  .btn-danger{background:var(--danger);color:#fff;}
+  .btn-outline{background:transparent;border:1px solid rgba(201,168,76,0.4);color:var(--gold);}
+  .btn:hover{opacity:.88;}
+
+  .input-control{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px 14px;color:#fff;font-family:'Cairo';font-size:14px;outline:none;transition:.2s;}
+  .input-control:focus{border-color:var(--gold);}
+  label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:600;}
+
+  /* ===== رابط الوكيل ===== */
+  .ref-box{background:rgba(201,168,76,0.06);border:1.5px dashed rgba(201,168,76,0.35);border-radius:12px;padding:1.2rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  .ref-url{font-size:13px;color:var(--gold);word-break:break-all;flex:1;}
+
+  /* ===== COMMISSION ===== */
+  .commission-summary{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
+  .comm-box{background:rgba(255,255,255,0.04);border-radius:10px;padding:1rem 1.2rem;border:1px solid rgba(255,255,255,0.06);}
+  .comm-label{font-size:12px;color:var(--muted);margin-bottom:4px;}
+  .comm-value{font-size:20px;font-weight:900;}
+
+  /* ===== MODAL ===== */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:999;padding:1rem;}
+  .modal-box{background:var(--navy-mid);border:2px solid var(--gold);border-radius:16px;padding:2rem;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;}
+  .modal-title{font-size:18px;font-weight:700;color:var(--gold);margin-bottom:1.5rem;display:flex;align-items:center;gap:8px;}
+  .form-row{margin-bottom:1rem;}
+
+  .empty-msg{text-align:center;color:var(--muted);padding:2rem;font-size:14px;}
+
+  /* ===== TABS ===== */
+  .tab-bar{display:flex;gap:8px;margin-bottom:1.5rem;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:10px;overflow-x:auto;}
+  .tab-btn{background:rgba(255,255,255,0.05);color:var(--muted);border:1px solid transparent;padding:8px 16px;border-radius:6px;cursor:pointer;font-family:'Cairo';font-weight:600;font-size:13px;white-space:nowrap;transition:.2s;}
+  .tab-btn.active{background:var(--gold);color:var(--navy);}
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div id="loginZone" class="login-wrap">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">🤝</div>
+      <div class="login-title">لوحة الوكيل</div>
+      <div class="login-sub">دليل البصرة العقاري</div>
+    </div>
+    <div class="form-row">
+      <label>رقم الهاتف</label>
+      <input id="agentPhone" class="input-control" type="text" placeholder="07xxxxxxxxx">
+    </div>
+    <div class="form-row">
+      <label>كلمة المرور</label>
+      <input id="agentPass" class="input-control" type="password" placeholder="••••••••">
+    </div>
+    <div id="loginError" style="color:var(--danger);font-size:13px;margin-bottom:10px;display:none;"></div>
+    <button onclick="agentLogin()" class="btn btn-gold" style="width:100%;justify-content:center;padding:13px;font-size:15px;">
+      <i class="ti ti-login"></i> دخول
+    </button>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div id="dashZone" style="display:none;">
+  <header class="dash-header">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:36px;height:36px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--navy);">🤝</div>
+      <div>
+        <div style="font-size:16px;font-weight:900;color:#fff;">لوحة الوكيل</div>
+        <div id="agentNameBadge" style="font-size:12px;color:var(--gold);"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="window.open('index.html','_blank')" class="btn btn-outline"><i class="ti ti-home"></i> الرئيسية</button>
+      <button onclick="agentLogout()" class="btn btn-danger"><i class="ti ti-logout"></i> خروج</button>
+    </div>
+  </header>
+
+  <div class="main-wrap">
+
+    <!-- إحصاءات -->
+    <div class="grid-stats">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="ti ti-building-community"></i></div>
+        <div><div style="font-size:12px;color:var(--muted);">المكاتب المسجّلة</div><h3 id="stTotalOffices" style="font-size:22px;font-weight:900;">0</h3></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="color:var(--success);"><i class="ti ti-discount-check"></i></div>
+        <div><div style="font-size:12px;color:var(--muted);">المكاتب النشطة</div><h3 id="stActiveOffices" style="font-size:22px;font-weight:900;color:var(--success);">0</h3></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="color:var(--gold);"><i class="ti ti-coin"></i></div>
+        <div><div style="font-size:12px;color:var(--muted);">العمولة المستحقة</div><h3 id="stPending" style="font-size:22px;font-weight:900;color:var(--gold);">0 د.ع</h3></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="color:var(--success);"><i class="ti ti-circle-check"></i></div>
+        <div><div style="font-size:12px;color:var(--muted);">إجمالي المحصّل</div><h3 id="stEarned" style="font-size:22px;font-weight:900;color:var(--success);">0 د.ع</h3></div>
+      </div>
+    </div>
+
+    <!-- رابط التسجيل الخاص -->
+    <div class="section">
+      <div class="section-title"><i class="ti ti-link"></i> رابطك الخاص للتسجيل</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">شارك هذا الرابط مع المكاتب — أي مكتب يسجّل عبره سيُحسب لك تلقائياً.</p>
+      <div class="ref-box">
+        <span class="ref-url" id="agentRefLink">—</span>
+        <button onclick="copyRefLink()" class="btn btn-gold" style="padding:8px 16px;font-size:12px;">
+          <i class="ti ti-copy"></i> نسخ
+        </button>
+      </div>
+    </div>
+
+    <!-- التبويبات -->
+    <div class="section">
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="showTab('tabOffices',this)"><i class="ti ti-building-community"></i> مكاتبي</button>
+        <button class="tab-btn" onclick="showTab('tabCommissions',this)"><i class="ti ti-receipt"></i> سجل العمولات</button>
+        <button class="tab-btn" onclick="showTab('tabRegister',this)"><i class="ti ti-plus"></i> تسجيل مكتب جديد</button>
+      </div>
+
+      <!-- مكاتبي -->
+      <div id="tabOffices">
+        <div class="table-container" style="overflow-x:auto;">
+          <table>
+            <thead><tr>
+              <th>اسم المكتب</th><th>الهاتف</th><th>الباقة</th>
+              <th>الحالة</th><th>انتهاء الاشتراك</th><th>العمولة الشهرية</th>
+            </tr></thead>
+            <tbody id="agentOfficesTable">
+              <tr><td colspan="6" class="empty-msg">جاري التحميل...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- سجل العمولات -->
+      <div id="tabCommissions" style="display:none;">
+        <div class="commission-summary">
+          <div class="comm-box">
+            <div class="comm-label">نسبة عمولتك</div>
+            <div class="comm-value" id="agentCommRate" style="color:var(--gold);">—%</div>
+          </div>
+          <div class="comm-box">
+            <div class="comm-label">إجمالي العمولات المستحقة</div>
+            <div class="comm-value" id="commTotalPending" style="color:var(--warning);">0 د.ع</div>
+          </div>
+          <div class="comm-box">
+            <div class="comm-label">إجمالي المدفوع</div>
+            <div class="comm-value" id="commTotalPaid" style="color:var(--success);">0 د.ع</div>
+          </div>
+          <div class="comm-box">
+            <div class="comm-label">الصافي المتبقي</div>
+            <div class="comm-value" id="commTotalNet" style="color:var(--gold);">0 د.ع</div>
+          </div>
+        </div>
+        <div class="table-container" style="overflow-x:auto;">
+          <table>
+            <thead><tr>
+              <th>المكتب</th><th>الشهر</th><th>المبلغ</th><th>الحالة</th><th>التاريخ</th>
+            </tr></thead>
+            <tbody id="commissionsTable">
+              <tr><td colspan="5" class="empty-msg">لا توجد سجلات عمولات بعد</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- تسجيل مكتب جديد -->
+      <div id="tabRegister" style="display:none;">
+        <div style="max-width:500px;">
+          <p style="font-size:13px;color:var(--muted);margin-bottom:1.5rem;">سجّل مكتباً جديداً مباشرةً — سيُربط بحسابك تلقائياً.</p>
+          <div class="form-row">
+            <label>اسم المكتب العقاري *</label>
+            <input id="regName" class="input-control" type="text" placeholder="مثال: مكتب الأمانة">
+          </div>
+          <div class="form-row">
+            <label>رقم الهاتف *</label>
+            <input id="regPhone" class="input-control" type="text" placeholder="07xxxxxxxxx">
+          </div>
+          <div class="form-row">
+            <label>كلمة المرور *</label>
+            <input id="regPass" class="input-control" type="password" placeholder="كلمة المرور للمكتب">
+          </div>
+          <div class="form-row">
+            <label>المنطقة</label>
+            <input id="regDistrict" class="input-control" type="text" placeholder="مثال: العشار، الجمهورية...">
+          </div>
+          <div class="form-row">
+            <label>الباقة</label>
+            <select id="regPkg" class="input-control">
+              <option value="free">مجانية</option>
+              <option value="eco">اقتصادية</option>
+              <option value="gold" selected>ذهبية</option>
+            </select>
+          </div>
+          <button onclick="agentRegisterOffice()" class="btn btn-gold" style="margin-top:8px;padding:12px 24px;font-size:14px;">
+            <i class="ti ti-plus"></i> تسجيل المكتب
+          </button>
+          <div id="regMsg" style="margin-top:12px;font-size:13px;display:none;"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== Config =====
+const SUPABASE_URL = 'https://blayfetxmufisvtigugt.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_zCJnnFxjHQ-X7BkkQCuVqA_U_UyaI6y';
+const AGENT_SESSION = 'basra_agent_session';
+
+// أسعار الباقات الشهرية (بالدينار العراقي)
+const PKG_PRICES = { free: 0, eco: 25000, gold: 50000 };
+
+// ===== Supabase =====
+async function sbFetch(table, method='GET', body=null, filter='') {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}${filter}`, {
+    method,
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Prefer': 'return=representation'
+    },
+    body: body ? JSON.stringify(body) : null
+  });
+  if (!res.ok) { const e = await res.text(); throw new Error(e); }
+  const text = await res.text();
+  return text ? JSON.parse(text) : [];
+}
+
+// ===== Session =====
+function getSession() { return JSON.parse(localStorage.getItem(AGENT_SESSION)); }
+function setSession(data) { localStorage.setItem(AGENT_SESSION, JSON.stringify(data)); }
+function clearSession() { localStorage.removeItem(AGENT_SESSION); }
+
+// ===== Login =====
+async function agentLogin() {
+  const phone = document.getElementById('agentPhone').value.trim();
+  const pass  = document.getElementById('agentPass').value.trim();
+  const errEl = document.getElementById('loginError');
+  errEl.style.display = 'none';
+
+  if (!phone || !pass) { errEl.textContent = 'يرجى إدخال الهاتف وكلمة المرور'; errEl.style.display='block'; return; }
+
+  try {
+    const agents = await sbFetch('agents','GET',null,`?phone=eq.${phone}&select=*`);
+    if (!agents || agents.length === 0) { errEl.textContent = '❌ الحساب غير موجود'; errEl.style.display='block'; return; }
+    const agent = agents[0];
+    if (agent.password !== pass) { errEl.textContent = '❌ كلمة المرور غير صحيحة'; errEl.style.display='block'; return; }
+    if (agent.status === 'suspended') { errEl.textContent = '⛔ حسابك موقوف، تواصل مع المدير'; errEl.style.display='block'; return; }
+    setSession({ agentId: agent.id, agentName: agent.name, agentPhone: agent.phone });
+    showDashboard(agent);
+  } catch(e) {
+    errEl.textContent = 'خطأ في الاتصال: ' + e.message;
+    errEl.style.display = 'block';
+  }
+}
+
+function agentLogout() { clearSession(); location.reload(); }
+
+// ===== Init =====
+window.onload = function() {
+  const session = getSession();
+  if (session) {
+    sbFetch('agents','GET',null,`?id=eq.${session.agentId}&select=*`)
+      .then(r => { if(r && r[0]) showDashboard(r[0]); else agentLogout(); })
+      .catch(() => agentLogout());
+  }
+};
+
+// ===== Show Dashboard =====
+async function showDashboard(agent) {
+  document.getElementById('loginZone').style.display = 'none';
+  document.getElementById('dashZone').style.display = 'block';
+  document.getElementById('agentNameBadge').textContent = `مرحباً، ${agent.name}`;
+  document.getElementById('agentCommRate').textContent = `${agent.commission_rate || 0}%`;
+
+  // رابط التسجيل الخاص
+  const refLink = `${location.origin}/index.html?agent=${agent.id}`;
+  document.getElementById('agentRefLink').textContent = refLink;
+
+  await loadAgentData(agent);
+}
+
+// ===== Load Data =====
+async function loadAgentData(agent) {
+  try {
+    // مكاتب الوكيل
+    const offices = await sbFetch('offices','GET',null,`?agent_id=eq.${agent.id}&select=*&order=created_at.desc`);
+
+    // إحصاءات
+    const activeOffices = offices.filter(o => !o.status || o.status === 'active');
+    document.getElementById('stTotalOffices').textContent = offices.length;
+    document.getElementById('stActiveOffices').textContent = activeOffices.length;
+
+    // حساب العمولات
+    const commissions = await sbFetch('commissions','GET',null,`?agent_id=eq.${agent.id}&select=*&order=created_at.desc`);
+    const pending = commissions.filter(c=>c.status==='pending').reduce((s,c)=>s+Number(c.amount),0);
+    const paid    = commissions.filter(c=>c.status==='paid').reduce((s,c)=>s+Number(c.amount),0);
+
+    document.getElementById('stPending').textContent  = pending.toLocaleString('ar-IQ') + ' د.ع';
+    document.getElementById('stEarned').textContent   = paid.toLocaleString('ar-IQ') + ' د.ع';
+    document.getElementById('commTotalPending').textContent = pending.toLocaleString('ar-IQ') + ' د.ع';
+    document.getElementById('commTotalPaid').textContent    = paid.toLocaleString('ar-IQ') + ' د.ع';
+    document.getElementById('commTotalNet').textContent     = (pending - paid).toLocaleString('ar-IQ') + ' د.ع';
+
+    // جدول المكاتب
+    renderAgentOffices(offices, agent.commission_rate || 0);
+    // جدول العمولات
+    renderCommissions(commissions, offices);
+
+  } catch(e) {
+    console.error('خطأ في تحميل البيانات:', e);
+  }
+}
+
+// ===== Render Offices =====
+function renderAgentOffices(offices, commRate) {
+  const tb = document.getElementById('agentOfficesTable');
+  if (!offices.length) { tb.innerHTML = '<tr><td colspan="6" class="empty-msg">لا توجد مكاتب مسجّلة بعد — سجّل أول مكتب!</td></tr>'; return; }
+
+  tb.innerHTML = offices.map(o => {
+    const isActive = !o.status || o.status === 'active';
+    const pkgPrice = PKG_PRICES[o.pkg] || 0;
+    const myComm   = Math.round(pkgPrice * commRate / 100);
+    const expiry   = o.expiry ? new Date(o.expiry).toLocaleDateString('ar-IQ') : '—';
+
+    return `<tr>
+      <td style="font-weight:700;">${o.name}</td>
+      <td>${o.phone}</td>
+      <td><span class="badge badge-gold">${o.pkg || 'free'}</span></td>
+      <td><span class="badge ${isActive?'badge-green':'badge-red'}">${isActive?'نشط':'موقوف'}</span></td>
+      <td>${expiry}</td>
+      <td style="color:var(--gold);font-weight:700;">${myComm.toLocaleString('ar-IQ')} د.ع</td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== Render Commissions =====
+function renderCommissions(commissions, offices) {
+  const tb = document.getElementById('commissionsTable');
+  if (!commissions.length) { tb.innerHTML = '<tr><td colspan="5" class="empty-msg">لا توجد سجلات عمولات بعد</td></tr>'; return; }
+
+  tb.innerHTML = commissions.map(c => {
+    const office = offices.find(o=>o.id===c.office_id);
+    const officeName = office ? office.name : c.office_name || '—';
+    const date = new Date(c.created_at).toLocaleDateString('ar-IQ');
+    return `<tr>
+      <td style="font-weight:600;">${officeName}</td>
+      <td>${c.month || '—'}</td>
+      <td style="color:var(--gold);font-weight:700;">${Number(c.amount).toLocaleString('ar-IQ')} د.ع</td>
+      <td><span class="badge ${c.status==='paid'?'badge-green':'badge-gray'}">${c.status==='paid'?'✅ مدفوع':'⏳ معلّق'}</span></td>
+      <td style="color:var(--muted);">${date}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== Register Office =====
+async function agentRegisterOffice() {
+  const session = getSession();
+  if (!session) return;
+
+  const name     = document.getElementById('regName').value.trim();
+  const phone    = document.getElementById('regPhone').value.trim();
+  const pass     = document.getElementById('regPass').value.trim();
+  const district = document.getElementById('regDistrict').value.trim();
+  const pkg      = document.getElementById('regPkg').value;
+  const msgEl    = document.getElementById('regMsg');
+
+  if (!name || !phone || !pass) {
+    msgEl.style.display='block'; msgEl.style.color='var(--danger)';
+    msgEl.textContent = '⚠️ يرجى تعبئة الحقول الإلزامية (الاسم، الهاتف، كلمة المرور)';
+    return;
+  }
+
+  const expiry = pkg !== 'free'
+    ? new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0]
+    : null;
+
+  try {
+    // التحقق من عدم تكرار الهاتف
+    const existing = await sbFetch('offices','GET',null,`?phone=eq.${phone}&select=id`);
+    if (existing && existing.length > 0) {
+      msgEl.style.display='block'; msgEl.style.color='var(--danger)';
+      msgEl.textContent = '❌ رقم الهاتف مسجّل مسبقاً';
+      return;
+    }
+
+    await sbFetch('offices','POST', {
+      name, phone, password: pass,
+      district: district || '',
+      pkg, status: 'active',
+      agent_id: session.agentId,
+      expiry, logo: '', description: ''
+    });
+
+    // إنشاء سجل عمولة تلقائي إذا الباقة مدفوعة
+    if (pkg !== 'free') {
+      const agent = await sbFetch('agents','GET',null,`?id=eq.${session.agentId}&select=commission_rate`);
+      const rate = agent[0]?.commission_rate || 0;
+      const amount = Math.round(PKG_PRICES[pkg] * rate / 100);
+      const month = new Date().toLocaleDateString('ar-IQ', {year:'numeric',month:'long'});
+      if (amount > 0) {
+        await sbFetch('commissions','POST',{
+          agent_id: session.agentId,
+          office_id: null,
+          office_name: name,
+          amount, month,
+          status: 'pending'
+        });
+      }
+    }
+
+    msgEl.style.display='block'; msgEl.style.color='var(--success)';
+    msgEl.textContent = `✅ تم تسجيل مكتب "${name}" بنجاح وربطه بحسابك!`;
+
+    // تصفير الحقول
+    ['regName','regPhone','regPass','regDistrict'].forEach(id => document.getElementById(id).value = '');
+
+    // تحديث البيانات
+    const agentData = await sbFetch('agents','GET',null,`?id=eq.${session.agentId}&select=*`);
+    if (agentData[0]) loadAgentData(agentData[0]);
+
+  } catch(e) {
+    msgEl.style.display='block'; msgEl.style.color='var(--danger)';
+    msgEl.textContent = '❌ خطأ: ' + e.message;
+  }
+}
+
+// ===== Copy Ref Link =====
+function copyRefLink() {
+  const link = document.getElementById('agentRefLink').textContent;
+  navigator.clipboard.writeText(link).then(() => alert('✅ تم نسخ الرابط!'));
+}
+
+// ===== Tabs =====
+function showTab(tabId, btn) {
+  ['tabOffices','tabCommissions','tabRegister'].forEach(id => {
+    document.getElementById(id).style.display = id === tabId ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
