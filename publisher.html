@@ -386,7 +386,7 @@
       <div class="row2">
         <div class="field">
           <label class="lbl">نوع الجمهور المستهدف</label>
-          <select id="post-type">
+          <select id="post-type" onchange="handleTypeChange()">
             <option value="buyer">🏠 باحث عن سكن</option>
             <option value="investor">📈 مستثمر عقاري</option>
             <option value="broker">🤝 مكتب عقارات / وسيط عقاري</option>
@@ -394,7 +394,13 @@
             <option value="reel">🎬 ريلز / تيك توك</option>
             <option value="promo">🔥 عرض عقار حصري</option>
             <option value="expat">🌍 مغتربون / عراق الخارج</option>
+            <option value="jobs">💼 باحث عن فرصة عمل</option>
+            <option value="custom">✏️ أخرى — اكتب يدوياً</option>
           </select>
+          <div id="custom-audience-row" style="display:none;margin-top:10px">
+            <label class="lbl">اكتب وصف الجمهور المستهدف</label>
+            <textarea id="custom-audience" placeholder="مثال: أصحاب المحلات التجارية الباحثين عن مكاتب للإيجار في البصرة..." style="min-height:70px"></textarea>
+          </div>
         </div>
         <div class="field">
           <label class="lbl">تفاصيل إضافية (اختياري)</label>
@@ -871,6 +877,17 @@ const TEMPLATES = {
   agent: d => `🔥 فرصة عمل وأنت في منزلك! 💰\n\nتبحث عن دخل إضافي بدون رأس مال ولا تعقيدات؟\n\nانضم لفريق وكلاء دليل البصرة العقاري وابدأ تربح من بيتك 🏠${d?'\n\nمطلوب وكلاء حالياً وبشكل خاص في منطقة '+d+'.':''}\n\n✅ نسبة عمولة مغرية تصل إلى 20% من قيمة كل تجديد اشتراك تجلبه\n✅ عقد رسمي موثّق يحفظ حقوقك، لمدة سنة كاملة قابلة للتجديد\n✅ لوحة تحكم خاصة بك لمتابعة عمولاتك ومكاتبك لحظة بلحظة\n✅ صرف العمولة شهرياً بأقصى مدة 15 يوم من نهاية كل شهر\n✅ بدون أي رسوم اشتراك أو التزام مالي — فقط جهدك وعلاقاتك\n✅ ندعمك بالمواد التسويقية والتدريب اللازم لتنطلق فوراً\n\n🎯 كل ما عليك تسويق خدماتنا للمكاتب العقارية في البصرة، وتربح من كل مكتب يشترك معك\n\n📲 للتسجيل أو الاستفسار، راسلنا الآن — 07719994201\n\n💌 شارك هذا المنشور مع من يفيده، فقد تفتح له فرصة عمره!`
 };
 
+function handleTypeChange() {
+  const type = document.getElementById('post-type').value;
+  const customRow = document.getElementById('custom-audience-row');
+  if (type === 'custom') {
+    customRow.style.display = 'block';
+    document.getElementById('custom-audience').focus();
+  } else {
+    customRow.style.display = 'none';
+  }
+}
+
 async function generatePost() {
   const type = document.getElementById('post-type').value;
   const detail = document.getElementById('post-detail').value.trim();
@@ -891,7 +908,9 @@ async function generatePost() {
     agent:    'شخص يريد العمل كوكيل عقاري وكسب عمولة شهرية',
     reel:     'محتوى ريلز/تيك توك قصير وجذاب مع توقيتات واضحة',
     promo:    'عرض عقار حصري ومميز للبيع أو الإيجار',
-    expat:    'مغترب عراقي خارج البلاد يريد الاستثمار أو شراء عقار في البصرة'
+    expat:    'مغترب عراقي خارج البلاد يريد الاستثمار أو شراء عقار في البصرة',
+    jobs:     'باحث عن فرصة عمل في قطاع العقارات أو المجالات المرتبطة به في البصرة',
+    custom:   document.getElementById('custom-audience')?.value?.trim() || 'جمهور عام'
   };
 
   // خصائص كل جمهور لتحسين الهاشتاكات
@@ -902,8 +921,18 @@ async function generatePost() {
     agent:    '#عمل_من_البيت #دخل_اضافي #وكيل_عقارات #فرصة_عمل #عمولة_مجزية',
     reel:     '#ريلز_عراق #تيك_توك_عراق #فيديو_قصير #محتوى_عقاري #ترند_البصرة',
     promo:    '#عقار_للبيع #بيت_للبيع #فيلا_للبيع #ارض_للبيع #فرصة_لا_تفوت',
-    expat:    '#عراقيين_الخارج #مغتربين_عراق #استثمر_في_العراق #عقارات_للمغتربين #بصرة_الاحبة'
+    expat:    '#عراقيين_الخارج #مغتربين_عراق #استثمر_في_العراق #عقارات_للمغتربين #بصرة_الاحبة',
+    jobs:     '#فرص_عمل_البصرة #وظائف_العراق #فرصة_عمل #عمل_البصرة #وظائف_البصرة',
+    custom:   '#عقارات_البصرة #دليل_عقارات_البصرة #البصرة #العراق #عقارات'
   };
+
+  // التحقق من إدخال الجمهور المخصص
+  if (type === 'custom' && !document.getElementById('custom-audience')?.value?.trim()) {
+    showToast('⚠️ يرجى كتابة وصف الجمهور المستهدف أولاً');
+    document.getElementById('ai-loader').classList.remove('show');
+    document.getElementById('custom-audience').focus();
+    return;
+  }
 
   const prompt = `أنت محلل تسويق رقمي وعقاري متخصص في سوق البصرة العراقي، وخبير في الهاشتاكات الفيروسية على فيسبوك وتيليغرام وإنستغرام وتيك توك.
 
