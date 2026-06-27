@@ -950,6 +950,7 @@ function rowToListing(row) {
     vip: !!row.vip,
     icon: row.icon || '🏠',
     image: row.image || '',
+    video_url: row.video_url || '',
     phone: row.phone || ''
   };
 }
@@ -1167,15 +1168,26 @@ async function sendVipWhatsapp() {
 
   if (!area || !price || !phone) { alert('⚠️ يرجى ملء جميع الحقول أولاً'); return; }
 
+  // رفع الصورة والفيديو قبل الحفظ
+  let vipImageUrl = '';
+  if (uploadedVisitorImgFile) {
+    try { vipImageUrl = await uploadToStorage(uploadedVisitorImgFile, 'properties', 'listings'); } catch(e) {}
+  }
+  let vipVideoUrl = '';
+  if (uploadedVisitorVideoFile) {
+    try { vipVideoUrl = await uploadVideoToStorage(uploadedVisitorVideoFile); } catch(e) {}
+  }
   try {
     await sbFetch('listings', 'POST', {
-      office_id: 'guest', office_name: 'زائر VIP — بانتظار الموافقة',
+      office_id: 'guest',
+      office_name: 'زائر VIP',
       type, action, price, area: '', district: area,
       deed_type: deedType, rooms: '-',
-      notes: 'طلب VIP — بانتظار تأكيد الدفع',
+      notes: type + ' في ' + area + ' — ' + action + ' بسعر ' + price,
       phone, vip: true, status: 'pending',
       icon: iconMap[type] || '🏠',
-      image: uploadedVisitorImgFile ? await uploadToStorage(uploadedVisitorImgFile, 'properties', 'listings').catch(()=>'') : ''
+      image: vipImageUrl,
+      video_url: vipVideoUrl
     });
   } catch(e) { console.warn('pending save failed:', e.message); }
 
