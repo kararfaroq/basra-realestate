@@ -871,7 +871,7 @@ const TEMPLATES = {
 async function generatePost() {
   const type = document.getElementById('post-type').value;
   const detail = document.getElementById('post-detail').value.trim();
-  const appLink = document.getElementById('cfg-link')?.value || 'https://basra-realestate.app';
+  const appLink = document.getElementById('cfg-link')?.value || 'https://basra-realestate.onrender.com';
   const sig = document.getElementById('cfg-sig')?.value || 'دليل عقارات البصرة 🏠';
   const hash = document.getElementById('cfg-hash')?.value || '#عقارات_البصرة';
 
@@ -879,39 +879,51 @@ async function generatePost() {
   document.getElementById('gen-box').classList.add('hidden');
 
   const typeLabels = {
-    buyer: 'باحث عن سكن (شقة أو بيت للإيجار أو الشراء)',
-    investor: 'مستثمر عقاري يبحث عن فرص استثمارية',
-    broker: 'مكتب عقارات أو وسيط عقاري',
-    agent: 'شخص يريد العمل كوكيل عقاري وكسب عمولة',
-    reel: 'محتوى ريلز/تيك توك قصير وجذاب مع توقيتات',
-    promo: 'عرض عقار حصري ومميز',
-    expat: 'مغترب عراقي خارج البلاد يريد الاستثمار في البصرة'
+    buyer:    'باحث عن سكن (شقة أو بيت للإيجار أو الشراء)',
+    investor: 'مستثمر عقاري يبحث عن فرص استثمارية مربحة',
+    broker:   'مكتب عقارات أو وسيط عقاري يريد توسيع عملائه',
+    agent:    'شخص يريد العمل كوكيل عقاري وكسب عمولة شهرية',
+    reel:     'محتوى ريلز/تيك توك قصير وجذاب مع توقيتات واضحة',
+    promo:    'عرض عقار حصري ومميز للبيع أو الإيجار',
+    expat:    'مغترب عراقي خارج البلاد يريد الاستثمار أو شراء عقار في البصرة'
   };
 
-  const prompt = `أنت خبير تسويق رقمي وعقاري متخصص في سوق البصرة العراقي ومتخصص في تحليل الهاشتاكات الرائجة على فيسبوك وتيليغرام وإنستغرام.
+  // خصائص كل جمهور لتحسين الهاشتاكات
+  const audienceHashtags = {
+    buyer:    '#شقق_للايجار #بيوت_للبيع #سكن_البصرة #ايجار_البصرة #شقق_البصرة',
+    investor: '#استثمار_عقاري #ارباح_العقار #فرص_استثمارية #عقارات_مربحة #استثمار_البصرة',
+    broker:   '#مكاتب_عقارية #وسيط_عقاري #عقارات_البصرة #سوق_العقار #دليل_عقارات',
+    agent:    '#عمل_من_البيت #دخل_اضافي #وكيل_عقارات #فرصة_عمل #عمولة_مجزية',
+    reel:     '#ريلز_عراق #تيك_توك_عراق #فيديو_قصير #محتوى_عقاري #ترند_البصرة',
+    promo:    '#عقار_للبيع #بيت_للبيع #فيلا_للبيع #ارض_للبيع #فرصة_لا_تفوت',
+    expat:    '#عراقيين_الخارج #مغتربين_عراق #استثمر_في_العراق #عقارات_للمغتربين #بصرة_الاحبة'
+  };
 
-مهمتك: اكتب منشور تسويقي عقاري فيروسي يصل لأكبر عدد ممكن من الناس.
+  const prompt = `أنت محلل تسويق رقمي وعقاري متخصص في سوق البصرة العراقي، وخبير في الهاشتاكات الفيروسية على فيسبوك وتيليغرام وإنستغرام وتيك توك.
 
-الجمهور المستهدف الأساسي: ${typeLabels[type] || type}
-الجمهور الموسّع: أهل البصرة، العراقيين داخل وخارج البلاد، المهتمين بالعقار والاستثمار
-${detail ? `التفاصيل: ${detail}` : ''}
-الرابط: ${appLink}
+مهمتك الآن: اكتب منشوراً تسويقياً عقارياً احترافياً يصل لأكبر شريحة جمهور ممكنة ويحقق أعلى تفاعل.
+
+═══ بيانات المنشور ═══
+الجمهور المستهدف: ${typeLabels[type] || type}
+${detail ? `تفاصيل العقار أو المحتوى: ${detail}` : ''}
+رابط الموقع: ${appLink}
 التوقيع: ${sig}
 
-اكتب المنشور باللهجة العراقية الدارجة مع:
-- عنوان صادم وجذاب جداً في السطر الأول يجعل الناس يتوقفون عن التمرير
-- محتوى عاطفي ومقنع يلامس احتياج حقيقي
-- إيموجيات قوية ومناسبة في كل سطر تقريباً
-- دعوة قوية للتفاعل (شارك، علّق، أرسل لصديق)
-- في النهاية أضف هاشتاكات رائجة وفيروسية تشمل:
-  * هاشتاكات البصرة المحلية
-  * هاشتاكات العقار العراقي
-  * هاشتاكات رائجة عامة تجذب جمهور أوسع عربي
-  * هاشتاكات الاستثمار والمال
-  اجعل عدد الهاشتاكات بين 15-20 هاشتاك متنوعة وقوية
-- أضف الرابط والتوقيع
+═══ تعليمات الكتابة ═══
+① السطر الأول: عنوان صادم يوقف التمرير — استخدم رقماً أو سؤالاً أو خبراً مثيراً
+② الجسم: باللهجة العراقية الدارجة — محتوى عاطفي يلامس ألم حقيقي أو حلم حقيقي للجمهور
+③ إيموجي قوي في بداية كل سطر تقريباً
+④ دعوة للتفاعل: اطلب التعليق أو المشاركة أو الإرسال لشخص معين
+⑤ أضف الرابط والتوقيع قبل الهاشتاكات
 
-اكتب المنشور مباشرة بدون أي مقدمة أو شرح.`;
+═══ الهاشتاكات (مهم جداً) ═══
+اختر 20 هاشتاك مدروسة وفعّالة موزعة كالتالي:
+• 5 هاشتاكات محلية خاصة بالبصرة والمنطقة (ابدأ بها)
+• 5 هاشتاكات عقارية عراقية رائجة: ${audienceHashtags[type] || audienceHashtags.buyer}
+• 5 هاشتاكات عربية واسعة الانتشار للوصول لجمهور أكبر
+• 5 هاشتاكات ترند عامة (استثمار، مال، نجاح، فرص)
+
+اكتب المنشور مباشرة من السطر الأول — بدون أي مقدمة أو شرح أو عنوان خارجي.`;
 
   try {
     const GROQ_KEY = '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';
@@ -1440,9 +1452,28 @@ function loadAPIKeys() {
 }
 
 function saveSettings() {
+  const settings = {
+    appLink: document.getElementById('cfg-link').value || 'https://basra-realestate.onrender.com',
+    sig:     document.getElementById('cfg-sig').value  || 'دليل عقارات البصرة 🏠',
+    hash:    document.getElementById('cfg-hash').value || '#عقارات_البصرة'
+  };
+  localStorage.setItem('basra_settings', JSON.stringify(settings));
   document.getElementById('settings-notify').style.display = 'block';
   setTimeout(() => document.getElementById('settings-notify').style.display = 'none', 2000);
   showToast('⚙️ تم حفظ الإعدادات');
+}
+
+function loadSettings() {
+  const saved = localStorage.getItem('basra_settings');
+  const defaults = {
+    appLink: 'https://basra-realestate.onrender.com',
+    sig:     'دليل عقارات البصرة 🏠',
+    hash:    '#عقارات_البصرة #دليل_عقارات_البصرة #شقق_البصرة #سوق_العقار_البصرة'
+  };
+  const s = saved ? { ...defaults, ...JSON.parse(saved) } : defaults;
+  document.getElementById('cfg-link').value = s.appLink;
+  document.getElementById('cfg-sig').value  = s.sig;
+  document.getElementById('cfg-hash').value = s.hash;
 }
 
 function showToast(msg) {
@@ -1666,6 +1697,7 @@ async function doPublishSbItem() {
 // showPanel مُحدَّثة في تعريفها الأصلي أعلاه
 
 loadAPIKeys();
+loadSettings();
 // تفعيل تيليغرام تلقائياً
 (function() {
   const saved = localStorage.getItem('basra_api_keys');
