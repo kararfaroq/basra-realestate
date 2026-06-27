@@ -1597,22 +1597,12 @@ function buildListingPost(l) {
   const desc = l.description || l.desc || '';
   const office = l.office_name || l.office || 'دليل البصرة';
 
-  return `${icon} ${type} ${action} في ${district}
+  const areaLine  = area  ? '📐 ' + area  + '\n' : '';
+  const roomsLine = rooms ? '🛏️ ' + rooms + '\n' : '';
+  const deedLine  = deed  ? '📄 ' + deed  + '\n' : '';
+  const descLine  = desc  ? '\n' + desc + '\n'   : '';
 
-💰 السعر: ${price}
-${area ? '📐 ' + area + '
-' : ''}${rooms ? '🛏️ ' + rooms + '
-' : ''}${deed ? '📄 ' + deed + '
-' : ''}${desc ? '
-' + desc + '
-' : ''}
-🏢 المكتب: ${office}
-📲 للتواصل والمزيد من العقارات:
-${appLink}
-
-${sig}
-
-${hash}`;
+  return `${icon} ${type} ${action} في ${district}\n\n💰 السعر: ${price}\n${areaLine}${roomsLine}${deedLine}${descLine}\n🏢 المكتب: ${office}\n📲 للتواصل والمزيد من العقارات:\n${appLink}\n\n${sig}\n\n${hash}`;
 }
 
 async function generatePostFromListing(listingJson) {
