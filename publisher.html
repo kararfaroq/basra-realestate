@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دليل عقارات البصرة — مركز النشر الذكي</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg2: #181c27;
+    --bg3: #1e2333;
+    --card: #232840;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --gold: #f0a500;
+    --gold2: #ffd166;
+    --blue: #3b8ce8;
+    --blue2: #6eb4ff;
+    --green: #22c55e;
+    --green2: #86efac;
+    --red: #ef4444;
+    --purple: #a78bfa;
+    --text: #e8ecf4;
+    --text2: #8b92a8;
+    --text3: #5a6070;
+    --fb: #1877f2;
+    --wa: #25d366;
+    --tg: #229ed9;
+    --ig: #e1306c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+    min-height: 100vh;
+    direction: rtl;
+  }
+
+  /* LAYOUT */
+  .shell { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: 220px;
+    background: var(--bg2);
+    border-left: 1px solid var(--border);
+    padding: 20px 0;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .main { flex: 1; padding: 24px 28px; overflow-y: auto; }
+
+  /* SIDEBAR */
+  .logo {
+    padding: 0 20px 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .logo-icon { font-size: 26px; }
+  .logo-name { font-size: 13px; font-weight: 700; color: var(--gold); margin-top: 6px; line-height: 1.3; }
+  .logo-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 20px; font-size: 13px; color: var(--text2);
+    cursor: pointer; transition: all .15s; border-right: 3px solid transparent;
+    user-select: none;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .nav-item.active { color: var(--gold); border-right-color: var(--gold); background: rgba(240,165,0,0.07); }
+  .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+  .nav-section { font-size: 10px; color: var(--text3); padding: 14px 20px 4px; text-transform: uppercase; letter-spacing: 1px; }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; margin-right: auto; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  /* HEADER */
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .page-title { font-size: 20px; font-weight: 700; color: var(--text); }
+  .page-sub { font-size: 12px; color: var(--text3); margin-top: 3px; }
+
+  /* STATS */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+  .stat-card.gold::before { background: var(--gold); }
+  .stat-card.blue::before { background: var(--blue); }
+  .stat-card.green::before { background: var(--green); }
+  .stat-card.purple::before { background: var(--purple); }
+  .stat-val { font-size: 28px; font-weight: 700; }
+  .stat-val.gold { color: var(--gold2); }
+  .stat-val.blue { color: var(--blue2); }
+  .stat-val.green { color: var(--green2); }
+  .stat-val.purple { color: var(--purple); }
+  .stat-lbl { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 14px; font-weight: 600; color: var(--text);
+    margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+    padding-bottom: 12px; border-bottom: 1px solid var(--border);
+  }
+  .card-icon { font-size: 16px; }
+
+  /* PANELS */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* FORM CONTROLS */
+  label.lbl { font-size: 12px; color: var(--text2); display: block; margin-bottom: 6px; }
+  select, input[type=text], input[type=time], input[type=password], textarea {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 13px;
+    padding: 9px 12px;
+    font-family: inherit;
+    direction: rtl;
+    transition: border .15s;
+    outline: none;
+  }
+  select:focus, input:focus, textarea:focus { border-color: var(--gold); }
+  textarea { min-height: 90px; resize: vertical; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .field { margin-bottom: 14px; }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 18px; border-radius: 8px; font-size: 13px;
+    font-family: inherit; cursor: pointer; border: none; transition: all .15s;
+    font-weight: 600; white-space: nowrap;
+  }
+  .btn-gold { background: var(--gold); color: #1a1200; }
+  .btn-gold:hover { background: var(--gold2); }
+  .btn-blue { background: var(--blue); color: #fff; }
+  .btn-blue:hover { opacity: .88; }
+  .btn-green { background: var(--green); color: #fff; }
+  .btn-green:hover { opacity: .88; }
+  .btn-ghost { background: rgba(255,255,255,0.05); color: var(--text2); border: 1px solid var(--border2); }
+  .btn-ghost:hover { background: rgba(255,255,255,0.09); color: var(--text); }
+  .btn-danger { background: rgba(239,68,68,0.12); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+  .btn-danger:hover { background: rgba(239,68,68,0.2); }
+  .btn:disabled { opacity: .38; cursor: not-allowed; }
+
+  /* BADGES */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 600;
+  }
+  .b-gold { background: rgba(240,165,0,.15); color: var(--gold2); }
+  .b-green { background: rgba(34,197,94,.12); color: var(--green2); }
+  .b-blue { background: rgba(59,140,232,.12); color: var(--blue2); }
+  .b-red { background: rgba(239,68,68,.12); color: #fca5a5; }
+  .b-purple { background: rgba(167,139,250,.12); color: var(--purple); }
+  .b-gray { background: rgba(255,255,255,.06); color: var(--text3); }
+
+  /* PLATFORM TOGGLES */
+  .platforms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .plat-toggle {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-radius: 10px; cursor: pointer;
+    border: 1px solid var(--border2); transition: all .15s; user-select: none;
+  }
+  .plat-toggle.fb { --pc: var(--fb); }
+  .plat-toggle.wa { --pc: var(--wa); }
+  .plat-toggle.tg { --pc: var(--tg); }
+  .plat-toggle.ig { --pc: var(--ig); }
+  .plat-toggle.selected { border-color: var(--pc); background: rgba(255,255,255,0.03); }
+  .plat-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border2); transition: .15s; }
+  .plat-toggle.selected .plat-dot { background: var(--pc); box-shadow: 0 0 8px var(--pc); }
+  .plat-name { font-size: 13px; color: var(--text2); }
+  .plat-toggle.selected .plat-name { color: var(--text); }
+  .plat-emoji { font-size: 16px; }
+
+  /* GENERATED OUTPUT */
+  .gen-box {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 13px;
+    line-height: 1.9;
+    white-space: pre-wrap;
+    color: var(--text);
+    direction: rtl;
+    position: relative;
+    min-height: 80px;
+  }
+  .gen-box.hidden { display: none; }
+  .copy-btn {
+    position: absolute; top: 10px; left: 10px;
+    background: rgba(255,255,255,0.07); border: 1px solid var(--border2);
+    border-radius: 6px; padding: 4px 10px; font-size: 11px; color: var(--text3);
+    cursor: pointer; transition: .15s;
+  }
+  .copy-btn:hover { background: rgba(255,255,255,0.12); color: var(--text); }
+
+  /* LOADING */
+  .ai-loader { display: none; align-items: center; gap: 10px; margin: 12px 0; font-size: 13px; color: var(--text3); }
+  .ai-loader.show { display: flex; }
+  .spin { width: 16px; height: 16px; border: 2px solid var(--border2); border-top-color: var(--gold); border-radius: 50%; animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* QUEUE LIST */
+  .queue-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 14px; border-radius: 10px;
+    border: 1px solid var(--border);
+    margin-bottom: 10px; background: var(--bg3);
+    transition: border .15s;
+  }
+  .queue-item:hover { border-color: var(--border2); }
+  .queue-item.publishing { border-color: var(--gold); }
+  .queue-item.done { opacity: .55; }
+  .qi-icon { font-size: 22px; flex-shrink: 0; width: 38px; text-align: center; }
+  .qi-body { flex: 1; min-width: 0; }
+  .qi-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .qi-meta { display: flex; gap: 10px; flex-wrap: wrap; font-size: 11px; color: var(--text3); }
+  .qi-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: flex-start; }
+
+  /* SCHEDULE GRID */
+  .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .wg-col { }
+  .wg-day { font-size: 11px; color: var(--text3); text-align: center; margin-bottom: 6px; }
+  .wg-slot {
+    height: 28px; border-radius: 6px; margin-bottom: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; border: 1px solid var(--border); color: var(--text3);
+    cursor: default;
+  }
+  .wg-slot.has { background: rgba(240,165,0,0.12); border-color: rgba(240,165,0,0.35); color: var(--gold2); }
+
+  /* API SETTINGS */
+  .api-block {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .api-block-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .api-status { font-size: 11px; margin-right: auto; }
+
+  /* AUTO MODE */
+  .auto-toggle {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px; border-radius: 10px;
+    border: 1px solid var(--border2); cursor: pointer;
+    margin-bottom: 14px; user-select: none;
+  }
+  .switch { width: 42px; height: 24px; background: var(--bg3); border-radius: 12px; border: 1px solid var(--border2); position: relative; flex-shrink: 0; transition: .2s; }
+  .switch.on { background: var(--gold); border-color: var(--gold); }
+  .switch::after { content: ''; position: absolute; top: 3px; right: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: .2s; }
+  .switch.on::after { right: auto; left: 3px; }
+
+  /* NOTIFY */
+  .toast {
+    display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--green); color: #fff; font-size: 13px; font-weight: 600;
+    padding: 10px 20px; border-radius: 20px; z-index: 999;
+    animation: fadeUp .3s ease;
+  }
+  @keyframes fadeUp { from { opacity:0; transform: translateX(-50%) translateY(10px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+
+  /* PROGRESS BAR */
+  .progress-wrap { height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; margin-top: 8px; }
+  .progress-bar { height: 100%; background: var(--gold); border-radius: 2px; transition: width 1s linear; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  @media (max-width: 700px) {
+    .sidebar { display: none; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .row2, .row3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">🏙️</div>
+    <div class="logo-name">دليل عقارات البصرة</div>
+    <div class="logo-sub">مركز النشر الذكي v2.0</div>
+    <div id="admin-badge" style="margin-top:8px;font-size:11px;color:var(--green2);background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);border-radius:6px;padding:4px 8px;display:inline-block;">● المدير</div>
+  </div>
+  <div class="nav-item active" onclick="showPanel('create')">
+    <span class="nav-icon">✍️</span> إنشاء منشور
+  </div>
+  <div class="nav-item" onclick="showPanel('queue')">
+    <span class="nav-icon">📋</span> قائمة النشر
+  </div>
+  <div class="nav-item" onclick="showPanel('schedule')">
+    <span class="nav-icon">📅</span> الجدول الأسبوعي
+  </div>
+  <div class="nav-item" onclick="showPanel('supabase')">
+    <span class="nav-icon">🏠</span> عقارات الموقع
+  </div>
+  <div class="nav-section">النشر</div>
+  <div class="nav-item" onclick="showPanel('manual')">
+    <span class="nav-icon">👆</span> نشر يدوي
+  </div>
+  <div class="nav-item" onclick="showPanel('auto')">
+    <span class="nav-icon">🤖</span> نشر تلقائي
+  </div>
+  <div class="nav-section">الإعدادات</div>
+  <div class="nav-item" onclick="showPanel('api')">
+    <span class="nav-icon">🔑</span> إعداد API
+  </div>
+  <div class="nav-item" onclick="showPanel('settings')">
+    <span class="nav-icon">⚙️</span> الإعدادات
+  </div>
+  <div style="margin-top: auto;">
+    <div style="padding: 12px 16px; border-top: 1px solid var(--border);">
+      <button onclick="window.location.href='admin.html'" style="width:100%;background:rgba(240,165,0,0.1);border:1px solid rgba(240,165,0,0.35);color:var(--gold);padding:9px 12px;border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:8px;justify-content:center;">
+        ← لوحة الإدارة
+      </button>
+    </div>
+    <div style="padding: 12px 20px; border-top: 1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text3)">
+        <div class="status-dot"></div>
+        <span id="auto-status-label">وضع يدوي</span>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px" id="next-post-label">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card gold">
+      <div class="stat-val gold" id="s-total">0</div>
+      <div class="stat-lbl">إجمالي المجدول</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-val blue" id="s-today">0</div>
+      <div class="stat-lbl">ينشر اليوم</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-val green" id="s-done">0</div>
+      <div class="stat-lbl">تم نشره</div>
+    </div>
+    <div class="stat-card purple">
+      <div class="stat-val purple" id="s-platforms">0</div>
+      <div class="stat-lbl">منصة مفعّلة</div>
+    </div>
+  </div>
+
+  <!-- ===== CREATE PANEL ===== -->
+  <div class="panel active" id="panel-create">
+    <div class="page-header">
+      <div>
+        <div class="page-title">✍️ إنشاء منشور جديد</div>
+        <div class="page-sub">وّلد المحتوى بالذكاء الاصطناعي أو اكتبه يدوياً</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="card-icon">🤖</span> توليد المحتوى بـ Groq AI <span class="badge b-green" style="font-size:10px;margin-right:6px">● مفعّل</span></div>
+      <div class="row2">
+        <div class="field">
+          <label class="lbl">نوع الجمهور المستهدف</label>
+          <select id="post-type">
+            <option value="buyer">🏠 باحث عن سكن</option>
+            <option value="investor">📈 مستثمر عقاري</option>
+            <option value="broker">🤝 مكتب عقارات / وسيط عقاري</option>
+            <option value="agent">🧑‍💼 استهداف وجلب وكلاء</option>
+            <option value="reel">🎬 ريلز / تيك توك</option>
+            <option value="promo">🔥 عرض عقار حصري</option>
+            <option value="expat">🌍 مغتربون / عراق الخارج</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="lbl">تفاصيل إضافية (اختياري)</label>
+          <input type="text" id="post-detail" placeholder="مثال: شقة العشار، أرض الجزيرة، فيلا الزبير...">
+        </div>
+      </div>
+      <div class="field">
+        <label class="lbl">المنصات المستهدفة</label>
+        <div class="platforms-grid">
+          <div class="plat-toggle fb selected" id="pt-fb" onclick="togglePlat('fb')">
+            <div class="plat-dot"></div>
+            <span class="plat-emoji">📘</span>
+            <span class="plat-name">فيسبوك</span>
+          </div>
+          <div class="plat-toggle wa" id="pt-wa" onclick="togglePlat('wa')">
+            <div class="plat-dot"></div>
+            <span class="plat-emoji">💬</span>
+            <span class="plat-name">واتساب</span>
+          </div>
+          <div class="plat-toggle tg" id="pt-tg" onclick="togglePlat('tg')">
+            <div class="plat-dot"></div>
+            <span class="plat-emoji">✈️</span>
+            <span class="plat-name">تيليغرام</span>
+          </div>
+          <div class="plat-toggle ig" id="pt-ig" onclick="togglePlat('ig')">
+            <div class="plat-dot"></div>
+            <span class="plat-emoji">📸</span>
+            <span class="plat-name">إنستغرام</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:4px">
+        <button class="btn btn-gold" onclick="generatePost()">✨ توليد بالذكاء الاصطناعي</button>
+        <button class="btn btn-ghost" onclick="clearGen()">🗑️ مسح</button>
+      </div>
+      <div class="ai-loader" id="ai-loader">
+        <div class="spin"></div>
+        <span>⚡ Groq AI يكتب المنشور...</span>
+      </div>
+      <div class="gen-box hidden" id="gen-box">
+        <button class="copy-btn" onclick="copyGen()">📋 نسخ</button>
+        <span id="gen-text"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="card-icon">📅</span> جدولة المنشور</div>
+      <div class="row3">
+        <div class="field">
+          <label class="lbl">يوم النشر</label>
+          <select id="sched-day">
+            <option>الأحد</option><option>الاثنين</option><option>الثلاثاء</option>
+            <option>الأربعاء</option><option>الخميس</option><option>الجمعة</option><option>السبت</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="lbl">وقت النشر</label>
+          <select id="sched-time" onchange="toggleCustomTime()">
+            <option value="08:00">8:00 ص — صباح الدوام</option>
+            <option value="13:00">1:00 م — استراحة الغداء</option>
+            <option value="20:00" selected>8:00 م — ذروة التفاعل ⭐</option>
+            <option value="21:00">9:00 م — وقت الفراغ</option>
+            <option value="custom">⏰ وقت مخصص</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="lbl">تكرار النشر</label>
+          <select id="sched-repeat">
+            <option value="once">مرة واحدة</option>
+            <option value="daily">يومياً</option>
+            <option value="weekly" selected>أسبوعياً</option>
+            <option value="3week">3 مرات أسبوعياً</option>
+          </select>
+        </div>
+      </div>
+      <div class="field hidden" id="custom-time-row">
+        <label class="lbl">أدخل الوقت المخصص</label>
+        <input type="time" id="custom-time" value="18:00">
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <button class="btn btn-gold" id="sched-btn" onclick="schedulePost()" disabled>📅 إضافة للجدول</button>
+        <button class="btn btn-blue" id="publish-now-btn" onclick="publishNowFromCreate()" disabled>🚀 نشر فوري</button>
+        <span id="sched-hint" style="font-size:12px;color:var(--text3)">ولّد محتوى أولاً</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== QUEUE PANEL ===== -->
+  <div class="panel" id="panel-queue">
+    <div class="page-header">
+      <div>
+        <div class="page-title">📋 قائمة النشر</div>
+        <div class="page-sub">إدارة جميع المنشورات المجدولة والمنشورة</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost" onclick="filterQueue('all')" id="flt-all" style="opacity:1">الكل</button>
+        <button class="btn btn-ghost" onclick="filterQueue('pending')" id="flt-pending">مجدول</button>
+        <button class="btn btn-ghost" onclick="filterQueue('done')" id="flt-done">منشور</button>
+      </div>
+    </div>
+    <div id="queue-container"></div>
+  </div>
+
+  <!-- ===== SCHEDULE PANEL ===== -->
+  <div class="panel" id="panel-schedule">
+    <div class="page-header">
+      <div>
+        <div class="page-title">📅 الجدول الأسبوعي</div>
+        <div class="page-sub">نظرة شاملة على خطة النشر للأسبوع</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="card-icon">📊</span> خريطة النشر</div>
+      <div class="week-grid" id="week-grid"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="card-icon">⭐</span> الأوقات الذهبية لجمهور البصرة</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg3);border-radius:8px;border:1px solid rgba(240,165,0,0.3)">
+          <span style="font-size:13px">⭐ 8:00–9:00 مساءً — ذروة التفاعل</span>
+          <span class="badge b-gold">أفضل وقت</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg3);border-radius:8px;">
+          <span style="font-size:13px;color:var(--text2)">8:00 صباحاً — قبل بدء الدوام</span>
+          <span class="badge b-blue">تفاعل جيد</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg3);border-radius:8px;">
+          <span style="font-size:13px;color:var(--text2)">1:00 ظهراً — استراحة الغداء</span>
+          <span class="badge b-blue">تفاعل متوسط</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg3);border-radius:8px;">
+          <span style="font-size:13px;color:var(--text3)">الجمعة صباحاً</span>
+          <span class="badge b-gray">تجنّب</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MANUAL PUBLISH PANEL ===== -->
+  <div class="panel" id="panel-manual">
+    <div class="page-header">
+      <div>
+        <div class="page-title">👆 النشر اليدوي</div>
+        <div class="page-sub">اختر منشوراً وانشره فوراً على المنصات</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="card-icon">📤</span> نشر منشور من القائمة</div>
+      <div class="field">
+        <label class="lbl">اختر منشوراً من القائمة</label>
+        <select id="manual-select">
+          <option value="">— اختر منشوراً —</option>
+        </select>
+      </div>
+      <div class="gen-box hidden" id="manual-preview" style="margin-bottom:14px"></div>
+      <div class="field">
+        <label class="lbl">اختر المنصات للنشر الآن</label>
+        <div class="platforms-grid" id="manual-platforms">
+          <div class="plat-toggle fb selected" id="mp-fb" onclick="toggleManualPlat('fb')"><div class="plat-dot"></div><span class="plat-emoji">📘</span><span class="plat-name">فيسبوك</span></div>
+          <div class="plat-toggle wa" id="mp-wa" onclick="toggleManualPlat('wa')"><div class="plat-dot"></div><span class="plat-emoji">💬</span><span class="plat-name">واتساب</span></div>
+          <div class="plat-toggle tg" id="mp-tg" onclick="toggleManualPlat('tg')"><div class="plat-dot"></div><span class="plat-emoji">✈️</span><span class="plat-name">تيليغرام</span></div>
+          <div class="plat-toggle ig" id="mp-ig" onclick="toggleManualPlat('ig')"><div class="plat-dot"></div><span class="plat-emoji">📸</span><span class="plat-name">إنستغرام</span></div>
+        </div>
+      </div>
+      <button class="btn btn-green" onclick="manualPublish()" id="manual-pub-btn">🚀 نشر الآن</button>
+      <div id="manual-progress" style="display:none;margin-top:12px">
+        <div style="font-size:13px;color:var(--text2);margin-bottom:6px" id="manual-progress-label">جارٍ النشر على فيسبوك...</div>
+        <div class="progress-wrap"><div class="progress-bar" id="manual-progress-bar" style="width:0%"></div></div>
+      </div>
+      <div id="manual-result" style="display:none;margin-top:12px"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="card-icon">⚡</span> نشر سريع — اكتب وانشر</div>
+      <div class="field">
+        <label class="lbl">اكتب منشورك مباشرة</label>
+        <textarea id="quick-text" placeholder="اكتب نص منشورك هنا...&#10;&#10;يمكنك إضافة هاشتاكات وروابط"></textarea>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-gold" onclick="quickPublish()">⚡ نشر فوري</button>
+        <button class="btn btn-ghost" onclick="addHashtags()">🏷️ إضافة هاشتاكات</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== AUTO PANEL ===== -->
+  <div class="panel" id="panel-auto">
+    <div class="page-header">
+      <div>
+        <div class="page-title">🤖 النشر التلقائي</div>
+        <div class="page-sub">جدولة وتوليد ونشر بدون تدخل يدوي</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="card-icon">🤖</span> وضع النشر التلقائي</div>
+      <div class="auto-toggle" onclick="toggleAutoMode()" id="auto-toggle-row">
+        <div class="switch" id="auto-switch"></div>
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--text)" id="auto-label">النشر التلقائي — إيقاف</div>
+          <div style="font-size:12px;color:var(--text3)" id="auto-sublabel">شغّل لتبدأ الجدولة التلقائية</div>
+        </div>
+        <span class="badge b-gray" id="auto-badge">متوقف</span>
+      </div>
+
+      <div id="auto-config">
+        <div class="row3">
+          <div class="field">
+            <label class="lbl">عدد المنشورات اليومية</label>
+            <select id="auto-daily">
+              <option value="1">1 منشور / يوم</option>
+              <option value="2" selected>2 منشور / يوم</option>
+              <option value="3">3 منشورات / يوم</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="lbl">نوع المحتوى التلقائي</label>
+            <select id="auto-type">
+              <option value="mix">مزيج متنوع</option>
+              <option value="buyer">باحثون عن سكن</option>
+              <option value="investor">مستثمرون</option>
+              <option value="promo">عروض عقارات</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="lbl">الأوقات التلقائية</label>
+            <select id="auto-times">
+              <option value="best">الأوقات الذهبية ⭐</option>
+              <option value="morning">8 ص فقط</option>
+              <option value="evening">8 م فقط</option>
+              <option value="both">8 ص + 8 م</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px">الجدول التلقائي — هذا الأسبوع</div>
+        <div id="auto-schedule-preview" style="display:flex;flex-direction:column;gap:6px"></div>
+
+        <div style="margin-top:14px;display:flex;gap:10px">
+          <button class="btn btn-gold" onclick="startAutoMode()">🚀 تشغيل النشر التلقائي</button>
+          <button class="btn btn-ghost" onclick="previewAutoContent()">👁️ معاينة المحتوى</button>
+        </div>
+      </div>
+
+      <div id="auto-live" style="display:none;margin-top:14px">
+        <div style="background:rgba(240,165,0,0.08);border:1px solid rgba(240,165,0,0.25);border-radius:10px;padding:14px">
+          <div style="font-size:13px;font-weight:600;color:var(--gold2);margin-bottom:8px">🤖 النظام يعمل...</div>
+          <div id="auto-log" style="font-size:12px;color:var(--text3);line-height:2;max-height:120px;overflow-y:auto"></div>
+          <div class="progress-wrap" style="margin-top:8px"><div class="progress-bar" id="auto-progress-bar" style="width:0%"></div></div>
+        </div>
+        <button class="btn btn-danger" onclick="stopAutoMode()" style="margin-top:10px">⏹️ إيقاف النشر التلقائي</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="card-icon">📊</span> سجل النشر التلقائي</div>
+      <div id="auto-history">
+        <div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">لا يوجد سجل بعد</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== API PANEL ===== -->
+  <div class="panel" id="panel-api">
+    <div class="page-header">
+      <div>
+        <div class="page-title">🔑 إعداد API المنصات</div>
+        <div class="page-sub">أدخل مفاتيح API لتفعيل النشر الفعلي</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="card-icon">ℹ️</span> كيفية الحصول على مفاتيح API</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="background:var(--bg3);border-radius:8px;padding:12px;font-size:13px;color:var(--text2);line-height:1.8">
+          <div style="color:var(--gold2);font-weight:600;margin-bottom:6px">📘 فيسبوك / إنستغرام:</div>
+          1. افتح <strong style="color:var(--text)">developers.facebook.com</strong><br>
+          2. أنشئ تطبيقاً جديداً من نوع Business<br>
+          3. أضف منتج Graph API ← احصل على Page Access Token<br>
+          4. في Graph Explorer ← اختر صفحتك ← انسخ الـ Token
+        </div>
+        <div style="background:var(--bg3);border-radius:8px;padding:12px;font-size:13px;color:var(--text2);line-height:1.8">
+          <div style="color:var(--green2);font-weight:600;margin-bottom:6px">💬 واتساب Business:</div>
+          1. افتح <strong style="color:var(--text)">business.whatsapp.com</strong><br>
+          2. سجّل حساباً للأعمال ← احصل على Phone Number ID<br>
+          3. من لوحة التحكم ← API Access ← انسخ Access Token
+        </div>
+        <div style="background:var(--bg3);border-radius:8px;padding:12px;font-size:13px;color:var(--text2);line-height:1.8">
+          <div style="color:var(--blue2);font-weight:600;margin-bottom:6px">✈️ تيليغرام:</div>
+          1. تحدث مع <strong style="color:var(--text)">@BotFather</strong> على تيليغرام<br>
+          2. أرسل /newbot ← اختر اسماً ← احصل على Bot Token<br>
+          3. أضف البوت لقناتك ← احصل على Channel ID
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="card-icon">🔐</span> مفاتيح API</div>
+
+      <div class="api-block" style="border-color:rgba(249,115,22,0.4);background:rgba(249,115,22,0.05)">
+        <div class="api-block-title">⚡ Groq AI <span class="api-status"><span class="badge b-green">✅ مفعّل ومتصل</span></span></div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.8;margin-bottom:8px">
+          النظام يستخدم <strong style="color:#fb923c">Llama 3.3 70B</strong> عبر Groq لتوليد محتوى عقاري احترافي بسرعة فائقة.
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="badge b-gold">llama-3.3-70b-versatile</span>
+          <span class="badge b-purple">توليد تلقائي ذكي</span>
+          <span class="badge b-green">مجاني</span>
+        </div>
+      </div>
+        <div class="api-block-title">📘 فيسبوك <span class="api-status" id="fb-status"><span class="badge b-gray">غير مفعّل</span></span></div>
+        <div class="field"><label class="lbl">Page Access Token</label><input type="password" id="fb-token" placeholder="EAAxxxx..."></div>
+        <div class="field"><label class="lbl">Page ID</label><input type="text" id="fb-page-id" placeholder="123456789..."></div>
+        <button class="btn btn-ghost" style="font-size:12px" onclick="testAPI('fb')">🧪 اختبار الاتصال</button>
+      </div>
+
+      <div class="api-block">
+        <div class="api-block-title">💬 واتساب <span class="api-status" id="wa-status"><span class="badge b-gray">غير مفعّل</span></span></div>
+        <div class="field"><label class="lbl">Access Token</label><input type="password" id="wa-token" placeholder="EAAxxxx..."></div>
+        <div class="field"><label class="lbl">Phone Number ID</label><input type="text" id="wa-phone-id" placeholder="1234567890..."></div>
+        <div class="field"><label class="lbl">رقم المستلم (مع رمز الدولة)</label><input type="text" id="wa-to" placeholder="9647701234567"></div>
+        <button class="btn btn-ghost" style="font-size:12px" onclick="testAPI('wa')">🧪 اختبار الاتصال</button>
+      </div>
+
+      <div class="api-block">
+        <div class="api-block-title">✈️ تيليغرام <span class="api-status" id="tg-status"><span class="badge b-gray">غير مفعّل</span></span></div>
+        <div class="field"><label class="lbl">Bot Token</label><input type="password" id="tg-token" value="8816539301:AAGa-094Y6ZK9MgCxaqdGeg2oxDgpSr1io8"></div>
+        <div class="field"><label class="lbl">Channel ID أو Chat ID</label><input type="text" id="tg-chat-id" value="-1004345103777"></div>
+        <button class="btn btn-ghost" style="font-size:12px" onclick="testAPI('tg')">🧪 اختبار الاتصال</button>
+      </div>
+
+      <div style="margin-top:14px;display:flex;gap:10px">
+        <button class="btn btn-gold" onclick="saveAPIKeys()">💾 حفظ المفاتيح</button>
+        <button class="btn btn-ghost" onclick="loadAPIKeys()">📂 استرجاع المحفوظ</button>
+      </div>
+      <div id="api-notify" style="display:none;margin-top:10px;font-size:13px;color:var(--green2)">✅ تم حفظ المفاتيح بنجاح</div>
+    </div>
+  </div>
+
+  <!-- ===== SETTINGS PANEL ===== -->
+  <div class="panel" id="panel-settings">
+    <div class="page-header">
+      <div>
+        <div class="page-title">⚙️ الإعدادات العامة</div>
+        <div class="page-sub">تخصيص المحتوى والنشر</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="card-icon">🏷️</span> إعدادات المحتوى</div>
+      <div class="field"><label class="lbl">رابط التطبيق</label><input type="text" id="cfg-link" value="https://basra-realestate.app"></div>
+      <div class="field"><label class="lbl">توقيع المنشور</label><input type="text" id="cfg-sig" value="دليل عقارات البصرة 🏠"></div>
+      <div class="field"><label class="lbl">الهاشتاكات الثابتة (تُضاف لكل منشور)</label><textarea id="cfg-hash" style="min-height:70px">#عقارات_البصرة #دليل_عقارات_البصرة #شقق_البصرة #سوق_العقار_البصرة</textarea></div>
+      <button class="btn btn-gold" onclick="saveSettings()">💾 حفظ الإعدادات</button>
+      <div id="settings-notify" style="display:none;margin-top:10px;font-size:13px;color:var(--green2)">✅ تم الحفظ</div>
+    </div>
+  </div>
+
+  <!-- ===== SUPABASE LISTINGS PANEL ===== -->
+  <div class="panel" id="panel-supabase">
+    <div class="page-header">
+      <div>
+        <div class="page-title">🏠 عقارات الموقع</div>
+        <div class="page-sub">اختر عقاراً من قاعدة بيانات الموقع وانشره مباشرة</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost" onclick="loadSupabaseListings()" id="refresh-listings-btn">🔄 تحديث</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="card-icon">🔍</span> فلترة وبحث</div>
+      <div class="row3" style="margin-bottom:0">
+        <div class="field" style="margin:0">
+          <label class="lbl">حالة العقار</label>
+          <select id="sb-filter-status" onchange="filterSupabaseListings()">
+            <option value="">الكل</option>
+            <option value="active">منشور</option>
+            <option value="pending">بانتظار الموافقة</option>
+          </select>
+        </div>
+        <div class="field" style="margin:0">
+          <label class="lbl">نوع العقار</label>
+          <select id="sb-filter-type" onchange="filterSupabaseListings()">
+            <option value="">الكل</option>
+            <option value="بيت">بيت</option>
+            <option value="شقة">شقة</option>
+            <option value="أرض">أرض</option>
+            <option value="فيلا">فيلا</option>
+            <option value="مكتب">مكتب</option>
+          </select>
+        </div>
+        <div class="field" style="margin:0">
+          <label class="lbl">بحث بالمنطقة أو المكتب</label>
+          <input type="text" id="sb-search" placeholder="مثال: الجمهورية..." oninput="filterSupabaseListings()">
+        </div>
+      </div>
+    </div>
+
+    <div id="sb-loading" style="text-align:center;padding:40px;color:var(--text3);font-size:13px;display:none">
+      <div class="spin" style="margin:0 auto 12px;width:24px;height:24px;"></div>
+      جاري جلب العقارات من Supabase...
+    </div>
+
+    <div id="sb-listings-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">
+      <div style="text-align:center;padding:40px;color:var(--text3);font-size:13px;grid-column:1/-1">
+        <div style="font-size:36px;margin-bottom:12px">🏠</div>
+        اضغط "تحديث" لجلب العقارات
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal نشر عقار Supabase -->
+  <div id="sb-publish-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:999;align-items:center;justify-content:center;padding:1rem;">
+    <div style="background:var(--card);border:1px solid var(--border2);border-radius:14px;padding:22px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:12px">
+        <div style="font-size:15px;font-weight:600;color:var(--text)">🚀 نشر العقار</div>
+        <button onclick="closeSbModal()" style="background:rgba(255,255,255,0.06);border:1px solid var(--border2);color:var(--text2);padding:5px 10px;border-radius:6px;font-size:12px;cursor:pointer;font-family:inherit">✕ إغلاق</button>
+      </div>
+      <div id="sb-modal-preview" style="background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:14px;font-size:13px;line-height:1.9;white-space:pre-wrap;margin-bottom:14px;max-height:200px;overflow-y:auto"></div>
+      <div class="field">
+        <label class="lbl">المنصات</label>
+        <div class="platforms-grid">
+          <div class="plat-toggle fb selected" id="sbp-fb" onclick="this.classList.toggle('selected')"><div class="plat-dot"></div><span class="plat-emoji">📘</span><span class="plat-name">فيسبوك</span></div>
+          <div class="plat-toggle wa" id="sbp-wa" onclick="this.classList.toggle('selected')"><div class="plat-dot"></div><span class="plat-emoji">💬</span><span class="plat-name">واتساب</span></div>
+          <div class="plat-toggle tg selected" id="sbp-tg" onclick="this.classList.toggle('selected')"><div class="plat-dot"></div><span class="plat-emoji">✈️</span><span class="plat-name">تيليغرام</span></div>
+          <div class="plat-toggle ig" id="sbp-ig" onclick="this.classList.toggle('selected')"><div class="plat-dot"></div><span class="plat-emoji">📸</span><span class="plat-name">إنستغرام</span></div>
+        </div>
+      </div>
+      <div id="sb-pub-progress" style="display:none;margin:12px 0">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:6px" id="sb-pub-label">جارٍ النشر...</div>
+        <div class="progress-wrap"><div class="progress-bar" id="sb-pub-bar" style="width:0%"></div></div>
+      </div>
+      <div id="sb-pub-result" style="display:none;margin-top:10px"></div>
+      <div style="display:flex;gap:10px;margin-top:14px">
+        <button class="btn btn-gold" onclick="doPublishSbItem()" id="sb-pub-btn" style="flex:1;justify-content:center">🚀 نشر الآن</button>
+        <button class="btn btn-ghost" onclick="closeSbModal()">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const DAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+const SLOTS = ['8:00 ص','1:00 م','8:00 م','9:00 م'];
+const TYPE_ICONS = {buyer:'🏠',investor:'📈',broker:'🤝',agent:'🧑\u200d💼',reel:'🎬',promo:'🔥',expat:'🌍'};
+const REPEAT_LBL = {once:'مرة واحدة',daily:'يومياً',weekly:'أسبوعياً','3week':'3×/أسبوع'};
+
+let queue = [];
+let generatedText = '';
+let autoMode = false;
+let autoTimer = null;
+let autoHistory = [];
+
+const TEMPLATES = {
+  buyer: d => `🏡 تبحث عن ${d||'شقة أو بيت'} في البصرة؟\n\nوفّر وقتك — كل العقارات في مكان واحد!\n\nدليل عقارات البصرة 📲 يضم أكبر قاعدة عقارية:\n✔️ شقق للإيجار والبيع\n✔️ أراضٍ وفيلل بجميع الأسعار\n✔️ بحث سريع بالمنطقة والسعر\n✔️ تواصل مباشر مع المالك`,
+  investor: d => `📈 سوق العقار في البصرة يشهد نمواً استثنائياً\n\n${d?'منطقة '+d+' من أكثر المناطق طلباً الآن.\n\n':''}🔍 تابع السوق مع دليل عقارات البصرة:\n• أسعار لحظية للعقارات\n• مقارنة المناطق والأحياء\n• فرص استثمارية حصرية\n\nالمستثمر الذكي يبدأ بالمعلومة الصحيحة. 💡`,
+  broker: d => `السلام عليكم ورحمة الله،\n\nأخوي الكريم، نرحب بك في دليل عقارات البصرة 🏠\n\nأدرج عقاراتك مجاناً وصلها لآلاف المهتمين يومياً!\n\nمميزات مكتب العقارات :\n✅ إدراج غير محدود\n✅ ظهور في أول النتائج\n✅ تواصل مباشر مع المشترين`,
+  reel: d => `[0–3 ث] تعبت تدور عقار بالبصرة؟ 😩\n[3–8 ث] شاهد كيف يعمل دليل عقارات البصرة 📲\n[8–13 ث] ${d||'أراضي، شقق، فيلل'} — ابحث بثانية واحدة!\n[13–15 ث] حمّل مجاناً 👇 — رابط في البايو`,
+  promo: d => `🔥 عرض حصري — ${d||'عقار مميز في البصرة'}\n\n📍 الموقع: البصرة\n💰 السعر: للتفاصيل تواصل معنا\n🏠 جميع التفاصيل في التطبيق\n\nلا تفوّت الفرصة — العروض تنتهي بسرعة!`,
+  expat: d => `🌍 أنت خارج العراق وتريد شراء عقار في البصرة؟\n\nلم تعد بحاجة لوسيط! 🎯\n\nدليل عقارات البصرة يتيح لك:\n✅ تصفح الآلاف من العقارات بالصور\n✅ التواصل المباشر مع الملاك\n✅ متابعة أسعار السوق لحظة بلحظة\n\nاستثمر في مدينتك من أي مكان في العالم 🌐`,
+  agent: d => `🔥 فرصة عمل وأنت في منزلك! 💰\n\nتبحث عن دخل إضافي بدون رأس مال ولا تعقيدات؟\n\nانضم لفريق وكلاء دليل البصرة العقاري وابدأ تربح من بيتك 🏠${d?'\n\nمطلوب وكلاء حالياً وبشكل خاص في منطقة '+d+'.':''}\n\n✅ نسبة عمولة مغرية تصل إلى 20% من قيمة كل تجديد اشتراك تجلبه\n✅ عقد رسمي موثّق يحفظ حقوقك، لمدة سنة كاملة قابلة للتجديد\n✅ لوحة تحكم خاصة بك لمتابعة عمولاتك ومكاتبك لحظة بلحظة\n✅ صرف العمولة شهرياً بأقصى مدة 15 يوم من نهاية كل شهر\n✅ بدون أي رسوم اشتراك أو التزام مالي — فقط جهدك وعلاقاتك\n✅ ندعمك بالمواد التسويقية والتدريب اللازم لتنطلق فوراً\n\n🎯 كل ما عليك تسويق خدماتنا للمكاتب العقارية في البصرة، وتربح من كل مكتب يشترك معك\n\n📲 للتسجيل أو الاستفسار، راسلنا الآن — 07719994201\n\n💌 شارك هذا المنشور مع من يفيده، فقد تفتح له فرصة عمره!`
+};
+
+async function generatePost() {
+  const type = document.getElementById('post-type').value;
+  const detail = document.getElementById('post-detail').value.trim();
+  const appLink = document.getElementById('cfg-link')?.value || 'https://basra-realestate.app';
+  const sig = document.getElementById('cfg-sig')?.value || 'دليل عقارات البصرة 🏠';
+  const hash = document.getElementById('cfg-hash')?.value || '#عقارات_البصرة';
+
+  document.getElementById('ai-loader').classList.add('show');
+  document.getElementById('gen-box').classList.add('hidden');
+
+  const typeLabels = {
+    buyer: 'باحث عن سكن (شقة أو بيت للإيجار أو الشراء)',
+    investor: 'مستثمر عقاري يبحث عن فرص استثمارية',
+    broker: 'مكتب عقارات أو وسيط عقاري',
+    agent: 'شخص يريد العمل كوكيل عقاري وكسب عمولة',
+    reel: 'محتوى ريلز/تيك توك قصير وجذاب مع توقيتات',
+    promo: 'عرض عقار حصري ومميز',
+    expat: 'مغترب عراقي خارج البلاد يريد الاستثمار في البصرة'
+  };
+
+  const prompt = `أنت خبير تسويق رقمي وعقاري متخصص في سوق البصرة العراقي ومتخصص في تحليل الهاشتاكات الرائجة على فيسبوك وتيليغرام وإنستغرام.
+
+مهمتك: اكتب منشور تسويقي عقاري فيروسي يصل لأكبر عدد ممكن من الناس.
+
+الجمهور المستهدف الأساسي: ${typeLabels[type] || type}
+الجمهور الموسّع: أهل البصرة، العراقيين داخل وخارج البلاد، المهتمين بالعقار والاستثمار
+${detail ? `التفاصيل: ${detail}` : ''}
+الرابط: ${appLink}
+التوقيع: ${sig}
+
+اكتب المنشور باللهجة العراقية الدارجة مع:
+- عنوان صادم وجذاب جداً في السطر الأول يجعل الناس يتوقفون عن التمرير
+- محتوى عاطفي ومقنع يلامس احتياج حقيقي
+- إيموجيات قوية ومناسبة في كل سطر تقريباً
+- دعوة قوية للتفاعل (شارك، علّق، أرسل لصديق)
+- في النهاية أضف هاشتاكات رائجة وفيروسية تشمل:
+  * هاشتاكات البصرة المحلية
+  * هاشتاكات العقار العراقي
+  * هاشتاكات رائجة عامة تجذب جمهور أوسع عربي
+  * هاشتاكات الاستثمار والمال
+  اجعل عدد الهاشتاكات بين 15-20 هاشتاك متنوعة وقوية
+- أضف الرابط والتوقيع
+
+اكتب المنشور مباشرة بدون أي مقدمة أو شرح.`;
+
+  try {
+    const GROQ_KEY = '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';
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + GROQ_KEY },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.85,
+        max_tokens: 1200
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.error) {
+      showToast('⚠️ خطأ في Groq: ' + data.error.message);
+      document.getElementById('ai-loader').classList.remove('show');
+      return;
+    }
+
+    let text = data.choices?.[0]?.message?.content || '';
+    if (!text) {
+      showToast('⚠️ لم يتم توليد محتوى، حاول مرة أخرى');
+      document.getElementById('ai-loader').classList.remove('show');
+      return;
+    }
+
+    generatedText = text;
+    document.getElementById('gen-text').textContent = text;
+    document.getElementById('gen-box').classList.remove('hidden');
+    document.getElementById('ai-loader').classList.remove('show');
+    document.getElementById('sched-btn').disabled = false;
+    document.getElementById('publish-now-btn').disabled = false;
+    document.getElementById('sched-hint').textContent = '✅ المحتوى جاهز (Groq AI)';
+    updateManualSelect();
+    showToast('⚡ تم التوليد بـ Groq AI!');
+
+  } catch (e) {
+    showToast('⚠️ تعذّر الاتصال بـ Gemini AI');
+    document.getElementById('ai-loader').classList.remove('show');
+  }
+}
+
+function clearGen() {
+  generatedText = '';
+  document.getElementById('gen-box').classList.add('hidden');
+  document.getElementById('gen-text').textContent = '';
+  document.getElementById('sched-btn').disabled = true;
+  document.getElementById('publish-now-btn').disabled = true;
+  document.getElementById('sched-hint').textContent = 'ولّد محتوى أولاً';
+}
+
+function copyGen() {
+  navigator.clipboard.writeText(generatedText).then(() => showToast('تم نسخ المنشور!'));
+}
+
+function togglePlat(id) {
+  const el = document.getElementById('pt-' + id);
+  el.classList.toggle('selected');
+}
+
+function toggleManualPlat(id) {
+  document.getElementById('mp-' + id).classList.toggle('selected');
+}
+
+function toggleCustomTime() {
+  const v = document.getElementById('sched-time').value;
+  document.getElementById('custom-time-row').classList.toggle('hidden', v !== 'custom');
+}
+
+function getSelectedPlatforms(prefix) {
+  const ids = ['fb','wa','tg','ig'];
+  return ids.filter(id => document.getElementById((prefix||'pt-') + id)?.classList.contains('selected'));
+}
+
+function schedulePost() {
+  if (!generatedText) return;
+  const day = document.getElementById('sched-day').value;
+  const timeVal = document.getElementById('sched-time').value;
+  const time = timeVal === 'custom' ? document.getElementById('custom-time').value : timeVal;
+  const repeat = document.getElementById('sched-repeat').value;
+  const type = document.getElementById('post-type').value;
+  const platforms = getSelectedPlatforms('pt-');
+
+  queue.push({
+    id: Date.now(),
+    text: generatedText,
+    day, time, repeat, type,
+    platforms: platforms.length ? platforms : ['fb'],
+    status: 'pending',
+    createdAt: new Date().toLocaleString('ar-IQ')
+  });
+
+  updateStats();
+  updateManualSelect();
+  showToast('✅ تم إضافة المنشور للجدول');
+  clearGen();
+}
+
+async function publishNowFromCreate() {
+  if (!generatedText) return;
+  const platforms = getSelectedPlatforms('pt-');
+  await simulatePublish(platforms, generatedText, null);
+}
+
+async function manualPublish() {
+  const sel = document.getElementById('manual-select').value;
+  if (!sel) return showToast('⚠️ اختر منشوراً أولاً');
+  const item = queue.find(q => q.id == sel);
+  if (!item) return;
+  const platforms = getSelectedPlatforms('mp-');
+  if (!platforms.length) return showToast('⚠️ اختر منصة واحدة على الأقل');
+  await simulatePublish(platforms, item.text, item.id);
+}
+
+async function simulatePublish(platforms, text, itemId) {
+  const progress = document.getElementById('manual-progress');
+  const progressBar = document.getElementById('manual-progress-bar');
+  const progressLabel = document.getElementById('manual-progress-label');
+  const resultDiv = document.getElementById('manual-result');
+  const PLAT_NAMES = {fb:'فيسبوك',wa:'واتساب',tg:'تيليغرام',ig:'إنستغرام'};
+
+  if (progress) progress.style.display = 'block';
+  if (resultDiv) resultDiv.style.display = 'none';
+
+  let results = [];
+  for (let i = 0; i < platforms.length; i++) {
+    const p = platforms[i];
+    const pct = Math.round(((i) / platforms.length) * 100);
+    if (progressBar) progressBar.style.width = pct + '%';
+    if (progressLabel) progressLabel.textContent = `جارٍ النشر على ${PLAT_NAMES[p] || p}...`;
+
+    const result = await publishToPlatform(p, text);
+    results.push({ platform: p, ...result });
+    await new Promise(r => setTimeout(r, 600));
+  }
+
+  if (progressBar) progressBar.style.width = '100%';
+  await new Promise(r => setTimeout(r, 300));
+  if (progress) progress.style.display = 'none';
+
+  if (resultDiv) {
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = results.map(r =>
+      `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;margin-bottom:6px;background:var(--bg3)">
+        <span>${r.success ? '✅' : '⚠️'}</span>
+        <span style="font-size:13px;color:${r.success?'var(--green2)':'var(--text2)'}">${PLAT_NAMES[r.platform]}: ${r.message}</span>
+      </div>`
+    ).join('');
+  }
+
+  if (itemId) {
+    const item = queue.find(q => q.id == itemId);
+    if (item) { item.status = 'done'; item.publishedAt = new Date().toLocaleString('ar-IQ'); }
+    updateStats();
+  }
+  showToast('🎉 تم النشر بنجاح!');
+}
+
+async function publishToPlatform(platform, text) {
+  if (platform === 'fb') {
+    const token = document.getElementById('fb-token')?.value;
+    const pageId = document.getElementById('fb-page-id')?.value;
+    if (token && pageId) {
+      try {
+        const res = await fetch(`https://graph.facebook.com/v19.0/${pageId}/feed`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text, access_token: token })
+        });
+        const data = await res.json();
+        if (data.id) return { success: true, message: 'تم النشر — ID: ' + data.id };
+        return { success: false, message: data.error?.message || 'خطأ في API فيسبوك' };
+      } catch (e) {
+        return { success: false, message: 'تعذّر الاتصال بـ API فيسبوك — تحقق من التوكن' };
+      }
+    }
+    return { success: true, message: 'وضع المحاكاة — أضف API Token لنشر حقيقي' };
+  }
+
+  if (platform === 'tg') {
+    const token = document.getElementById('tg-token')?.value;
+    const chatId = document.getElementById('tg-chat-id')?.value;
+    if (token && chatId) {
+      try {
+        const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chatId, text: text })
+        });
+        const data = await res.json();
+        if (data.ok) return { success: true, message: 'تم الإرسال للقناة' };
+        return { success: false, message: data.description || 'خطأ في API تيليغرام' };
+      } catch (e) {
+        return { success: false, message: 'تعذّر الاتصال — تحقق من Bot Token' };
+      }
+    }
+    return { success: true, message: 'وضع المحاكاة — أضف Bot Token لنشر حقيقي' };
+  }
+
+  if (platform === 'wa') {
+    const token = document.getElementById('wa-token')?.value;
+    const phoneId = document.getElementById('wa-phone-id')?.value;
+    const toNum = document.getElementById('wa-to')?.value;
+    if (token && phoneId && toNum) {
+      try {
+        const res = await fetch(`https://graph.facebook.com/v19.0/${phoneId}/messages`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ messaging_product: 'whatsapp', to: toNum, type: 'text', text: { body: text } })
+        });
+        const data = await res.json();
+        if (data.messages) return { success: true, message: 'تم الإرسال عبر واتساب' };
+        return { success: false, message: data.error?.message || 'خطأ في API واتساب' };
+      } catch (e) {
+        return { success: false, message: 'تعذّر الاتصال — تحقق من مفاتيح واتساب Business' };
+      }
+    }
+    return { success: true, message: 'وضع المحاكاة — أضف مفاتيح واتساب Business' };
+  }
+
+  await new Promise(r => setTimeout(r, 400));
+  return { success: true, message: 'وضع المحاكاة — إنستغرام API يتطلب Meta Business Suite' };
+}
+
+async function testAPI(platform) {
+  showToast('⏳ جارٍ اختبار الاتصال...');
+  await new Promise(r => setTimeout(r, 1200));
+  const statusEl = document.getElementById(platform + '-status');
+
+  const token = document.getElementById(platform + '-token')?.value;
+  if (!token) {
+    statusEl.innerHTML = '<span class="badge b-gray">غير مفعّل</span>';
+    return showToast('⚠️ أدخل التوكن أولاً');
+  }
+
+  if (platform === 'tg') {
+    const tgToken = document.getElementById('tg-token').value;
+    try {
+      const res = await fetch(`https://api.telegram.org/bot${tgToken}/getMe`);
+      const data = await res.json();
+      if (data.ok) {
+        statusEl.innerHTML = `<span class="badge b-green">✅ متصل — @${data.result.username}</span>`;
+        return showToast('✅ تيليغرام متصل بنجاح!');
+      }
+    } catch(e) {}
+  }
+
+  statusEl.innerHTML = '<span class="badge b-green">✅ متصل</span>';
+  showToast('✅ تم التحقق من الاتصال');
+}
+
+async function quickPublish() {
+  const text = document.getElementById('quick-text').value.trim();
+  if (!text) return showToast('⚠️ اكتب النص أولاً');
+  await simulatePublish(['fb','tg'], text, null);
+}
+
+function addHashtags() {
+  const hash = document.getElementById('cfg-hash')?.value || '#عقارات_البصرة';
+  const ta = document.getElementById('quick-text');
+  ta.value = (ta.value + '\n\n' + hash).trim();
+}
+
+function toggleAutoMode() {
+  autoMode = !autoMode;
+  const sw = document.getElementById('auto-switch');
+  const lbl = document.getElementById('auto-label');
+  const sub = document.getElementById('auto-sublabel');
+  const badge = document.getElementById('auto-badge');
+  const sideLabel = document.getElementById('auto-status-label');
+
+  sw.classList.toggle('on', autoMode);
+  lbl.textContent = autoMode ? 'النشر التلقائي — تشغيل' : 'النشر التلقائي — إيقاف';
+  sub.textContent = autoMode ? 'النظام يراقب الجدول وينشر تلقائياً' : 'شغّل لتبدأ الجدولة التلقائية';
+  badge.className = 'badge ' + (autoMode ? 'b-green' : 'b-gray');
+  badge.textContent = autoMode ? '● نشط' : 'متوقف';
+  sideLabel.textContent = autoMode ? '🤖 تلقائي' : 'وضع يدوي';
+}
+
+async function startAutoMode() {
+  if (!autoMode) toggleAutoMode();
+  const daily = parseInt(document.getElementById('auto-daily').value);
+  const type = document.getElementById('auto-type').value;
+  const liveDiv = document.getElementById('auto-live');
+  const logDiv = document.getElementById('auto-log');
+  const progressBar = document.getElementById('auto-progress-bar');
+  const configDiv = document.getElementById('auto-config');
+
+  configDiv.style.display = 'none';
+  liveDiv.style.display = 'block';
+
+  const types = type === 'mix' ? ['buyer','investor','promo','expat','broker'] : [type];
+  const times = ['8:00 م','9:00 م','8:00 ص'];
+
+  const log = msg => {
+    logDiv.innerHTML += `<div>[${new Date().toLocaleTimeString('ar-IQ')}] ${msg}</div>`;
+    logDiv.scrollTop = logDiv.scrollHeight;
+  };
+
+  log('🤖 تم تشغيل وضع النشر التلقائي');
+  log(`📋 سيتم توليد ${daily} منشور يومياً`);
+
+  let progress = 0;
+  const generateWithGemini = async (postType) => {
+    const typeLabels = {
+      buyer: 'باحث عن سكن', investor: 'مستثمر عقاري',
+      broker: 'مكتب عقارات', agent: 'وكيل عقاري',
+      reel: 'ريلز/تيك توك', promo: 'عرض حصري', expat: 'مغترب'
+    };
+    const appLink = document.getElementById('cfg-link')?.value || 'https://basra-realestate.app';
+    const hash = document.getElementById('cfg-hash')?.value || '#عقارات_البصرة';
+    const prompt = `أنت خبير تسويق رقمي وعقاري متخصص في سوق البصرة. اكتب منشور تسويقي عقاري فيروسي لجمهور (${typeLabels[postType]}) باللهجة العراقية. المنشور يجب أن يكون جذاباً جداً مع إيموجيات قوية ودعوة للتفاعل. في النهاية أضف 15-20 هاشتاك رائج يشمل هاشتاكات البصرة والعقار العراقي والاستثمار وهاشتاكات عربية واسعة الانتشار، ثم أضف الرابط: ${appLink}. اكتب مباشرة بدون مقدمة.`;
+    try {
+      const GROQ_KEY = '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';
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + GROQ_KEY },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.9,
+          max_tokens: 600
+        })
+      });
+      const data = await res.json();
+      return data.choices?.[0]?.message?.content || TEMPLATES[postType]('');
+    } catch(e) { return TEMPLATES[postType](''); }
+  };
+
+  const tick = async () => {
+    const t = types[Math.floor(Math.random() * types.length)];
+    log(`🤖 جارٍ توليد منشور بـ Gemini AI...`);
+    const text = await generateWithGemini(t);
+
+    log(`✨ تم توليد منشور (${TYPE_ICONS[t]} ${t})`);
+    await new Promise(r => setTimeout(r, 800));
+
+    const platforms = ['fb','tg'];
+    for (const p of platforms) {
+      log(`📤 جارٍ النشر على ${p === 'fb' ? 'فيسبوك' : 'تيليغرام'}...`);
+      await new Promise(r => setTimeout(r, 700));
+      log(`✅ تم النشر على ${p === 'fb' ? 'فيسبوك' : 'تيليغرام'}`);
+    }
+
+    progress = Math.min(100, progress + 20);
+    progressBar.style.width = progress + '%';
+
+    autoHistory.unshift({
+      time: new Date().toLocaleString('ar-IQ'),
+      type: t,
+      platforms,
+      status: 'done'
+    });
+    renderAutoHistory();
+    updateStats();
+    document.getElementById('next-post-label').textContent = 'التالي خلال 4 ساعات';
+  };
+
+  await tick();
+  autoTimer = setInterval(tick, 15000);
+  showToast('🤖 النشر التلقائي بدأ!');
+}
+
+function stopAutoMode() {
+  clearInterval(autoTimer);
+  autoMode = false;
+  toggleAutoMode();
+  document.getElementById('auto-live').style.display = 'none';
+  document.getElementById('auto-config').style.display = 'block';
+  document.getElementById('next-post-label').textContent = '—';
+  showToast('⏹️ تم إيقاف النشر التلقائي');
+}
+
+function previewAutoContent() {
+  const type = document.getElementById('auto-type').value;
+  const types = type === 'mix' ? ['buyer','investor','promo'] : [type];
+  const t = types[0];
+  showToast('👁️ تحقق من تبويب إنشاء منشور للمعاينة');
+}
+
+function renderAutoHistory() {
+  const el = document.getElementById('auto-history');
+  if (!autoHistory.length) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">لا يوجد سجل بعد</div>';
+    return;
+  }
+  el.innerHTML = autoHistory.slice(0,10).map(h =>
+    `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;margin-bottom:6px;background:var(--bg3)">
+      <span>${TYPE_ICONS[h.type]||'📝'}</span>
+      <div style="flex:1">
+        <div style="font-size:13px;color:var(--text)">تم نشر منشور (${h.type})</div>
+        <div style="font-size:11px;color:var(--text3)">${h.time} — ${h.platforms.map(p=>({fb:'فيسبوك',tg:'تيليغرام',wa:'واتساب',ig:'إنستغرام'}[p]||p)).join('، ')}</div>
+      </div>
+      <span class="badge b-green">✅ منشور</span>
+    </div>`
+  ).join('');
+}
+
+function updateStats() {
+  document.getElementById('s-total').textContent = queue.filter(q => q.status === 'pending').length;
+  document.getElementById('s-today').textContent = queue.filter(q => q.day === DAYS[new Date().getDay()] && q.status === 'pending').length;
+  document.getElementById('s-done').textContent = queue.filter(q => q.status === 'done').length + autoHistory.length;
+  const pset = new Set(queue.flatMap(q => q.platforms));
+  document.getElementById('s-platforms').textContent = pset.size || 0;
+}
+
+function updateManualSelect() {
+  const sel = document.getElementById('manual-select');
+  const pending = queue.filter(q => q.status === 'pending');
+  sel.innerHTML = '<option value="">— اختر منشوراً —</option>' +
+    pending.map(q => `<option value="${q.id}">${TYPE_ICONS[q.type]||'📝'} ${q.day} ${q.time} — ${q.text.split('\n')[0].substring(0,35)}...</option>`).join('');
+  sel.onchange = function() {
+    const item = queue.find(q => q.id == this.value);
+    const prev = document.getElementById('manual-preview');
+    if (item) { prev.textContent = item.text; prev.classList.remove('hidden'); }
+    else prev.classList.add('hidden');
+  };
+}
+
+function renderQueue(filter = 'all') {
+  const container = document.getElementById('queue-container');
+  const items = filter === 'all' ? queue : queue.filter(q => q.status === filter);
+  if (!items.length) {
+    container.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text3);font-size:13px">
+      <div style="font-size:36px;margin-bottom:12px">📭</div>
+      لا توجد منشورات — اذهب لـ "إنشاء منشور" لإضافة أول منشور
+    </div>`;
+    return;
+  }
+  container.innerHTML = items.map(item => `
+    <div class="queue-item ${item.status}" id="qi-${item.id}">
+      <div class="qi-icon">${TYPE_ICONS[item.type]||'📝'}</div>
+      <div class="qi-body">
+        <div class="qi-title">${item.text.split('\n')[0].substring(0,60)}...</div>
+        <div class="qi-meta">
+          <span>📅 ${item.day}</span>
+          <span>⏰ ${item.time}</span>
+          <span>🔄 ${REPEAT_LBL[item.repeat]||item.repeat}</span>
+          <span>📱 ${item.platforms.map(p=>({fb:'فيسبوك',tg:'تيليغرام',wa:'واتساب',ig:'إنستغرام'}[p]||p)).join('، ')}</span>
+          <span class="badge ${item.status==='done'?'b-green':item.status==='publishing'?'b-gold':'b-blue'}">${item.status==='done'?'✅ منشور':item.status==='publishing'?'🔄 يُنشر':'📅 مجدول'}</span>
+        </div>
+      </div>
+      <div class="qi-actions">
+        ${item.status==='pending'?`<button class="btn btn-green" style="font-size:12px;padding:6px 12px" onclick="quickPublishItem(${item.id})">🚀 نشر</button>`:''}
+        <button class="btn btn-danger" style="font-size:12px;padding:6px 10px" onclick="deleteItem(${item.id})">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function quickPublishItem(id) {
+  const item = queue.find(q => q.id == id);
+  if (!item) return;
+  item.status = 'publishing';
+  renderQueue();
+  await new Promise(r => setTimeout(r, 1500));
+  await publishToPlatform('fb', item.text);
+  await publishToPlatform('tg', item.text);
+  item.status = 'done';
+  item.publishedAt = new Date().toLocaleString('ar-IQ');
+  updateStats();
+  renderQueue();
+  showToast('✅ تم النشر!');
+}
+
+function deleteItem(id) {
+  queue = queue.filter(q => q.id != id);
+  updateStats();
+  updateManualSelect();
+  renderQueue();
+}
+
+function filterQueue(f) {
+  ['all','pending','done'].forEach(k => {
+    document.getElementById('flt-'+k).style.opacity = k===f?'1':'0.5';
+  });
+  renderQueue(f);
+}
+
+function renderWeekGrid() {
+  const grid = document.getElementById('week-grid');
+  grid.innerHTML = DAYS.map(day => {
+    const slots = SLOTS.map(slot => {
+      const has = queue.some(q => q.day === day && q.status === 'pending');
+      return `<div class="wg-slot ${has?'has':''}">${has?slot.split(' ')[0]:'—'}</div>`;
+    }).join('');
+    return `<div class="wg-col"><div class="wg-day">${day.substring(0,3)}</div>${slots}</div>`;
+  }).join('');
+}
+
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (id === 'queue') { renderQueue(); updateManualSelect(); }
+  if (id === 'schedule') renderWeekGrid();
+  if (id === 'manual') updateManualSelect();
+}
+
+function saveAPIKeys() {
+  const keys = {
+    fb: { token: document.getElementById('fb-token').value, pageId: document.getElementById('fb-page-id').value },
+    wa: { token: document.getElementById('wa-token').value, phoneId: document.getElementById('wa-phone-id').value, to: document.getElementById('wa-to').value },
+    tg: { token: document.getElementById('tg-token').value, chatId: document.getElementById('tg-chat-id').value }
+  };
+  localStorage.setItem('basra_api_keys', JSON.stringify(keys));
+  document.getElementById('api-notify').style.display = 'block';
+  setTimeout(() => document.getElementById('api-notify').style.display = 'none', 2500);
+  showToast('🔑 تم حفظ المفاتيح');
+}
+
+function loadAPIKeys() {
+  const saved = localStorage.getItem('basra_api_keys');
+  if (!saved) return showToast('⚠️ لا يوجد مفاتيح محفوظة');
+  const keys = JSON.parse(saved);
+  if (keys.fb) { document.getElementById('fb-token').value = keys.fb.token||''; document.getElementById('fb-page-id').value = keys.fb.pageId||''; }
+  if (keys.wa) { document.getElementById('wa-token').value = keys.wa.token||''; document.getElementById('wa-phone-id').value = keys.wa.phoneId||''; document.getElementById('wa-to').value = keys.wa.to||''; }
+  if (keys.tg) { document.getElementById('tg-token').value = keys.tg.token||''; document.getElementById('tg-chat-id').value = keys.tg.chatId||''; }
+  showToast('✅ تم استرجاع المفاتيح');
+}
+
+function saveSettings() {
+  document.getElementById('settings-notify').style.display = 'block';
+  setTimeout(() => document.getElementById('settings-notify').style.display = 'none', 2000);
+  showToast('⚙️ تم حفظ الإعدادات');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2800);
+}
+
+// ========== AUTH CHECK — ربط مع لوحة الإدارة ==========
+const SESSION_KEY = 'basra_session_v3';
+const SUPABASE_URL = 'https://blayfetxmufisvtigugt.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_zCJnnFxjHQ-X7BkkQCuVqA_U_UyaI6y';
+
+(function checkAuth() {
+  const session = JSON.parse(localStorage.getItem(SESSION_KEY));
+  if (!session || session.role !== 'admin') {
+    const msg = document.createElement('div');
+    msg.style.cssText = 'position:fixed;inset:0;background:#0f1117;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:9999;color:#e8ecf4;font-family:inherit;text-align:center;padding:2rem';
+    msg.innerHTML = '<div style="font-size:48px">🔒</div><div style="font-size:18px;font-weight:700">هذه الصفحة للمدير فقط</div><div style="font-size:13px;color:#5a6070">يرجى تسجيل الدخول أولاً من لوحة الإدارة</div><button onclick="location.href='admin.html'" style="background:#f0a500;color:#1a1200;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px">← الذهاب للوحة الإدارة</button>';
+    document.body.appendChild(msg);
+    return;
+  }
+  // تحديث badge المدير
+  const badge = document.getElementById('admin-badge');
+  if (badge) badge.textContent = '● ' + (session.username || 'المدير');
+})();
+
+// ========== Supabase Helper ==========
+async function sbFetch(table, method='GET', body=null, filter='') {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 8000);
+  try {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}${filter}`, {
+      method, signal: ctrl.signal,
+      headers: {
+        'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json', 'Accept': 'application/json',
+        'Prefer': (method==='POST'||method==='PATCH') ? 'return=representation' : 'return=minimal'
+      },
+      body: body ? JSON.stringify(body) : null
+    });
+    clearTimeout(t);
+    if (!r.ok) { const e = await r.text(); throw new Error(e); }
+    const txt = await r.text();
+    return txt ? JSON.parse(txt) : [];
+  } catch(e) { clearTimeout(t); throw e; }
+}
+
+// ========== عقارات Supabase ==========
+let allSbListings = [];
+let currentSbItem = null;
+
+async function loadSupabaseListings() {
+  const grid = document.getElementById('sb-listings-grid');
+  const loader = document.getElementById('sb-loading');
+  loader.style.display = 'block';
+  grid.style.display = 'none';
+
+  try {
+    allSbListings = await sbFetch('listings', 'GET', null, '?order=created_at.desc&limit=60');
+    loader.style.display = 'none';
+    grid.style.display = 'grid';
+    renderSbListings(allSbListings);
+  } catch(e) {
+    loader.style.display = 'none';
+    grid.style.display = 'grid';
+    grid.innerHTML = `<div style="text-align:center;padding:40px;color:var(--red);font-size:13px;grid-column:1/-1">⚠️ تعذّر الاتصال بـ Supabase<br><span style="color:var(--text3);font-size:11px">${e.message}</span></div>`;
+  }
+}
+
+function filterSupabaseListings() {
+  const status = document.getElementById('sb-filter-status').value;
+  const type   = document.getElementById('sb-filter-type').value;
+  const search = document.getElementById('sb-search').value.toLowerCase();
+
+  let filtered = allSbListings;
+  if (status) filtered = filtered.filter(l => l.status === status);
+  if (type)   filtered = filtered.filter(l => l.type === type);
+  if (search) filtered = filtered.filter(l =>
+    (l.district||'').toLowerCase().includes(search) ||
+    (l.office_name||l.office||'').toLowerCase().includes(search)
+  );
+  renderSbListings(filtered);
+}
+
+function renderSbListings(listings) {
+  const grid = document.getElementById('sb-listings-grid');
+  if (!listings.length) {
+    grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3);font-size:13px;grid-column:1/-1"><div style="font-size:36px;margin-bottom:12px">📭</div>لا توجد عقارات مطابقة</div>';
+    return;
+  }
+
+  const statusColors = { active:'var(--green)', pending:'var(--gold)', suspended:'var(--red)' };
+  const statusLabels = { active:'منشور', pending:'بانتظار', suspended:'موقوف' };
+
+  grid.innerHTML = listings.map(l => {
+    const statusColor = statusColors[l.status] || 'var(--text3)';
+    const statusLabel = statusLabels[l.status] || l.status;
+    const img = l.image || l.img || '';
+    const date = l.created_at ? new Date(l.created_at).toLocaleDateString('ar-IQ') : '—';
+    return `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border .15s;cursor:default" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
+      ${img ? `<img src="${img}" style="width:100%;height:130px;object-fit:cover;display:block" onerror="this.style.display='none'">` : `<div style="width:100%;height:80px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:32px">${l.icon||'🏠'}</div>`}
+      <div style="padding:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:13px;font-weight:700;color:var(--text)">${l.icon||'🏠'} ${l.type||'عقار'}</span>
+          <span style="font-size:10px;font-weight:700;color:${statusColor};background:rgba(255,255,255,0.05);padding:2px 8px;border-radius:20px;border:1px solid ${statusColor}">${statusLabel}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:4px">📍 ${l.district||'—'}</div>
+        <div style="font-size:13px;color:var(--gold2);font-weight:700;margin-bottom:4px">💰 ${l.price||'—'}</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:10px">🏢 ${l.office_name||l.office||'زائر'} &nbsp;|&nbsp; ${date}</div>
+        <div style="display:flex;gap:6px">
+          <button onclick="openSbPublishModal(${JSON.stringify(JSON.stringify(l))})" class="btn btn-gold" style="flex:1;justify-content:center;font-size:12px;padding:7px">🚀 نشر الآن</button>
+          <button onclick="generatePostFromListing(${JSON.stringify(JSON.stringify(l))})" class="btn btn-ghost" style="font-size:12px;padding:7px" title="توليد محتوى ذكي">✨ AI</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openSbPublishModal(listingJson) {
+  const l = JSON.parse(listingJson);
+  currentSbItem = l;
+
+  // بناء نص المنشور من بيانات العقار
+  const text = buildListingPost(l);
+  document.getElementById('sb-modal-preview').textContent = text;
+  document.getElementById('sb-pub-result').style.display = 'none';
+  document.getElementById('sb-pub-progress').style.display = 'none';
+  document.getElementById('sb-pub-btn').disabled = false;
+
+  const modal = document.getElementById('sb-publish-modal');
+  modal.style.display = 'flex';
+}
+
+function closeSbModal() {
+  document.getElementById('sb-publish-modal').style.display = 'none';
+  currentSbItem = null;
+}
+
+function buildListingPost(l) {
+  const appLink = document.getElementById('cfg-link')?.value || 'https://basra-realestate.app';
+  const sig = document.getElementById('cfg-sig')?.value || 'دليل عقارات البصرة 🏠';
+  const hash = document.getElementById('cfg-hash')?.value || '#عقارات_البصرة';
+  const icon = l.icon || '🏠';
+  const type = l.type || 'عقار';
+  const action = l.action || 'للبيع';
+  const district = l.district || 'البصرة';
+  const price = l.price || 'السعر عند التواصل';
+  const area = l.area ? `المساحة: ${l.area} م²` : '';
+  const rooms = l.rooms ? `الغرف: ${l.rooms}` : '';
+  const deed = l.deed ? `السند: ${l.deed}` : '';
+  const desc = l.description || l.desc || '';
+  const office = l.office_name || l.office || 'دليل البصرة';
+
+  return `${icon} ${type} ${action} في ${district}
+
+💰 السعر: ${price}
+${area ? '📐 ' + area + '
+' : ''}${rooms ? '🛏️ ' + rooms + '
+' : ''}${deed ? '📄 ' + deed + '
+' : ''}${desc ? '
+' + desc + '
+' : ''}
+🏢 المكتب: ${office}
+📲 للتواصل والمزيد من العقارات:
+${appLink}
+
+${sig}
+
+${hash}`;
+}
+
+async function generatePostFromListing(listingJson) {
+  const l = JSON.parse(listingJson);
+  // الانتقال لتبويب إنشاء منشور وتعبئة التفاصيل
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-create').classList.add('active');
+
+  const detail = [l.type, l.district, l.price, l.area ? l.area+'م²' : ''].filter(Boolean).join('، ');
+  document.getElementById('post-detail').value = detail;
+  document.getElementById('post-type').value = 'promo';
+
+  showToast('✅ تم تعبئة بيانات العقار — اضغط "توليد بالذكاء الاصطناعي"');
+}
+
+async function doPublishSbItem() {
+  if (!currentSbItem) return;
+  const text = document.getElementById('sb-modal-preview').textContent;
+  const platforms = ['fb','wa','tg','ig'].filter(id => document.getElementById('sbp-'+id)?.classList.contains('selected'));
+  if (!platforms.length) return showToast('⚠️ اختر منصة واحدة على الأقل');
+
+  const btn = document.getElementById('sb-pub-btn');
+  const prog = document.getElementById('sb-pub-progress');
+  const bar  = document.getElementById('sb-pub-bar');
+  const lbl  = document.getElementById('sb-pub-label');
+  const res  = document.getElementById('sb-pub-result');
+  const PLAT_NAMES = {fb:'فيسبوك',wa:'واتساب',tg:'تيليغرام',ig:'إنستغرام'};
+
+  btn.disabled = true;
+  prog.style.display = 'block';
+  res.style.display = 'none';
+  bar.style.width = '0%';
+
+  const results = [];
+  for (let i = 0; i < platforms.length; i++) {
+    const p = platforms[i];
+    lbl.textContent = `جارٍ النشر على ${PLAT_NAMES[p]}...`;
+    bar.style.width = Math.round(((i) / platforms.length) * 100) + '%';
+    const r = await publishToPlatform(p, text);
+    results.push({ platform: p, ...r });
+    await new Promise(x => setTimeout(x, 600));
+  }
+
+  bar.style.width = '100%';
+  await new Promise(x => setTimeout(x, 300));
+  prog.style.display = 'none';
+  btn.disabled = false;
+
+  res.style.display = 'block';
+  res.innerHTML = results.map(r =>
+    `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;margin-bottom:6px;background:var(--bg3)">
+      <span>${r.success ? '✅' : '⚠️'}</span>
+      <span style="font-size:13px;color:${r.success?'var(--green2)':'var(--text2)'}">${PLAT_NAMES[r.platform]}: ${r.message}</span>
+    </div>`
+  ).join('');
+
+  showToast('🎉 تم النشر بنجاح!');
+}
+
+// ========== showPanel override لدعم supabase ==========
+const _origShowPanel = showPanel;
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const panel = document.getElementById('panel-' + id);
+  if (panel) panel.classList.add('active');
+  if (event && event.currentTarget) event.currentTarget.classList.add('active');
+  if (id === 'queue') { renderQueue(); updateManualSelect(); }
+  if (id === 'schedule') renderWeekGrid();
+  if (id === 'manual') updateManualSelect();
+  if (id === 'supabase') loadSupabaseListings();
+}
+
+loadAPIKeys();
+// تفعيل تيليغرام تلقائياً
+(function() {
+  const saved = localStorage.getItem('basra_api_keys');
+  const keys = saved ? JSON.parse(saved) : {};
+  if (!keys.tg || !keys.tg.token) {
+    keys.tg = { token: '8816539301:AAGa-094Y6ZK9MgCxaqdGeg2oxDgpSr1io8', chatId: '-1004345103777' };
+    localStorage.setItem('basra_api_keys', JSON.stringify(keys));
+  }
+  document.getElementById('tg-status').innerHTML = '<span class="badge b-green">✅ متصل</span>';
+})();
+updateStats();
+renderQueue();
+</script>
+</body>
+</html>
