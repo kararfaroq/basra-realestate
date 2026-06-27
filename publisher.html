@@ -842,6 +842,11 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// ===== ثوابت الربط مع لوحة الإدارة =====
+const SESSION_KEY = 'basra_session_v3';
+const SUPABASE_URL = 'https://blayfetxmufisvtigugt.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_zCJnnFxjHQ-X7BkkQCuVqA_U_UyaI6y';
+
 const DAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
 const SLOTS = ['8:00 ص','1:00 م','8:00 م','9:00 م'];
 const TYPE_ICONS = {buyer:'🏠',investor:'📈',broker:'🤝',agent:'🧑\u200d💼',reel:'🎬',promo:'🔥',expat:'🌍'};
@@ -1403,11 +1408,13 @@ function renderWeekGrid() {
 function showPanel(id) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('panel-' + id).classList.add('active');
-  event.currentTarget.classList.add('active');
+  const panel = document.getElementById('panel-' + id);
+  if (panel) panel.classList.add('active');
+  if (event && event.currentTarget) event.currentTarget.classList.add('active');
   if (id === 'queue') { renderQueue(); updateManualSelect(); }
   if (id === 'schedule') renderWeekGrid();
   if (id === 'manual') updateManualSelect();
+  if (id === 'supabase') loadSupabaseListings();
 }
 
 function saveAPIKeys() {
@@ -1446,9 +1453,7 @@ function showToast(msg) {
 }
 
 // ========== AUTH CHECK — ربط مع لوحة الإدارة ==========
-const SESSION_KEY = 'basra_session_v3';
-const SUPABASE_URL = 'https://blayfetxmufisvtigugt.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_zCJnnFxjHQ-X7BkkQCuVqA_U_UyaI6y';
+// (الثوابت مُعرَّفة في أعلى السكريبت)
 
 (function checkAuth() {
   const session = JSON.parse(localStorage.getItem(SESSION_KEY));
@@ -1668,19 +1673,7 @@ async function doPublishSbItem() {
   showToast('🎉 تم النشر بنجاح!');
 }
 
-// ========== showPanel override لدعم supabase ==========
-const _origShowPanel = showPanel;
-function showPanel(id) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  const panel = document.getElementById('panel-' + id);
-  if (panel) panel.classList.add('active');
-  if (event && event.currentTarget) event.currentTarget.classList.add('active');
-  if (id === 'queue') { renderQueue(); updateManualSelect(); }
-  if (id === 'schedule') renderWeekGrid();
-  if (id === 'manual') updateManualSelect();
-  if (id === 'supabase') loadSupabaseListings();
-}
+// showPanel مُحدَّثة في تعريفها الأصلي أعلاه
 
 loadAPIKeys();
 // تفعيل تيليغرام تلقائياً
