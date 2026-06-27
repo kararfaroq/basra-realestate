@@ -744,7 +744,10 @@
     </div>
     <div class="card">
       <div class="card-title"><span class="card-icon">🏷️</span> إعدادات المحتوى</div>
-      <div class="field"><label class="lbl">رابط التطبيق</label><input type="text" id="cfg-link" value="https://basra-realestate.app"></div>
+      <div class="field"><label class="lbl">رابط الموقع</label><input type="text" id="cfg-link" value="https://basra-realestate.onrender.com"></div>
+      <div class="field"><label class="lbl">رقم واتساب (مع رمز الدولة)</label><input type="text" id="cfg-whatsapp" value="009647719994201" placeholder="009647701234567"></div>
+      <div class="field"><label class="lbl">رابط قناة تيليغرام</label><input type="text" id="cfg-telegram" value="https://t.me/+ug-vsQCLrs0wNjEy"></div>
+      <div class="field"><label class="lbl">رابط مجموعة فيسبوك</label><input type="text" id="cfg-fbgroup" value="https://www.facebook.com/groups/1934617513360529"></div>
       <div class="field"><label class="lbl">توقيع المنشور</label><input type="text" id="cfg-sig" value="دليل عقارات البصرة 🏠"></div>
       <div class="field"><label class="lbl">الهاشتاكات الثابتة (تُضاف لكل منشور)</label><textarea id="cfg-hash" style="min-height:70px">#عقارات_البصرة #دليل_عقارات_البصرة #شقق_البصرة #سوق_العقار_البصرة</textarea></div>
       <button class="btn btn-gold" onclick="saveSettings()">💾 حفظ الإعدادات</button>
@@ -871,9 +874,12 @@ const TEMPLATES = {
 async function generatePost() {
   const type = document.getElementById('post-type').value;
   const detail = document.getElementById('post-detail').value.trim();
-  const appLink = document.getElementById('cfg-link')?.value || 'https://basra-realestate.onrender.com';
-  const sig = document.getElementById('cfg-sig')?.value || 'دليل عقارات البصرة 🏠';
-  const hash = document.getElementById('cfg-hash')?.value || '#عقارات_البصرة';
+  const appLink  = document.getElementById('cfg-link')?.value      || 'https://basra-realestate.onrender.com';
+  const sig      = document.getElementById('cfg-sig')?.value       || 'دليل عقارات البصرة 🏠';
+  const hash     = document.getElementById('cfg-hash')?.value      || '#عقارات_البصرة';
+  const whatsapp = document.getElementById('cfg-whatsapp')?.value  || '009647719994201';
+  const tgLink   = document.getElementById('cfg-telegram')?.value  || 'https://t.me/+ug-vsQCLrs0wNjEy';
+  const fbGroup  = document.getElementById('cfg-fbgroup')?.value   || 'https://www.facebook.com/groups/1934617513360529';
 
   document.getElementById('ai-loader').classList.add('show');
   document.getElementById('gen-box').classList.add('hidden');
@@ -909,12 +915,19 @@ ${detail ? `تفاصيل العقار أو المحتوى: ${detail}` : ''}
 رابط الموقع: ${appLink}
 التوقيع: ${sig}
 
+═══ بيانات التواصل (أضفها في نهاية كل منشور) ═══
+📲 واتساب للتواصل الفوري: https://wa.me/${whatsapp}
+📢 قناة تيليغرام: ${tgLink}
+👥 مجموعة فيسبوك: ${fbGroup}
+🌐 الموقع الرسمي: ${appLink}
+
 ═══ تعليمات الكتابة ═══
 ① السطر الأول: عنوان صادم يوقف التمرير — استخدم رقماً أو سؤالاً أو خبراً مثيراً
 ② الجسم: باللهجة العراقية الدارجة — محتوى عاطفي يلامس ألم حقيقي أو حلم حقيقي للجمهور
 ③ إيموجي قوي في بداية كل سطر تقريباً
 ④ دعوة للتفاعل: اطلب التعليق أو المشاركة أو الإرسال لشخص معين
-⑤ أضف الرابط والتوقيع قبل الهاشتاكات
+⑤ في نهاية المنشور ضع قسم "📞 للتواصل:" وأدرج فيه روابط واتساب وتيليغرام وفيسبوك والموقع بشكل واضح وجذاب
+⑥ أضف التوقيع بعد روابط التواصل
 
 ═══ الهاشتاكات (مهم جداً) ═══
 اختر 20 هاشتاك مدروسة وفعّالة موزعة كالتالي:
@@ -1453,9 +1466,12 @@ function loadAPIKeys() {
 
 function saveSettings() {
   const settings = {
-    appLink: document.getElementById('cfg-link').value || 'https://basra-realestate.onrender.com',
-    sig:     document.getElementById('cfg-sig').value  || 'دليل عقارات البصرة 🏠',
-    hash:    document.getElementById('cfg-hash').value || '#عقارات_البصرة'
+    appLink:   document.getElementById('cfg-link').value      || 'https://basra-realestate.onrender.com',
+    sig:       document.getElementById('cfg-sig').value       || 'دليل عقارات البصرة 🏠',
+    hash:      document.getElementById('cfg-hash').value      || '#عقارات_البصرة',
+    whatsapp:  document.getElementById('cfg-whatsapp').value  || '009647719994201',
+    tgLink:    document.getElementById('cfg-telegram').value  || 'https://t.me/+ug-vsQCLrs0wNjEy',
+    fbGroup:   document.getElementById('cfg-fbgroup').value   || 'https://www.facebook.com/groups/1934617513360529'
   };
   localStorage.setItem('basra_settings', JSON.stringify(settings));
   document.getElementById('settings-notify').style.display = 'block';
@@ -1466,14 +1482,20 @@ function saveSettings() {
 function loadSettings() {
   const saved = localStorage.getItem('basra_settings');
   const defaults = {
-    appLink: 'https://basra-realestate.onrender.com',
-    sig:     'دليل عقارات البصرة 🏠',
-    hash:    '#عقارات_البصرة #دليل_عقارات_البصرة #شقق_البصرة #سوق_العقار_البصرة'
+    appLink:  'https://basra-realestate.onrender.com',
+    sig:      'دليل عقارات البصرة 🏠',
+    hash:     '#عقارات_البصرة #دليل_عقارات_البصرة #شقق_البصرة #سوق_العقار_البصرة',
+    whatsapp: '009647719994201',
+    tgLink:   'https://t.me/+ug-vsQCLrs0wNjEy',
+    fbGroup:  'https://www.facebook.com/groups/1934617513360529'
   };
   const s = saved ? { ...defaults, ...JSON.parse(saved) } : defaults;
-  document.getElementById('cfg-link').value = s.appLink;
-  document.getElementById('cfg-sig').value  = s.sig;
-  document.getElementById('cfg-hash').value = s.hash;
+  document.getElementById('cfg-link').value     = s.appLink;
+  document.getElementById('cfg-sig').value      = s.sig;
+  document.getElementById('cfg-hash').value     = s.hash;
+  document.getElementById('cfg-whatsapp').value = s.whatsapp;
+  document.getElementById('cfg-telegram').value = s.tgLink;
+  document.getElementById('cfg-fbgroup').value  = s.fbGroup;
 }
 
 function showToast(msg) {
