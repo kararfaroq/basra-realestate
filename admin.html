@@ -111,6 +111,9 @@
       <button id="backupNavBtn" onclick="toggleBackupPanel()" class="btn" style="background: rgba(201,168,76,0.12); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); display:none;">
         <i class="ti ti-database-export"></i> النسخ الاحتياطي
       </button>
+      <button id="publisherNavBtn" onclick="window.location.href='publisher.html'" class="btn" style="background: rgba(76,175,125,0.15); color: #4CAF7D; border: 1px solid #4CAF7D; display:none;">
+        <i class="ti ti-rocket"></i> النشر التلقائي
+      </button>
       <button onclick="handleLogout()" class="btn btn-danger">
         <i class="ti ti-logout"></i> خروج
       </button>
@@ -1208,6 +1211,9 @@ function toggleBackupPanel() {
 function showBackupBtn() {
   const btn = document.getElementById('backupNavBtn');
   if (btn) btn.style.display = 'inline-flex';
+  // إظهار زر النشر التلقائي للمدير فقط
+  const pubBtn = document.getElementById('publisherNavBtn');
+  if (pubBtn) pubBtn.style.display = 'inline-flex';
 }
 
 async function createBackup() {
