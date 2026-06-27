@@ -1458,14 +1458,13 @@ function showToast(msg) {
 (function checkAuth() {
   const session = JSON.parse(localStorage.getItem(SESSION_KEY));
   if (!session || session.role !== 'admin') {
-    document.body.style.pointerEvents = 'none';
-    document.body.style.userSelect = 'none';
     const msg = document.createElement('div');
-    msg.style.cssText = 'position:fixed;inset:0;background:#0f1117;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:9999;color:#e8ecf4;font-family:inherit;text-align:center;padding:2rem;pointer-events:all;user-select:auto';
-    msg.innerHTML = '<div style="font-size:48px">🔒</div><div style="font-size:18px;font-weight:700">هذه الصفحة للمدير فقط</div><div style="font-size:13px;color:#5a6070">يرجى تسجيل الدخول أولاً من لوحة الإدارة</div><button onclick="location.href='admin.html'" style="background:#f0a500;color:#1a1200;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px">← الذهاب للوحة الإدارة</button>';
+    msg.style.cssText = 'position:fixed;inset:0;background:#0f1117;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:9999;color:#e8ecf4;font-family:inherit;text-align:center;padding:2rem';
+    msg.innerHTML = '<div style="font-size:48px">🔒</div><div style="font-size:18px;font-weight:700">هذه الصفحة للمدير فقط</div><div style="font-size:13px;color:#5a6070">يرجى تسجيل الدخول أولاً من لوحة الإدارة</div><button onclick="location.href=\'admin.html\'" style="background:#f0a500;color:#1a1200;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px">← الذهاب للوحة الإدارة</button>';
     document.body.appendChild(msg);
     return;
   }
+  // تحديث badge المدير
   const badge = document.getElementById('admin-badge');
   if (badge) badge.textContent = '● ' + (session.username || 'المدير');
 })();
