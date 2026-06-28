@@ -892,6 +892,26 @@ function compressImage(file, maxSize, quality) {
 }
 
 // دالة مساعدة لاستدعاء Supabase REST API
+// حذف ملف من Supabase Storage (صورة أو فيديو)
+async function deleteStorageFile(fileUrl) {
+  if (!fileUrl) return;
+  try {
+    const marker = '/object/public/properties/';
+    const idx = fileUrl.indexOf(marker);
+    if (idx === -1) return;
+    const filePath = fileUrl.slice(idx + marker.length);
+    await fetch(`${SUPABASE_URL}/storage/v1/object/properties/${filePath}`, {
+      method: 'DELETE',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    });
+  } catch(e) {
+    console.warn('فشل حذف الملف من Storage:', e.message);
+  }
+}
+
 async function sbFetch(table, method = 'GET', body = null, filter = '') {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 8000);
@@ -1604,11 +1624,17 @@ async function openPropModal(idx) {
     deleteBtn.onclick = async () => {
       if (!confirm('⚠️ تأكيد حذف هذا العقار نهائياً؟')) return;
       try {
+        // حذف الصورة والفيديو من Storage أولاً
+        await Promise.all([
+          deleteStorageFile(l.image),
+          deleteStorageFile(l.video_url)
+        ]);
+        // ثم حذف السجل من قاعدة البيانات
         await sbFetch('listings', 'DELETE', null, `?id=eq.${l.id}`);
         closePropModal();
         _cachedListings = [];
         renderListings();
-        alert('✅ تم حذف العقار بنجاح');
+        alert('✅ تم حذف العقار وملفاته بنجاح');
       } catch(e) {
         alert('❌ فشل الحذف: ' + e.message);
       }
