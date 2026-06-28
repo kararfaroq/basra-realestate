@@ -406,9 +406,44 @@ async function getDbActiveListings() {
   catch(e) { console.warn('Supabase active listings error:', e); return []; }
 }
 
-// حذف عقار من Supabase
+// حذف ملف من Supabase Storage (صورة أو فيديو)
+async function deleteStorageFile(fileUrl) {
+  if (!fileUrl) return;
+  try {
+    // استخراج مسار الملف من الرابط الكامل
+    // الرابط: https://xxx.supabase.co/storage/v1/object/public/properties/listings/file.jpg
+    const marker = '/object/public/properties/';
+    const idx = fileUrl.indexOf(marker);
+    if (idx === -1) return;
+    const filePath = fileUrl.slice(idx + marker.length); // listings/file.jpg
+    await fetch(`${SUPABASE_URL}/storage/v1/object/properties/${filePath}`, {
+      method: 'DELETE',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    });
+  } catch(e) {
+    console.warn('فشل حذف الملف من Storage:', e.message);
+  }
+}
+
+// حذف عقار من Supabase (مع حذف الصورة والفيديو من Storage)
 async function deleteDbListing(id) {
-  try { await sbFetch('listings', 'DELETE', null, `?id=eq.${id}`); return true; }
+  try {
+    // جلب بيانات العقار أولاً لمعرفة روابط الصورة والفيديو
+    const rows = await sbFetch('listings', 'GET', null, `?id=eq.${id}&select=image,video_url`);
+    if (rows && rows.length > 0) {
+      const { image, video_url } = rows[0];
+      // حذف الصورة والفيديو من Storage قبل حذف السجل
+      await Promise.all([
+        deleteStorageFile(image),
+        deleteStorageFile(video_url)
+      ]);
+    }
+    await sbFetch('listings', 'DELETE', null, `?id=eq.${id}`);
+    return true;
+  }
   catch(e) { console.error('Delete error:', e); return false; }
 }
 
